@@ -1,15 +1,12 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import {
     FileText,
     FileSpreadsheet,
     Image,
     Link as LinkIcon,
-    ArrowLeft,
     Download,
-    FolderOpen
 } from 'lucide-react';
 import { getLibraryResources } from '../lib/store.js';
 import Navbar from '../components/Navbar.jsx';
@@ -59,51 +56,44 @@ export default function LibraryPage() {
                 <meta name="description" content="Books, articles, and videos for the church community." />
             </Helmet>
             <Navbar />
-            <div className="min-h-screen bg-[#fcfcff]">
-                {/* Header / Sub-Navbar */}
-                <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-xl border-b border-black/[0.04]">
-                    <div className="max-w-[1200px] mx-auto px-6 h-16 flex items-center justify-between">
-                        <Link to="/" className="flex items-center gap-2 font-bold tracking-tight font-display text-accent">
-                            <span className="text-xl">✦</span>
-                            <span className="text-[15px] text-church-dark">Digital Library</span>
-                        </Link>
-                        <Link
-                            to="/"
-                            className="text-[10px] font-bold tracking-[0.2em] uppercase text-church-gray hover:text-accent transition-colors flex items-center gap-2 bg-black/[0.03] px-4 py-2 rounded-xl"
-                        >
-                            <ArrowLeft className="w-3 h-3" /> Return Home
-                        </Link>
-                    </div>
-                </nav>
-
-                {/* Hero Section */}
-                <header className="pt-40 pb-20 px-6">
+            <div className="min-h-screen" style={{ background: 'var(--paper)' }}>
+                <header className="pt-32 pb-16 px-6">
                     <div className="max-w-[1200px] mx-auto text-center">
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.8 }}
                         >
-                            <span className="inline-block px-4 py-1.5 rounded-full text-[10px] tracking-[0.3em] uppercase font-bold mb-6 bg-accent/5 text-accent border border-accent/10">
+                            <span
+                                className="inline-block px-4 py-1.5 rounded-full text-[10px] tracking-[0.3em] uppercase font-bold mb-6"
+                                style={{ background: 'var(--brass-soft)', color: 'var(--brass)', border: '1px solid rgba(184, 146, 63, 0.2)' }}
+                            >
                                 Knowledge Base
                             </span>
-                            <h1 className="text-5xl md:text-6xl font-bold text-church-dark font-display tracking-tight mb-6">
-                                Church <span className="text-accent">Library</span>.
+                            <h1
+                                className="font-display tracking-tight mb-6"
+                                style={{ fontSize: 'clamp(2.5rem, 5vw, 4rem)', color: 'var(--ink)', lineHeight: 1.05 }}
+                            >
+                                Church <em style={{ color: 'var(--brass)' }}>Library.</em>
                             </h1>
-                            <p className="text-church-gray text-lg max-w-2xl mx-auto leading-relaxed opacity-70">
+                            <p
+                                className="text-lg max-w-2xl mx-auto leading-relaxed"
+                                style={{ color: 'var(--ink-soft)' }}
+                            >
                                 Access and download official documents, weekly bulletins, newsletters, and discipleship materials.
                             </p>
                         </motion.div>
                     </div>
                 </header>
 
-                {/* Main Content */}
                 <main className="max-w-[1200px] mx-auto px-6 pb-32">
                     {/* Search and Filters */}
-                    <div className="flex flex-col md:flex-row gap-6 mb-16 px-4 py-6 bg-white/50 backdrop-blur-sm rounded-[2.5rem] border border-black/[0.03] shadow-sm">
-                        {/* Search */}
-                        <div className="flex-1 relative group">
-                            <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none text-church-gray/30 group-focus-within:text-accent transition-colors">
+                    <div
+                        className="flex flex-col md:flex-row gap-6 mb-16 px-6 py-6 rounded-2xl"
+                        style={{ background: 'var(--cream-card)', border: '1px solid var(--line)' }}
+                    >
+                        <div className="flex-1 relative">
+                            <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none" style={{ color: 'var(--ink-mute)' }}>
                                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
                             </div>
                             <input
@@ -111,70 +101,89 @@ export default function LibraryPage() {
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
                                 placeholder="Find a document or resource..."
-                                className="w-full h-14 bg-black/[0.02] border border-black/[0.02] rounded-2xl pl-12 pr-6 py-4 text-sm text-church-dark placeholder:text-church-gray/30 focus:ring-4 focus:ring-accent/5 focus:border-accent/10 transition-all outline-none"
+                                className="w-full h-14 rounded-xl pl-12 pr-6 py-4 text-sm outline-none transition-all"
+                                style={{ background: 'var(--paper)', color: 'var(--ink)', border: '1px solid var(--line)' }}
                             />
                         </div>
 
-                        {/* Filter */}
-                        <div className="flex flex-wrap gap-2 overflow-x-auto no-scrollbar py-1">
-                            {categories.map((cat) => (
-                                <button
-                                    key={cat}
-                                    onClick={() => setCategoryFilter(cat)}
-                                    className={`px-6 py-3 rounded-2xl text-[10px] font-bold tracking-widest uppercase transition-all whitespace-nowrap border ${categoryFilter === cat
-                                        ? 'bg-church-dark text-white border-church-dark shadow-xl shadow-black/10'
-                                        : 'bg-white text-church-gray border-black/[0.05] hover:border-accent/20 hover:bg-accent/5'
-                                        }`}
-                                >
-                                    {cat}
-                                </button>
-                            ))}
+                        <div className="flex flex-wrap gap-2 py-1">
+                            {categories.map((cat) => {
+                                const active = categoryFilter === cat;
+                                return (
+                                    <button
+                                        key={cat}
+                                        onClick={() => setCategoryFilter(cat)}
+                                        className="px-5 py-3 rounded-xl text-[10px] font-bold tracking-widest uppercase transition-all whitespace-nowrap"
+                                        style={
+                                            active
+                                                ? { background: 'var(--oxblood)', color: 'var(--paper)', border: '1px solid var(--oxblood)' }
+                                                : { background: 'var(--paper)', color: 'var(--ink-soft)', border: '1px solid var(--line)' }
+                                        }
+                                    >
+                                        {cat}
+                                    </button>
+                                );
+                            })}
                         </div>
                     </div>
 
-                    {/* Results Grid */}
                     {loading ? (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             {[...Array(6)].map((_, i) => (
-                                <div key={i} className="h-64 bg-black/[0.02] rounded-[2.5rem] animate-pulse" />
+                                <div key={i} className="h-56 rounded-2xl animate-pulse" style={{ background: 'var(--paper-2)' }} />
                             ))}
                         </div>
                     ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             <AnimatePresence mode="popLayout">
                                 {filtered.map((item, i) => (
                                     <motion.div
                                         key={item.id}
                                         layout
-                                        initial={{ opacity: 0, scale: 0.9 }}
+                                        initial={{ opacity: 0, scale: 0.95 }}
                                         animate={{ opacity: 1, scale: 1 }}
                                         transition={{ delay: i * 0.05 }}
-                                        className="group bg-white rounded-[2.5rem] p-8 border border-black/[0.03] hover:border-accent/20 hover:shadow-2xl hover:shadow-accent/5 transition-all duration-500 relative flex flex-col justify-between"
+                                        className="rounded-2xl p-7 transition-all duration-300 flex flex-col justify-between"
+                                        style={{ background: 'var(--cream-card)', border: '1px solid var(--line)' }}
                                     >
                                         <div>
-                                            <div className="flex items-start justify-between mb-8">
-                                                <div className="w-14 h-14 rounded-2xl bg-accent/5 flex items-center justify-center p-3.5 shadow-inner border border-accent/5 group-hover:bg-accent group-hover:text-white group-hover:scale-110 transition-all duration-500">
+                                            <div className="flex items-start justify-between mb-6">
+                                                <div
+                                                    className="w-12 h-12 rounded-xl flex items-center justify-center p-3"
+                                                    style={{ background: 'var(--brass-soft)', color: 'var(--brass)', border: '1px solid rgba(184, 146, 63, 0.2)' }}
+                                                >
                                                     {getIcon(item.fileType)}
                                                 </div>
-                                                <span className="px-3 py-1 bg-black/[0.03] rounded-lg text-[9px] font-bold tracking-widest uppercase text-church-gray/60">
+                                                <span
+                                                    className="px-3 py-1 rounded-md text-[9px] font-bold tracking-widest uppercase"
+                                                    style={{ background: 'var(--paper-2)', color: 'var(--ink-soft)' }}
+                                                >
                                                     {item.category}
                                                 </span>
                                             </div>
-                                            <h3 className="text-xl font-bold text-church-dark mb-3 font-display leading-tight group-hover:text-accent transition-colors">{item.title}</h3>
-                                            <p className="text-church-gray text-xs leading-relaxed opacity-60 mb-8 line-clamp-3">
+                                            <h3
+                                                className="text-xl font-bold mb-3 font-display leading-tight"
+                                                style={{ color: 'var(--ink)' }}
+                                            >
+                                                {item.title}
+                                            </h3>
+                                            <p className="text-sm leading-relaxed mb-6 line-clamp-3" style={{ color: 'var(--ink-soft)' }}>
                                                 {item.description || 'No description available for this resource.'}
                                             </p>
                                         </div>
 
-                                        <div className="flex items-center justify-between pt-6 border-t border-black/[0.02]">
-                                            <span className="text-[10px] font-bold text-church-gray/40 tracking-[0.2em] uppercase">{item.fileType} Asset</span>
+                                        <div className="flex items-center justify-between pt-5" style={{ borderTop: '1px solid var(--line-soft)' }}>
+                                            <span className="text-[10px] font-bold tracking-[0.2em] uppercase" style={{ color: 'var(--ink-mute)' }}>
+                                                {item.fileType} Asset
+                                            </span>
                                             <a
                                                 href={item.fileUrl}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                className="inline-flex items-center gap-2 text-[10px] font-bold text-accent uppercase tracking-widest hover:translate-x-1 transition-transform"
+                                                className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest transition-transform hover:translate-x-1"
+                                                style={{ color: 'var(--oxblood)' }}
                                             >
-                                                Download Now
+                                                Download
                                                 <Download className="w-3 h-3" />
                                             </a>
                                         </div>
@@ -184,36 +193,38 @@ export default function LibraryPage() {
                         </div>
                     )}
 
-                    {/* Empty State */}
                     {!loading && filtered.length === 0 && (
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            className="text-center py-40 bg-white rounded-[3rem] border border-dashed border-black/[0.08]"
-                        >
-                            <FolderOpen className="w-16 h-16 mx-auto mb-6 text-church-gray/20" />
-                            <h3 className="text-2xl font-bold text-church-dark font-display mb-2">No Matching Resources</h3>
-                            <p className="text-church-gray opacity-60 max-w-sm mx-auto mb-10">Try adjusting your search or category filters to find what you&apos;re looking for.</p>
-                            <button onClick={() => { setSearch(''); setCategoryFilter('All'); }} className="text-accent font-bold text-xs tracking-widest uppercase border-b-2 border-accent/20 hover:border-accent transition-all pb-1">Reset Filters</button>
-                        </motion.div>
+                        <div className="empty-state">
+                            <div className="empty-state__ornament">✚</div>
+                            <h3 className="empty-state__title">No matching resources</h3>
+                            <p className="empty-state__copy">
+                                Try adjusting your search or category filter. Bulletins, newsletters, and discipleship materials will appear here as the office uploads them.
+                            </p>
+                            <button
+                                onClick={() => { setSearch(''); setCategoryFilter('All'); }}
+                                className="btn btn--link mt-6"
+                            >
+                                Reset filters
+                            </button>
+                        </div>
                     )}
                 </main>
 
-                {/* Bottom Section */}
-                <section className="bg-church-dark py-24 px-6 overflow-hidden relative">
-                    <div className="max-w-[1200px] mx-auto text-center relative z-10">
-                        <h2 className="text-4xl font-bold text-white font-display tracking-tight mb-8">Can&apos;t find what you need?</h2>
-                        <p className="text-white/40 mb-12 max-w-lg mx-auto leading-relaxed">
+                {/* Bottom contact section */}
+                <section className="py-20 px-6" style={{ background: 'var(--dark-bg)' }}>
+                    <div className="max-w-[1200px] mx-auto text-center">
+                        <h2 className="font-display tracking-tight mb-6" style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', color: 'var(--paper)' }}>
+                            Can&apos;t find what you need?
+                        </h2>
+                        <p className="mb-10 max-w-lg mx-auto leading-relaxed" style={{ color: 'rgba(251, 244, 220, 0.7)' }}>
                             If you are looking for a specific document that isn&apos;t listed here, please contact the General Assembly office.
                         </p>
-                        <a href="mailto:info@pcphilippines.org" className="inline-flex h-14 px-10 items-center justify-center bg-accent text-white font-bold text-[11px] tracking-[0.2em] uppercase rounded-2xl shadow-2xl shadow-accent/20 hover:bg-accent/90 transition-all">
+                        <a
+                            href="mailto:info@pcphilippines.org"
+                            className="btn btn--on-dark btn--primary"
+                        >
                             Contact Secretariat
                         </a>
-                    </div>
-                    {/* Background Decor */}
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full">
-                        <div className="absolute top-0 right-[10%] w-[500px] h-[500px] bg-accent/10 rounded-full blur-[120px]" />
-                        <div className="absolute bottom-0 left-[10%] w-[400px] h-[400px] bg-blue-600/10 rounded-full blur-[100px]" />
                     </div>
                 </section>
             </div>

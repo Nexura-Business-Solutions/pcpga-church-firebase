@@ -170,9 +170,15 @@ export default function ChurchesPage() {
                                 )}
 
                                 {!loading && filtered.length === 0 && (
-                                    <div className="text-center py-20 bg-white rounded-[2rem] border border-black/[0.02]">
-                                        <p className="text-church-gray font-bold font-display">No Results Found</p>
-                                        <button onClick={() => { setSearch(''); setRegionFilter(''); }} className="mt-4 text-accent text-xs font-bold underline">Clear filters</button>
+                                    <div className="empty-state">
+                                        <div className="empty-state__ornament">✚</div>
+                                        <h3 className="empty-state__title">No churches match</h3>
+                                        <p className="empty-state__copy">
+                                            Try a different region or clear your filter — over a hundred congregations are gathered here.
+                                        </p>
+                                        <button onClick={() => { setSearch(''); setRegionFilter(''); }} className="btn btn--link mt-6">
+                                            Clear filters
+                                        </button>
                                     </div>
                                 )}
                             </div>

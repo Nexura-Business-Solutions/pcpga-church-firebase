@@ -7,6 +7,7 @@ import ChurchesPage from './pages/ChurchesPage.jsx';
 import DonationPage from './pages/DonationPage.jsx';
 import DonationSuccessPage from './pages/DonationSuccessPage.jsx';
 import LoginPage from './pages/LoginPage.jsx';
+import NotFoundPage from './pages/NotFoundPage.jsx';
 
 const AdminDashboard = lazy(() => import('./admin/AdminDashboard.jsx'));
 const AdminHero = lazy(() => import('./admin/AdminHero.jsx'));
@@ -53,6 +54,8 @@ export default function App() {
       <Route path="/admin/donations" element={adminRoute(AdminDonations)} />
       <Route path="/admin/donations/donors" element={adminRoute(AdminDonors)} />
       <Route path="/admin/content" element={adminRoute(AdminContent)} />
+
+      <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );
 }

@@ -3,53 +3,55 @@
 @tailwind utilities;
 
 /* ============================================================
-   PCPGA — Quiet Reverence
+   PCPGA — Sacred Heritage
    Editorial design system (Fraunces + Inter + JetBrains Mono)
-   Palette: ink / paper / brass, set against warm cream.
+   Palette: ink (umber) / paper (ivory) / brass (gold) / oxblood.
    ============================================================ */
 
 :root {
-  /* Editorial direct colors */
-  --ink: #1a2744;
-  --ink-soft: #3c4a66;
-  --ink-mute: #7a849a;
-  --paper: #f5f0e6;
-  --paper-2: #ede6d6;
-  --paper-3: #e4dcc9;
-  --line: rgba(26, 39, 68, 0.14);
-  --line-soft: rgba(26, 39, 68, 0.08);
-  --brass: #a67c3a;
-  --brass-soft: rgba(166, 124, 58, 0.12);
-  --cream-card: #fffdf7;
-  --dark-bg: #161e30;
+  /* Editorial direct colors — Sacred Heritage (antique tones) */
+  --ink: #2c1810;                 /* umber — dark foreground */
+  --ink-soft: #5a3a28;
+  --ink-mute: #8c7565;
+  --paper: #fbf4dc;               /* aged ivory — main background */
+  --paper-2: #f4ebd3;
+  --paper-3: #e8deb8;
+  --line: rgba(44, 24, 16, 0.14);
+  --line-soft: rgba(44, 24, 16, 0.08);
+  --brass: #b8923f;               /* antique gold — italic / link accent */
+  --brass-soft: rgba(184, 146, 63, 0.12);
+  --oxblood: #8b1f24;             /* primary brand red — CTAs + seal */
+  --oxblood-soft: rgba(139, 31, 36, 0.12);
+  --cream-card: #fefcf2;
+  --dark-bg: #1a0e08;             /* deepest umber for inverted sections */
 
   /* HSL shims — so existing Tailwind tokens (text-accent, bg-church-dark, etc.)
      render in the editorial palette without touching every component.
      Admin pages get their own --admin-* tokens below. */
-  --bg: 40 33% 93%;               /* paper */
-  --text: 220 44% 19%;            /* ink */
-  --text-secondary: 220 17% 35%;  /* ink-soft */
+  --bg: 42 76% 92%;               /* paper (aged ivory) */
+  --text: 17 47% 13%;             /* ink (umber) */
+  --text-secondary: 18 40% 26%;   /* ink-soft */
 
-  --accent: 32 49% 44%;           /* brass */
-  --accent-soft: 32 49% 90%;
-  --violet: 32 49% 44%;           /* map to brass — keeps "italic accent" consistent */
-  --violet-soft: 32 49% 92%;
-  --coral: 4 55% 50%;             /* status dot */
-  --gold: 32 55% 55%;
-  --teal: 220 44% 19%;
+  --accent: 40 49% 49%;           /* brass (antique gold) */
+  --accent-soft: 40 50% 88%;
+  --violet: 40 49% 49%;           /* map to antique gold — keeps "italic accent" consistent */
+  --violet-soft: 40 49% 90%;
+  --coral: 358 64% 33%;           /* oxblood — status / primary accent */
+  --gold: 40 50% 50%;
+  --teal: 17 47% 13%;
 
-  --surface: 40 28% 89%;
-  --glass-bg: 40 33% 95% / 0.85;
-  --glass-border: 220 44% 19% / 0.08;
+  --surface: 42 50% 90%;
+  --glass-bg: 42 76% 92% / 0.85;
+  --glass-border: 17 47% 13% / 0.08;
 
-  /* Admin Semantic Tokens (Light) — unchanged, admin pages rely on these */
-  --admin-bg: 221 30% 98%;
-  --admin-sidebar: 221 39% 11%;
-  --admin-sidebar-text: 0 0% 100%;
-  --admin-surface: 0 0% 100%;
-  --admin-border: 221 39% 11% / 0.08;
-  --admin-text: 221 39% 11%;
-  --admin-text-dim: 221 20% 45%;
+  /* Admin Semantic Tokens — light Sacred Heritage. Easy on the eyes, warm tones. */
+  --admin-bg: 42 76% 95%;                /* warm ivory bg */
+  --admin-sidebar: 42 50% 90%;           /* cream sidebar (light, not dark) */
+  --admin-sidebar-text: 17 47% 13%;      /* umber text on cream sidebar */
+  --admin-surface: 42 80% 98%;           /* near-ivory card */
+  --admin-border: 17 47% 13% / 0.1;
+  --admin-text: 17 47% 13%;              /* umber */
+  --admin-text-dim: 18 40% 32%;          /* umber-soft */
 
   /* Font + layout tokens */
   --font-serif: var(--font-fraunces), 'Fraunces', 'Adobe Caslon Pro', ui-serif, Georgia, serif;
@@ -61,22 +63,23 @@
   --section-y: clamp(5rem, 10vw, 9rem);
 }
 
+/* Dark mode kept for completeness, but light is the canonical PCP admin theme.
+   When dark is toggled, use warm umber tones (not cool navy) so it stays on-brand. */
 [data-theme='dark'] {
-  --bg: 221 32% 14%;
-  --text: 221 20% 98%;
-  --text-secondary: 221 15% 78%;
-  --surface: 221 26% 18%;
-  --glass-bg: 221 32% 14% / 0.82;
-  --glass-border: 255 255 255% / 0.14;
+  --bg: 17 47% 13%;
+  --text: 42 76% 95%;
+  --text-secondary: 42 50% 78%;
+  --surface: 17 40% 18%;
+  --glass-bg: 17 47% 13% / 0.82;
+  --glass-border: 42 76% 95% / 0.14;
 
-  /* Admin dark mode — brighter so the console stays legible */
-  --admin-bg: 221 30% 16%;
-  --admin-sidebar: 221 39% 12%;
-  --admin-sidebar-text: 0 0% 100%;
-  --admin-surface: 221 24% 22%;
-  --admin-border: 255 255 255% / 0.12;
-  --admin-text: 221 20% 98%;
-  --admin-text-dim: 221 15% 78%;
+  --admin-bg: 17 47% 13%;
+  --admin-sidebar: 17 50% 10%;
+  --admin-sidebar-text: 42 76% 95%;
+  --admin-surface: 17 40% 18%;
+  --admin-border: 42 76% 95% / 0.12;
+  --admin-text: 42 76% 95%;
+  --admin-text-dim: 42 50% 78%;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -93,6 +96,20 @@ body {
   font-family: var(--font-sans-var);
   line-height: 1.5;
   overflow-x: hidden;
+  position: relative;
+}
+
+/* Subtle vellum grain — adds tactile heritage feel without affecting readability. */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.05;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.17 0 0 0 0 0.09 0 0 0 0 0.06 0 0 0 0.9 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 260px 260px;
 }
 
 img { max-width: 100%; display: block; }
@@ -148,7 +165,7 @@ em.font-display,
   color: var(--brass);
   margin-bottom: 1.25rem;
 }
-.kicker.on-dark { color: #d4b77a; }
+.kicker.on-dark { color: #cca54f; }
 .on-dark { color: var(--paper); }
 
 /* ── Section head ── */
@@ -162,11 +179,11 @@ em.font-display,
   color: var(--ink-soft);
   max-width: 32rem;
 }
-.section-head--on-dark .kicker { color: #d4b77a; }
+.section-head--on-dark .kicker { color: #cca54f; }
 .section-head--on-dark .display-h2,
 .section-head--on-dark .display-h1,
 .section-head--on-dark .display-h3 { color: var(--paper); }
-.section-head--on-dark .section-head__lede { color: rgba(245, 240, 230, 0.82); }
+.section-head--on-dark .section-head__lede { color: rgba(251, 244, 220, 0.88); }
 @media (max-width: 720px) {
   .section-head--split { grid-template-columns: 1fr; }
 }
@@ -188,12 +205,12 @@ em.font-display,
   transition: all 0.25s ease;
   cursor: pointer;
 }
-.btn--primary { background: var(--ink); color: var(--paper); }
-.btn--primary:hover { background: #0e1a36; }
+.btn--primary { background: var(--oxblood); color: var(--paper); border-color: var(--oxblood); }
+.btn--primary:hover { background: #6b1719; border-color: #6b1719; }
 .btn--ghost { border-color: var(--line); color: var(--ink); }
 .btn--ghost:hover { background: var(--paper-2); border-color: var(--ink); }
 .btn--on-dark.btn--primary { background: var(--brass); color: #fff; border-color: var(--brass); }
-.btn--on-dark.btn--primary:hover { background: #8e6830; border-color: #8e6830; }
+.btn--on-dark.btn--primary:hover { background: #967530; border-color: #967530; }
 .btn--on-dark.btn--ghost { border-color: rgba(255,255,255,0.3); color: var(--paper); }
 .btn--on-dark.btn--ghost:hover { background: rgba(255,255,255,0.08); border-color: #fff; }
 .btn--small { padding: 0.6rem 1.1rem; font-size: 13px; }
@@ -279,7 +296,7 @@ em.font-display,
 .nav:not(.nav--scrolled) .nav__sub { color: rgba(245,240,230,0.6); }
 .nav:not(.nav--scrolled) .nav__link:hover { color: #fff; }
 .nav:not(.nav--scrolled) .nav__burger span { background: var(--paper); }
-.nav:not(.nav--scrolled) .nav__link--active::after { background: #d4b77a; }
+.nav:not(.nav--scrolled) .nav__link--active::after { background: #cca54f; }
 
 @media (max-width: 880px) {
   .nav__links, .nav__actions { display: none; }
@@ -320,7 +337,7 @@ em.font-display,
   position: relative;
   min-height: 100vh;
   padding: 0;
-  background: #0a0f1e;
+  background: #150807;
   color: var(--paper);
   overflow: hidden;
   display: flex;
@@ -333,19 +350,28 @@ em.font-display,
   width: 100%; height: 100%;
   object-fit: cover;
   object-position: center 40%;
-  filter: grayscale(0.35) contrast(1.05) brightness(0.85);
+  /* Warm aged-archive tone — desaturate, sepia warmth, slight contrast lift */
+  filter: sepia(0.18) saturate(0.85) contrast(1.06) brightness(0.82) hue-rotate(-6deg);
+}
+
+/* Apply the same warm aged tone to any content photo marked with .photo-archive.
+   Sections that render imagery (Invitation, Donation, Churches placeholder)
+   can opt in via this class. */
+.photo-archive,
+.photo-archive img {
+  filter: sepia(0.12) saturate(0.92) contrast(1.04) hue-rotate(-4deg);
 }
 .hero-ed__bg-veil {
   position: absolute; inset: 0;
   background:
     linear-gradient(180deg,
-      rgba(10, 15, 30, 0.55) 0%,
-      rgba(10, 15, 30, 0.35) 35%,
-      rgba(10, 15, 30, 0.50) 65%,
-      rgba(10, 15, 30, 0.85) 100%),
+      rgba(26, 14, 8, 0.55) 0%,
+      rgba(26, 14, 8, 0.35) 35%,
+      rgba(26, 14, 8, 0.50) 65%,
+      rgba(26, 14, 8, 0.88) 100%),
     radial-gradient(ellipse at center,
-      rgba(10, 15, 30, 0) 30%,
-      rgba(10, 15, 30, 0.45) 100%);
+      rgba(26, 14, 8, 0) 30%,
+      rgba(26, 14, 8, 0.45) 100%);
 }
 .hero-ed__bg-grain {
   position: absolute; inset: 0;
@@ -390,7 +416,7 @@ em.font-display,
   font-family: var(--font-serif);
   font-style: italic;
   font-size: 0.9rem;
-  color: rgba(245, 240, 230, 0.72);
+  color: rgba(251, 244, 220, 0.78);
   margin-bottom: 2.25rem;
   font-variation-settings: 'opsz' 14, 'SOFT' 80;
 }
@@ -404,7 +430,7 @@ em.font-display,
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: #d4b77a;
+  color: #cca54f;
   backdrop-filter: blur(8px);
   background: rgba(10, 15, 30, 0.25);
 }
@@ -425,7 +451,7 @@ em.font-display,
 .hero-ed__line1 { }
 .hero-ed__line2 {
   font-style: italic;
-  color: #e8c987;
+  color: #d8b561;
   font-variation-settings: 'opsz' 144, 'SOFT' 100;
   font-size: 1.15em;
   margin: 0.02em 0;
@@ -438,7 +464,7 @@ em.font-display,
   justify-content: center;
   gap: 0.8rem;
   margin: 2.5rem 0 2rem;
-  color: #d4b77a;
+  color: #cca54f;
 }
 .hero-ed__ornament .line {
   width: 60px;
@@ -447,7 +473,7 @@ em.font-display,
 }
 .hero-ed__ornament .diamond {
   font-size: 0.7rem;
-  color: #d4b77a;
+  color: #cca54f;
 }
 
 .hero-ed__scripture {
@@ -462,7 +488,7 @@ em.font-display,
 }
 .hero-ed__scripture em {
   font-style: italic;
-  color: #e8c987;
+  color: #d8b561;
   font-variation-settings: 'opsz' 72, 'SOFT' 100;
 }
 .hero-ed__scripture-cite {
@@ -498,7 +524,7 @@ em.font-display,
   color: var(--ink);
   border-color: var(--paper);
 }
-.hero-ed__actions .btn--primary:hover { background: #fffdf7; }
+.hero-ed__actions .btn--primary:hover { background: #fefcf2; }
 
 .hero-ed__status {
   display: inline-flex;
@@ -534,7 +560,7 @@ em.font-display,
   font-family: var(--font-serif);
   font-style: italic;
   font-size: 0.95rem;
-  color: #e8c987;
+  color: #d8b561;
   letter-spacing: 0;
   font-variation-settings: 'opsz' 14, 'SOFT' 100;
 }
@@ -574,7 +600,7 @@ em.font-display,
 }
 .hero-ed__meta dd em {
   font-style: italic;
-  color: #e8c987;
+  color: #d8b561;
   font-variation-settings: 'opsz' 14, 'SOFT' 100;
 }
 @media (max-width: 720px) {
@@ -595,7 +621,7 @@ em.font-display,
   font-weight: 600;
   letter-spacing: 0.32em;
   text-transform: uppercase;
-  color: rgba(245, 240, 230, 0.72);
+  color: rgba(251, 244, 220, 0.78);
   margin-bottom: 2.25rem;
 }
 .hero-simple__title {
@@ -609,14 +635,14 @@ em.font-display,
   margin: 0 auto 2.5rem;
   font-size: clamp(1.05rem, 1.3vw, 1.15rem);
   line-height: 1.6;
-  color: rgba(245, 240, 230, 0.82);
+  color: rgba(251, 244, 220, 0.88);
 }
 .hero--simple .hero-ed__actions { margin-bottom: 2.5rem; }
 .hero-simple__times {
   font-family: var(--font-serif);
   font-style: italic;
   font-size: 0.95rem;
-  color: rgba(245, 240, 230, 0.65);
+  color: rgba(251, 244, 220, 0.7);
   font-variation-settings: 'opsz' 14, 'SOFT' 100;
 }
 
@@ -1012,6 +1038,9 @@ em.font-display,
   width: 100%; height: 100%;
   object-fit: cover;
 }
+.sermon__media img {
+  filter: sepia(0.12) saturate(0.92) contrast(1.04) hue-rotate(-4deg);
+}
 .sermon__play {
   position: absolute;
   left: 50%; top: 50%;
@@ -1161,7 +1190,7 @@ em.font-display,
 }
 .give__inner { max-width: 44rem; margin: 0 auto; }
 .give__inner .display-h2 { color: var(--paper); margin-bottom: 0.5rem; }
-.give__inner .display-h2 em { color: #d4b77a; }
+.give__inner .display-h2 em { color: #cca54f; }
 .give__cite {
   font-family: var(--font-serif);
   font-style: italic;
@@ -1262,7 +1291,7 @@ em.font-display,
   color: rgba(245, 240, 230, 0.75);
   text-align: center;
 }
-.give-form__contact a { color: #e8c987; border-bottom: 1px solid currentColor; }
+.give-form__contact a { color: #d8b561; border-bottom: 1px solid currentColor; }
 @media (max-width: 560px) {
   .give-form__amounts { grid-template-columns: repeat(2, 1fr); }
   .give-form__qrs { flex-direction: column; align-items: center; }
@@ -1286,11 +1315,11 @@ em.font-display,
 .invitation__media img {
   width: 100%; height: 100%;
   object-fit: cover;
-  filter: grayscale(0.15) contrast(1.05);
+  filter: sepia(0.2) saturate(0.85) contrast(1.05) brightness(0.86) hue-rotate(-6deg);
 }
 .invitation__veil {
   position: absolute; inset: 0;
-  background: linear-gradient(180deg, rgba(10, 15, 31, 0.85) 0%, rgba(10, 15, 31, 0.75) 50%, rgba(10, 15, 31, 0.92) 100%);
+  background: linear-gradient(180deg, rgba(26, 14, 8, 0.85) 0%, rgba(26, 14, 8, 0.72) 50%, rgba(26, 14, 8, 0.92) 100%);
 }
 .invitation__content {
   position: relative; z-index: 2;
@@ -1306,7 +1335,7 @@ em.font-display,
   background: rgba(245, 240, 230, 0.05);
 }
 .invitation__content .display-h1 { color: var(--paper); }
-.invitation__content .display-h1 em { color: #d4b77a; }
+.invitation__content .display-h1 em { color: #cca54f; }
 .invitation__lede {
   font-size: clamp(1.05rem, 1.6vw, 1.25rem);
   line-height: 1.6;
@@ -1539,7 +1568,7 @@ em.font-display,
   color: rgba(245,240,230,0.8);
 }
 .foot__cols a { transition: color 0.2s; }
-.foot__cols a:hover { color: #d4b77a; }
+.foot__cols a:hover { color: #cca54f; }
 
 .foot__solas {
   max-width: var(--max); margin: 2.5rem auto 0;
@@ -1624,7 +1653,7 @@ em.font-display,
   line-height: 1.15;
   color: var(--paper);
 }
-.announce__title em { color: #d4b77a; font-style: italic; }
+.announce__title em { color: #cca54f; font-style: italic; }
 .announce__media {
   margin: 1.25rem 0;
   aspect-ratio: 16/9;
@@ -1840,6 +1869,12 @@ em.font-display,
   background-size: 200px 200px;
 }
 
+.section-divider {
+  padding: clamp(2.5rem, 5vw, 4rem) clamp(1.5rem, 5vw, 3rem);
+  background: var(--paper);
+}
+.section-divider--on-dark { background: var(--dark-bg); }
+
 .divider-ornament {
   display: flex; align-items: center; justify-content: center;
   gap: 1.5rem; margin: 0 auto;
@@ -1857,7 +1892,7 @@ em.font-display,
   font-size: 1.05rem;
   color: var(--brass);
   background: var(--brass-soft);
-  border: 1px solid rgba(166, 124, 58, 0.3);
+  border: 1px solid rgba(184, 146, 63, 0.32);
   border-radius: 999px;
   transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
 }
@@ -1867,7 +1902,7 @@ em.font-display,
   background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.28) 50%, transparent);
 }
 .divider-ornament.on-dark > span {
-  color: #d4b77a;
+  color: #cca54f;
   background: rgba(255, 255, 255, 0.08);
   border-color: rgba(255, 255, 255, 0.22);
 }
@@ -2012,4 +2047,294 @@ a, button {
     animation: none !important;
     transform: none !important;
   }
+}
+
+/* ============================================================
+   LOGIN PAGE — Sacred Heritage (light, easy on the eyes)
+   ============================================================ */
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1.5rem;
+  background: var(--paper);
+  position: relative;
+  overflow: hidden;
+}
+.login-page::before {
+  content: '';
+  position: absolute;
+  top: -20%;
+  left: -10%;
+  width: 60%;
+  height: 60%;
+  background: radial-gradient(circle, var(--brass-soft) 0%, transparent 60%);
+  pointer-events: none;
+}
+.login-page::after {
+  content: '';
+  position: absolute;
+  bottom: -20%;
+  right: -10%;
+  width: 50%;
+  height: 50%;
+  background: radial-gradient(circle, var(--oxblood-soft) 0%, transparent 60%);
+  pointer-events: none;
+}
+.login-page__shell {
+  position: relative;
+  width: 100%;
+  max-width: 440px;
+}
+.login-page__brand {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+.login-page__mark {
+  display: block;
+  font-size: 1.75rem;
+  color: var(--brass);
+  margin-bottom: 0.5rem;
+}
+.login-page__title {
+  font-family: var(--font-serif);
+  font-size: 2rem;
+  color: var(--ink);
+  letter-spacing: -0.02em;
+  margin: 0 0 0.5rem;
+}
+.login-page__eyebrow {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--brass);
+  margin: 0;
+}
+.login-page__card {
+  background: var(--cream-card);
+  border: 1px solid var(--line);
+  border-radius: 1.25rem;
+  padding: 2.5rem;
+  box-shadow:
+    0 1px 3px rgba(44, 24, 16, 0.04),
+    0 12px 40px rgba(44, 24, 16, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+.login-page__label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.login-page__input {
+  font-family: var(--font-sans-var);
+  font-size: 0.95rem;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--ink);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 0.75rem;
+  padding: 0.85rem 1rem;
+  outline: none;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+.login-page__input::placeholder { color: var(--ink-mute); }
+.login-page__input:focus {
+  border-color: var(--brass);
+  box-shadow: 0 0 0 4px var(--brass-soft);
+}
+.login-page__error {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--oxblood);
+  margin: 0;
+}
+.login-page__error-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--oxblood);
+}
+.login-page__submit {
+  height: 3.25rem;
+  font-size: 11px;
+  letter-spacing: 0.24em;
+  margin-top: 0.5rem;
+}
+.login-page__spinner-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.login-page__spinner {
+  width: 1rem;
+  height: 1rem;
+  animation: spin 1s linear infinite;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+.login-page__reset {
+  font-family: var(--font-sans-var);
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+  background: none;
+  border: 0;
+  cursor: pointer;
+  padding: 0.25rem;
+  transition: color 0.18s ease;
+}
+.login-page__reset:hover { color: var(--oxblood); }
+.login-page__footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+.login-page__small {
+  font-size: 10px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  margin: 0;
+}
+.login-page__exit {
+  font-size: 11px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  font-weight: 600;
+  transition: color 0.18s ease;
+}
+.login-page__exit:hover { color: var(--oxblood); }
+
+/* ============================================================
+   SCROLLBAR + SELECTION — Sacred Heritage flourishes
+   ============================================================ */
+::selection {
+  background: var(--oxblood);
+  color: var(--paper);
+}
+::-moz-selection {
+  background: var(--oxblood);
+  color: var(--paper);
+}
+/* Custom scrollbar (WebKit) */
+::-webkit-scrollbar { width: 12px; height: 12px; }
+::-webkit-scrollbar-track { background: var(--paper-2); }
+::-webkit-scrollbar-thumb {
+  background: var(--brass);
+  border: 3px solid var(--paper-2);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover { background: #967530; }
+/* Firefox */
+html { scrollbar-color: var(--brass) var(--paper-2); scrollbar-width: thin; }
+
+/* ============================================================
+   EMPTY STATES — ornament + serif copy
+   ============================================================ */
+.empty-state {
+  text-align: center;
+  padding: clamp(3rem, 6vw, 5rem) 1.5rem;
+  max-width: 32rem;
+  margin: 0 auto;
+}
+.empty-state__ornament {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 999px;
+  border: 1px solid rgba(184, 146, 63, 0.32);
+  background: var(--brass-soft);
+  color: var(--brass);
+  font-family: var(--font-serif);
+  margin-bottom: 1.25rem;
+}
+.empty-state__title {
+  font-family: var(--font-serif);
+  font-size: 1.5rem;
+  color: var(--ink);
+  margin: 0 0 0.5rem;
+}
+.empty-state__copy {
+  font-family: var(--font-serif);
+  font-style: italic;
+  color: var(--ink-soft);
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* ============================================================
+   NOT FOUND (404) — Sacred Heritage
+   ============================================================ */
+.not-found {
+  min-height: calc(100vh - 5rem);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6rem 1.5rem 5rem;
+  background: var(--paper);
+}
+.not-found__inner {
+  max-width: 38rem;
+  text-align: center;
+}
+.not-found__mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 999px;
+  border: 1px solid rgba(184, 146, 63, 0.32);
+  background: var(--brass-soft);
+  color: var(--brass);
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+.not-found__eyebrow {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--brass);
+  margin: 0 0 1.25rem;
+}
+.not-found__title {
+  font-family: var(--font-serif);
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  line-height: 1.05;
+  color: var(--ink);
+  margin: 0 0 1.5rem;
+  letter-spacing: -0.015em;
+}
+.not-found__title em { color: var(--brass); }
+.not-found__copy {
+  font-family: var(--font-serif);
+  font-size: 1.05rem;
+  color: var(--ink-soft);
+  line-height: 1.7;
+  margin: 0 0 2.5rem;
+}
+.not-found__actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
 }

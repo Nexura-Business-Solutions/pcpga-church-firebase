@@ -13,6 +13,7 @@ import Invitation from '../components/Invitation.jsx';
 import Footer from '../components/Footer.jsx';
 import AnnouncementModal from '../components/AnnouncementModal.jsx';
 import ChatbotWidget from '../components/ChatbotWidget.jsx';
+import SectionDivider from '../components/SectionDivider.jsx';
 import { Helmet } from 'react-helmet-async';
 
 export default function HomePage() {
@@ -29,10 +30,13 @@ export default function HomePage() {
         <Hero />
         <StatsStrip />
         <MessageSection />
+        <SectionDivider />
         <SermonHighlight />
         <MissionVision />
+        <SectionDivider />
         <Committees />
         <Presbyteries />
+        <SectionDivider />
         <Resources />
         <Donation />
         <Invitation />
