@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { getChurches, initStore } from '../lib/store.js';
+import { getChurches } from '../lib/store.js';
 import { regions } from '../lib/seed-data.js';
 import { Skeleton } from '../components/Skeleton.jsx';
 import Navbar from '../components/Navbar.jsx';
@@ -16,7 +16,6 @@ export default function ChurchesPage() {
     const [regionFilter, setRegionFilter] = useState('');
     const [selected, setSelected] = useState(null);
     const [viewMode, setViewMode] = useState('list'); // 'list' or 'map'
-    const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
         const fetchChurches = async () => {
@@ -193,7 +192,6 @@ export default function ChurchesPage() {
                                 <iframe
                                     width="100%"
                                     height="100%"
-                                    frameBorder="0"
                                     style={{ border: 0, filter: 'grayscale(0.2) contrast(1.1)' }}
                                     src={selected
                                         ? `https://maps.google.com/maps?q=${encodeURIComponent(selected.address + ' ' + selected.name)}&t=&z=16&ie=UTF8&iwloc=&output=embed`

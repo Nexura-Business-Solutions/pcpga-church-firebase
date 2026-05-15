@@ -7,11 +7,9 @@ import {
     FileSpreadsheet,
     Image,
     Link as LinkIcon,
-    Search,
     ArrowLeft,
     Download,
-    FolderOpen,
-    Sparkles
+    FolderOpen
 } from 'lucide-react';
 import { getLibraryResources } from '../lib/store.js';
 import Navbar from '../components/Navbar.jsx';
