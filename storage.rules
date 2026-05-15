@@ -1,8 +1,14 @@
 rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
-    match /{allPaths=**} {
-      allow read, write: if false;
+    function isAdmin() {
+      return request.auth != null
+        && firestore.exists(/databases/(default)/documents/admins/$(request.auth.uid));
     }
+
+    match /sermons/{file=**}  { allow read: if true; allow write: if isAdmin(); }
+    match /hero/{file=**}     { allow read: if true; allow write: if isAdmin(); }
+    match /churches/{file=**} { allow read: if true; allow write: if isAdmin(); }
+    match /library/{file=**}  { allow read: if true; allow write: if isAdmin(); }
   }
 }
