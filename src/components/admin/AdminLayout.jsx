@@ -12,7 +12,6 @@ import {
     Moon,
     Globe,
     LogOut,
-    Search,
 } from 'lucide-react';
 import { logout, useAuth } from '../../lib/auth.js';
 import { initStore } from '../../lib/store.js';
