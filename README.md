@@ -1,16 +1,44 @@
-# React + Vite
+# PCPGA Church Website (Firebase)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Vite + React + Firebase replacement for the original Next.js + Vercel + NeonDB site
+(`Nexura-Business-Solutions/pcpga-church-website`).
 
-Currently, two official plugins are available:
+Live: https://pcpga-church-prod.web.app
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Local development
 
-## React Compiler
+```bash
+npm install
+npm run dev          # http://localhost:5173
+```
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Tests
 
-## Expanding the ESLint configuration
+```bash
+npm test                     # frontend tests (Vitest)
+cd functions && npm test     # Cloud Functions tests (Vitest)
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Lint
+
+```bash
+npm run lint
+```
+
+## Deploy
+
+```bash
+firebase deploy --only hosting,firestore,storage    # frontend + rules
+firebase deploy --only functions                    # Cloud Functions (requires Xendit secrets)
+firebase deploy                                     # everything
+```
+
+The deploy account is currently `slowdee59@gmail.com` (Nexura). Firebase project is `pcpga-church-prod` (asia-southeast1).
+
+## Architecture
+
+See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
+
+## Handoff (adding admins, etc.)
+
+See [`docs/HANDOFF.md`](docs/HANDOFF.md).

@@ -37,22 +37,38 @@ export default function GuidedTour({ steps, onComplete, isActive }) {
         }
     }, [isActive, steps, currentStep]);
 
-    const animate = useCallback(() => {
-        updateRect();
-        requestRef.current = requestAnimationFrame(animate);
-    }, [updateRect]);
+    const next = useCallback(() => {
+        setCurrentStep((s) => {
+            if (s < steps.length - 1) return s + 1;
+            onComplete();
+            return s;
+        });
+    }, [steps.length, onComplete]);
+
+    const prev = useCallback(() => {
+        setCurrentStep((s) => (s > 0 ? s - 1 : s));
+    }, []);
+
+    useEffect(() => {
+        if (isActive) return;
+        // eslint-disable-next-line react-hooks/set-state-in-effect -- reset tour position when deactivated
+        setCurrentStep(0);
+    }, [isActive]);
 
     useEffect(() => {
         const checkMobile = () => setIsMobile(window.innerWidth < 768);
         checkMobile();
 
         if (!isActive) {
-            setCurrentStep(0);
             document.body.style.overflow = 'unset';
             return;
         }
 
         document.body.style.overflow = 'hidden';
+        const animate = () => {
+            updateRect();
+            requestRef.current = requestAnimationFrame(animate);
+        };
         requestRef.current = requestAnimationFrame(animate);
 
         window.addEventListener('resize', checkMobile);
@@ -69,7 +85,7 @@ export default function GuidedTour({ steps, onComplete, isActive }) {
             window.removeEventListener('resize', checkMobile);
             window.removeEventListener('keydown', handleKeyDown);
         };
-    }, [isActive, animate, onComplete]);
+    }, [isActive, updateRect, onComplete, next, prev]);
 
     // Independent scroll effect to avoid interrupting the animation loop
     useEffect(() => {
@@ -81,18 +97,6 @@ export default function GuidedTour({ steps, onComplete, isActive }) {
     }, [isActive, currentStep, steps]);
 
     if (!isActive || !steps[currentStep]) return null;
-
-    const next = () => {
-        if (currentStep < steps.length - 1) {
-            setCurrentStep(currentStep + 1);
-        } else {
-            onComplete();
-        }
-    };
-
-    const prev = () => {
-        if (currentStep > 0) setCurrentStep(currentStep - 1);
-    };
 
     const calculatePosition = () => {
         if (!rect) return { placement: 'bottom' };
@@ -117,7 +121,7 @@ export default function GuidedTour({ steps, onComplete, isActive }) {
         const spaceAbove = rect.top;
 
         let style = { width: tooltipW };
-        let placement = 'bottom';
+        let placement;
 
         const needsFlipping = spaceBelow < (estimatedTooltipH + footerSafety);
         const canFlipToTop = spaceAbove > (estimatedTooltipH + spacing);

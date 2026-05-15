@@ -188,7 +188,7 @@ export default function AdminChurches() {
                                                     try {
                                                         // Parse Name: Extract from /place/NAME/
                                                         let name = '';
-                                                        const placeMatch = link.match(/\/place\/([^\/]+)/);
+                                                        const placeMatch = link.match(/\/place\/([^/]+)/);
                                                         if (placeMatch) {
                                                             name = decodeURIComponent(placeMatch[1].replace(/\+/g, ' '));
                                                         }

@@ -32,13 +32,13 @@ export default function AdminLayout({ children }) {
     const location = useLocation();
     const pathname = location.pathname;
     const [sidebarOpen, setSidebarOpen] = useState(false);
-    const [theme, setTheme] = useState('light');
+    const [theme, setTheme] = useState(() => {
+        if (typeof window === 'undefined') return 'light';
+        return localStorage.getItem('pcp-admin-theme') || 'light';
+    });
 
     useEffect(() => {
         initStore();
-        // Theme Persistence — default to light so the console is easy to read
-        const savedTheme = (typeof window !== 'undefined' && localStorage.getItem('pcp-admin-theme')) || 'light';
-        setTheme(savedTheme);
     }, []);
 
     const toggleTheme = () => {

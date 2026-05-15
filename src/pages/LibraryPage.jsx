@@ -21,19 +21,14 @@ export default function LibraryPage() {
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState('');
     const [categoryFilter, setCategoryFilter] = useState('All');
-    const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
-        setMounted(true);
-        const fetchResources = async () => {
+        (async () => {
             const data = await getLibraryResources();
             setResources(data);
             setLoading(false);
-        };
-        fetchResources();
+        })();
     }, []);
-
-    if (!mounted) return <div className="min-h-screen bg-[#fcfcff]" />;
 
     const categories = ['All', ...new Set(resources.map(r => r.category))];
 

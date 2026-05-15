@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import AdminRoute from './components/AdminRoute.jsx';
 import HomePage from './pages/HomePage.jsx';
@@ -6,14 +7,33 @@ import ChurchesPage from './pages/ChurchesPage.jsx';
 import DonationPage from './pages/DonationPage.jsx';
 import DonationSuccessPage from './pages/DonationSuccessPage.jsx';
 import LoginPage from './pages/LoginPage.jsx';
-import AdminDashboard from './admin/AdminDashboard.jsx';
-import AdminHero from './admin/AdminHero.jsx';
-import AdminSermons from './admin/AdminSermons.jsx';
-import AdminLibrary from './admin/AdminLibrary.jsx';
-import AdminChurches from './admin/AdminChurches.jsx';
-import AdminDonations from './admin/AdminDonations.jsx';
-import AdminDonors from './admin/AdminDonors.jsx';
-import AdminContent from './admin/AdminContent.jsx';
+
+const AdminDashboard = lazy(() => import('./admin/AdminDashboard.jsx'));
+const AdminHero = lazy(() => import('./admin/AdminHero.jsx'));
+const AdminSermons = lazy(() => import('./admin/AdminSermons.jsx'));
+const AdminLibrary = lazy(() => import('./admin/AdminLibrary.jsx'));
+const AdminChurches = lazy(() => import('./admin/AdminChurches.jsx'));
+const AdminDonations = lazy(() => import('./admin/AdminDonations.jsx'));
+const AdminDonors = lazy(() => import('./admin/AdminDonors.jsx'));
+const AdminContent = lazy(() => import('./admin/AdminContent.jsx'));
+
+function AdminFallback() {
+  return (
+    <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--ink-mute, #888)' }}>
+      Loading…
+    </div>
+  );
+}
+
+function adminRoute(Component) {
+  return (
+    <AdminRoute>
+      <Suspense fallback={<AdminFallback />}>
+        <Component />
+      </Suspense>
+    </AdminRoute>
+  );
+}
 
 export default function App() {
   return (
@@ -25,14 +45,14 @@ export default function App() {
       <Route path="/donation/success" element={<DonationSuccessPage />} />
       <Route path="/login" element={<LoginPage />} />
 
-      <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
-      <Route path="/admin/hero" element={<AdminRoute><AdminHero /></AdminRoute>} />
-      <Route path="/admin/sermons" element={<AdminRoute><AdminSermons /></AdminRoute>} />
-      <Route path="/admin/library" element={<AdminRoute><AdminLibrary /></AdminRoute>} />
-      <Route path="/admin/churches" element={<AdminRoute><AdminChurches /></AdminRoute>} />
-      <Route path="/admin/donations" element={<AdminRoute><AdminDonations /></AdminRoute>} />
-      <Route path="/admin/donations/donors" element={<AdminRoute><AdminDonors /></AdminRoute>} />
-      <Route path="/admin/content" element={<AdminRoute><AdminContent /></AdminRoute>} />
+      <Route path="/admin" element={adminRoute(AdminDashboard)} />
+      <Route path="/admin/hero" element={adminRoute(AdminHero)} />
+      <Route path="/admin/sermons" element={adminRoute(AdminSermons)} />
+      <Route path="/admin/library" element={adminRoute(AdminLibrary)} />
+      <Route path="/admin/churches" element={adminRoute(AdminChurches)} />
+      <Route path="/admin/donations" element={adminRoute(AdminDonations)} />
+      <Route path="/admin/donations/donors" element={adminRoute(AdminDonors)} />
+      <Route path="/admin/content" element={adminRoute(AdminContent)} />
     </Routes>
   );
 }

@@ -9,6 +9,20 @@ const TYPE_KICKER = {
     urgent: 'Urgent',
 };
 
+const SEEN_KEY = 'pcpga_seen_announcements';
+
+function readSeenList() {
+    const raw = localStorage.getItem(SEEN_KEY);
+    if (!raw) return [];
+    try {
+        const parsed = JSON.parse(raw);
+        return Array.isArray(parsed) ? parsed : [];
+    } catch {
+        localStorage.removeItem(SEEN_KEY);
+        return [];
+    }
+}
+
 export default function AnnouncementModal() {
     const [announcement, setAnnouncement] = useState(null);
     const [isOpen, setIsOpen] = useState(false);
@@ -17,10 +31,7 @@ export default function AnnouncementModal() {
         (async () => {
             const data = await getSettings('announcement');
             if (data && data.isActive) {
-                const seenStr = localStorage.getItem('pcpga_seen_announcements');
-                let seenList = [];
-                try { seenList = seenStr ? JSON.parse(seenStr) : []; } catch {}
-
+                const seenList = readSeenList();
                 const id = [data.title, data.message, data.mediaUrl, data.updatedAt].filter(Boolean).join('|');
                 if (!seenList.includes(id)) {
                     setAnnouncement({ ...data, id });
@@ -33,12 +44,10 @@ export default function AnnouncementModal() {
     const handleClose = () => {
         setIsOpen(false);
         if (!announcement?.id) return;
-        const seenStr = localStorage.getItem('pcpga_seen_announcements');
-        let seenList = [];
-        try { seenList = seenStr ? JSON.parse(seenStr) : []; } catch {}
+        const seenList = readSeenList();
         seenList.push(announcement.id);
         if (seenList.length > 10) seenList.shift();
-        localStorage.setItem('pcpga_seen_announcements', JSON.stringify(seenList));
+        localStorage.setItem(SEEN_KEY, JSON.stringify(seenList));
     };
 
     if (!announcement) return null;

@@ -4,7 +4,7 @@ import { getSermons } from '../lib/store.js';
 
 function getYouTubeId(url) {
     if (!url) return null;
-    const re = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    const re = /^.*(youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
     const m = url.match(re);
     return m && m[2].length === 11 ? m[2] : null;
 }
@@ -23,7 +23,10 @@ export default function SermonHighlight() {
         })();
     }, []);
 
-    useEffect(() => { setPlaying(false); }, [active]);
+    const selectSermon = (i) => {
+        setActive(i);
+        setPlaying(false);
+    };
 
     if (loading) {
         return (
@@ -113,7 +116,7 @@ export default function SermonHighlight() {
                                 <button
                                     key={s.id || i}
                                     className={`sermon__row ${active === i ? 'is-active' : ''}`}
-                                    onClick={() => setActive(i)}
+                                    onClick={() => selectSermon(i)}
                                 >
                                     <span className="date">{formatShortDate(s.date) || `No. ${i + 1}`}</span>
                                     <span className="title">{s.title || 'Untitled'}</span>
