@@ -21,7 +21,7 @@ import { uploadFile } from '../../src/lib/storage.js';
 describe('uploadFile', () => {
   it('resolves with downloadURL on success, calls onProgress on update', async () => {
     const onProgress = vi.fn();
-    uploadTaskMock.on.mockImplementation((evt, onProg, onErr, onComplete) => {
+    uploadTaskMock.on.mockImplementation((_evt, onProg, _onErr, onComplete) => {
       onProg({ bytesTransferred: 50, totalBytes: 100 });
       onComplete();
     });
@@ -33,7 +33,7 @@ describe('uploadFile', () => {
   });
 
   it('rejects when upload fires error', async () => {
-    uploadTaskMock.on.mockImplementation((evt, onProg, onErr) => {
+    uploadTaskMock.on.mockImplementation((_evt, _onProg, onErr) => {
       onErr(new Error('boom'));
     });
     await expect(uploadFile('x', new Blob(['hi']))).rejects.toThrow('boom');
