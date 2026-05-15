@@ -2,9 +2,9 @@
 // through our Firebase libs (firestore.js + storage.js). Components in this
 // repo import these functions exactly like the Next.js source did.
 import {
-  listSermons, getSermon, createSermon, updateSermon as fsUpdateSermon, deleteSermon as fsDeleteSermon,
-  listLibrary, getLibraryItem, createLibraryItem, updateLibraryItem, deleteLibraryItem,
-  listChurches, getChurch, createChurch, updateChurch as fsUpdateChurch, deleteChurch as fsDeleteChurch,
+  listSermons, createSermon, updateSermon as fsUpdateSermon, deleteSermon as fsDeleteSermon,
+  listLibrary, createLibraryItem, updateLibraryItem, deleteLibraryItem,
+  listChurches, createChurch, updateChurch as fsUpdateChurch, deleteChurch as fsDeleteChurch,
   getSetting, setSetting,
 } from './firestore.js';
 import { defaultPresbyteries } from './seed-data.js';
