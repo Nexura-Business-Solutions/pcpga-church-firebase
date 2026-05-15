@@ -83,7 +83,6 @@ function SuccessContent() {
     };
 
     const status = donation?.status;
-    const isPaid = status === 'PAID';
     const isFailed = status === 'EXPIRED' || status === 'FAILED';
     const isPending = !donation || status === 'PENDING';
 
