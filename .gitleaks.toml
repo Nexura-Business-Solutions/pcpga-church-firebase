@@ -1,0 +1,20 @@
+# DLV / Nexura gitleaks config — extends defaults, allowlists known-public values only.
+title = "DLV gitleaks config"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Known-public, non-secret values (Firebase web config + public firebase-tools CLI secret)"
+# Exact public firebase-tools CLI client secret (shipped in the open-source npm package)
+regexes = [
+  '''j9iVZfS8kkCEFUPaAeJV0sAi''',
+]
+# Firebase WEB apiKey is public by design; allow ONLY in firebase config files,
+# so real Google keys elsewhere are still caught.
+paths = [
+  '''(.*/)?firebase\.js$''',
+  '''(.*/)?firebase/config\.js$''',
+  '''(.*/)?src/lib/firebase\.js$''',
+  '''(.*/)?firebaseConfig\.(js|ts)$''',
+]
