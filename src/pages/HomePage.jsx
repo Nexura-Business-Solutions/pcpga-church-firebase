@@ -219,13 +219,24 @@ export default function HomePage() {
   useEffect(() => {
     let active = true;
     (async () => {
-      const keys = ['hero', 'site-identity', 'mission-vision', 'core-principles', 'invitation-stats', 'announcement'];
-      const [hero, identity, mv, msg, stats, ann] = await Promise.all(keys.map((k) => getSettings(k)));
-      if (active) setCms({ hero: hero || {}, identity: identity || {}, mv: mv || {}, msg: msg || {}, stats: stats || {}, ann: ann || {} });
+      const keys = ['hero', 'site-identity', 'mission-vision', 'core-principles', 'invitation-stats', 'announcement', 'standing-committees'];
+      const [hero, identity, mv, msg, stats, ann, committees] = await Promise.all(keys.map((k) => getSettings(k)));
+      if (active) setCms({
+        hero: hero || {}, identity: identity || {}, mv: mv || {}, msg: msg || {},
+        stats: stats || {}, ann: ann || {}, committees: Array.isArray(committees) ? committees : [],
+      });
     })();
     return () => { active = false; };
   }, []);
   const hero = cms.hero || {};
+  // Normalize committees (editor stores `details`; landing modal reads `duties`).
+  const committees = (cms.committees?.length ? cms.committees : COMMITTEES).map((c) => ({
+    name: c.name,
+    sub: c.sub || '',
+    description: c.description || '',
+    duties: c.duties || c.details || [],
+    officers: c.officers || [],
+  }));
 
   // body class management
   useEffect(() => {
@@ -457,8 +468,8 @@ export default function HomePage() {
           <a href="#" className="nav__brand">
             <img src="/pcpga_logo.png" alt="" className="nav__logo" />
             <div className="nav__brand-text">
-              <span className="nav__name">Presbyterian Church</span>
-              <span className="nav__sub">of the Philippines</span>
+              <span className="nav__name">{cms.identity?.name || 'Presbyterian Church'}</span>
+              <span className="nav__sub">{cms.identity?.sub || 'of the Philippines'}</span>
             </div>
           </a>
           <nav className="nav__links">
@@ -556,13 +567,28 @@ export default function HomePage() {
       {/* STATS */}
       <section className="stats" aria-label="At a glance">
         <div className="stats__grid">
-          {STATS.map((s, i) => (
-            <StatItem
-              key={s.label}
-              stat={s}
-              refSetter={(el) => { countRefs.current[i] = el; }}
-            />
-          ))}
+          {(() => {
+            const ROMANS = ['I.', 'II.', 'III.', 'IV.', 'V.', 'VI.'];
+            const list = cms.stats?.stats?.length
+              ? cms.stats.stats.map((s, i) => {
+                  const m = String(s.value ?? '').match(/^(\d+)(.*)$/);
+                  return {
+                    roman: ROMANS[i] || `${i + 1}.`,
+                    target: m ? Number(m[1]) : (Number(s.value) || 0),
+                    suffix: m ? m[2].trim() : '',
+                    label: s.label,
+                    note: s.note || STATS[i]?.note || '',
+                  };
+                })
+              : STATS;
+            return list.map((s, i) => (
+              <StatItem
+                key={s.label || i}
+                stat={s}
+                refSetter={(el) => { countRefs.current[i] = el; }}
+              />
+            ));
+          })()}
         </div>
       </section>
 
@@ -631,20 +657,20 @@ export default function HomePage() {
           </aside>
           <div className="editorial__body reveal">
             <h2 className="editorial__title">
-              We are a church built on the <em>old foundation</em> — Christ, the Scriptures, and the fellowship of the saints.
+              {cms.msg?.title || <>We are a church built on the <em>old foundation</em> — Christ, the Scriptures, and the fellowship of the saints.</>}
             </h2>
             <p className="editorial__para has-drop-cap">
-              For over a century, the Gospel has travelled through these islands — from the seaside chapels of the Ilocos coast to the mountain parishes of the Cordillera, and into the neighborhoods of Metro Manila. Our congregations are ordinary and small; the God we worship is not. We gather weekly around the preached Word and the Lord’s Table, believing that grace still reaches the ordinary sinner through ordinary means.
+              {cms.msg?.paragraphs?.[0] || 'For over a century, the Gospel has travelled through these islands — from the seaside chapels of the Ilocos coast to the mountain parishes of the Cordillera, and into the neighborhoods of Metro Manila. Our congregations are ordinary and small; the God we worship is not. We gather weekly around the preached Word and the Lord’s Table, believing that grace still reaches the ordinary sinner through ordinary means.'}
             </p>
             <blockquote className="pull-quote">
-              Grace still reaches the ordinary sinner through ordinary means — the preached Word, the Sacraments, the prayers of the saints.
+              {cms.msg?.pullQuote || 'Grace still reaches the ordinary sinner through ordinary means — the preached Word, the Sacraments, the prayers of the saints.'}
             </blockquote>
             <p className="editorial__para">
-              Whether you are new to the faith, returning after many years away, or simply visiting for a season — you will find a seat here, a Bible opened, and a community that believes the Gospel is good news for you today.
+              {cms.msg?.paragraphs?.[1] || 'Whether you are new to the faith, returning after many years away, or simply visiting for a season — you will find a seat here, a Bible opened, and a community that believes the Gospel is good news for you today.'}
             </p>
             <div className="signature">
-              <em>Rev. Dr. Eduardo T. Reyes</em>
-              <span>Moderator · 32nd General Assembly</span>
+              <em>{cms.msg?.signer || 'Rev. Dr. Eduardo T. Reyes'}</em>
+              <span>{cms.msg?.role || 'Moderator · 32nd General Assembly'}</span>
             </div>
           </div>
           <aside className="marginalia reveal">
@@ -782,7 +808,7 @@ export default function HomePage() {
           <div className="mv__motto reveal">
             <span className="kicker kicker--brass">The Denominational Motto</span>
             <p className="mv__motto-text">
-              “To glorify God <em>and to enjoy Him forever.</em>”
+              {cms.mv?.motto ? `“${cms.mv.motto}”` : <>“To glorify God <em>and to enjoy Him forever.</em>”</>}
             </p>
             <div className="sdg-seal reveal reveal--scale">
               <span className="sdg-seal__diamond">✦</span>
@@ -797,27 +823,34 @@ export default function HomePage() {
               <span className="kicker">Our Calling</span>
               <h2 className="display display--lg">Five tasks,<br /><em>one Lord.</em></h2>
               <p className="lede">
-                As a Reformed and Presbyterian denomination under the authority of Scripture and the Lordship of Jesus Christ, we are called to:
+                {cms.mv?.summary || 'As a Reformed and Presbyterian denomination under the authority of Scripture and the Lordship of Jesus Christ, we are called to:'}
               </p>
               <p className="mv__pillars-tag">Established in grace · moving in faith.</p>
             </div>
 
             <ol className="pillars-list">
-              {[
-                { n: 'I.', h: 'Go,', em: 'make disciples.', p: 'Nurture believers to maturity through Word, Sacrament and prayer.' },
-                { n: 'II.', h: 'Advance', em: 'the mission.', p: 'Proclaim the gospel of grace locally and globally, in mercy and justice.' },
-                { n: 'III.', h: 'Grow', em: 'the church.', p: 'Plant, strengthen, and revitalize confessional Presbyterian congregations.' },
-                { n: 'IV.', h: 'Develop', em: 'leaders.', p: 'Train faithful pastors, elders and deacons for worship, service and witness.' },
-                { n: 'V.', h: 'Uphold', em: 'the Reformed faith.', p: 'Preserve the confessional heritage and promote unity among Reformed bodies.' },
-              ].map((p) => (
-                <li key={p.n} className="reveal">
-                  <span className="num">{p.n}</span>
-                  <div>
-                    <h4>{p.h} <em>{p.em}</em></h4>
-                    <p>{p.p}</p>
-                  </div>
-                </li>
-              ))}
+              {(() => {
+                const ROMANS = ['I.', 'II.', 'III.', 'IV.', 'V.', 'VI.', 'VII.', 'VIII.', 'IX.', 'X.'];
+                const HARD = [
+                  { h: 'Go,', em: 'make disciples.', p: 'Nurture believers to maturity through Word, Sacrament and prayer.' },
+                  { h: 'Advance', em: 'the mission.', p: 'Proclaim the gospel of grace locally and globally, in mercy and justice.' },
+                  { h: 'Grow', em: 'the church.', p: 'Plant, strengthen, and revitalize confessional Presbyterian congregations.' },
+                  { h: 'Develop', em: 'leaders.', p: 'Train faithful pastors, elders and deacons for worship, service and witness.' },
+                  { h: 'Uphold', em: 'the Reformed faith.', p: 'Preserve the confessional heritage and promote unity among Reformed bodies.' },
+                ];
+                const items = cms.mv?.missionPoints?.length
+                  ? cms.mv.missionPoints.map((m) => ({ title: m.title, p: m.sub }))
+                  : HARD.map((x) => ({ title: <>{x.h} <em>{x.em}</em></>, p: x.p }));
+                return items.map((it, i) => (
+                  <li key={i} className="reveal">
+                    <span className="num">{ROMANS[i] || `${i + 1}.`}</span>
+                    <div>
+                      <h4>{it.title}</h4>
+                      <p>{it.p}</p>
+                    </div>
+                  </li>
+                ));
+              })()}
             </ol>
           </div>
         </div>
@@ -834,7 +867,7 @@ export default function HomePage() {
             </p>
           </div>
           <ul className="committees__list">
-            {COMMITTEES.map((c, i) => {
+            {committees.map((c, i) => {
               const romans = ['I.', 'II.', 'III.', 'IV.', 'V.', 'VI.', 'VII.', 'VIII.', 'IX.'];
               return (
                 <li key={c.name}>
@@ -1078,12 +1111,12 @@ export default function HomePage() {
               <div className="foot__brand">
                 <img src="/pcpga_logo.png" alt="" className="foot__logo" />
                 <div>
-                  <div className="foot__name">Presbyterian Church of the Philippines</div>
+                  <div className="foot__name">{cms.identity?.name ? `${cms.identity.name}${cms.identity.sub ? ' ' + cms.identity.sub : ''}` : 'Presbyterian Church of the Philippines'}</div>
                   <div className="foot__sub">General Assembly · Est. MDCCCXCVIII</div>
                 </div>
               </div>
               <p className="foot__desc">
-                Serving the Philippines since 1898 — proclaiming the Gospel, equipping believers, and planting confessional Presbyterian congregations across the nation.
+                {cms.identity?.footerDesc || 'Serving the Philippines since 1898 — proclaiming the Gospel, equipping believers, and planting confessional Presbyterian congregations across the nation.'}
               </p>
             </div>
 
@@ -1110,12 +1143,12 @@ export default function HomePage() {
                 <h5>Contact</h5>
                 <ul>
                   <li>1200 Taft Avenue, Ermita, Manila 1000</li>
-                  <li>info@pcphilippines.org</li>
+                  <li>{cms.identity?.social?.email || 'info@pcphilippines.org'}</li>
                   <li>+63 2 8524 0000</li>
                   <li className="social">
-                    <a href="#">Facebook</a>
-                    <a href="#">YouTube</a>
-                    <a href="#">Instagram</a>
+                    <a href={cms.identity?.social?.facebook || '#'}>Facebook</a>
+                    <a href={cms.identity?.social?.youtube || '#'}>YouTube</a>
+                    <a href={cms.identity?.social?.instagram || '#'}>Instagram</a>
                   </li>
                 </ul>
               </div>
@@ -1152,7 +1185,7 @@ export default function HomePage() {
       >
         <div className="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
           <button className="modal__close" aria-label="Close" type="button" onClick={closeModal}>×</button>
-          {modal && modal.kind === 'committee' && <CommitteeModal data={COMMITTEES[modal.i]} />}
+          {modal && modal.kind === 'committee' && <CommitteeModal data={committees[modal.i]} />}
           {modal && modal.kind === 'presbytery' && <PresbyteryModal data={PRESBYTERIES[modal.i]} />}
         </div>
       </div>

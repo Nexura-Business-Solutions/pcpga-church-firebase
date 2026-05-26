@@ -598,6 +598,17 @@ export default function AdminContent() {
                                             />
                                         </div>
 
+                                        <div>
+                                            <label className="block text-coral text-[10px] tracking-[0.25em] uppercase mb-4 font-bold">Pull Quote</label>
+                                            <textarea
+                                                rows={2}
+                                                value={principles.pullQuote || ''}
+                                                onChange={(e) => setPrinciples({ ...principles, pullQuote: e.target.value })}
+                                                placeholder="A short highlighted line pulled from the message…"
+                                                className="w-full bg-[hsl(var(--admin-bg-alt))] border border-[hsl(var(--admin-text))]/20 rounded-2xl p-5 text-sm italic leading-relaxed focus:ring-2 focus:ring-coral/20 outline-none transition-all resize-none"
+                                            />
+                                        </div>
+
                                         <div className="space-y-6">
                                             <h3 className="text-[10px] font-bold uppercase tracking-widest text-coral border-b border-[hsl(var(--admin-border))] pb-4">Body Paragraphs</h3>
                                             <div className="grid grid-cols-1 gap-4">
@@ -813,6 +824,21 @@ export default function AdminContent() {
                                                                 setCommittees(newComs);
                                                             }}
                                                             className="flex-1 bg-[hsl(var(--admin-bg-alt))] p-4 rounded-2xl text-sm font-bold border border-[hsl(var(--admin-text))]/20 shadow-sm"
+                                                        />
+                                                    </div>
+
+                                                    <div className="space-y-4">
+                                                        <label className="text-[9px] font-bold uppercase tracking-widest text-coral ml-1">Short Subtitle</label>
+                                                        <input
+                                                            type="text"
+                                                            value={com.sub || ''}
+                                                            onChange={e => {
+                                                                const newComs = [...committees];
+                                                                newComs[i].sub = e.target.value;
+                                                                setCommittees(newComs);
+                                                            }}
+                                                            placeholder="Acts for the General Assembly between sessions."
+                                                            className="w-full bg-[hsl(var(--admin-bg-alt))] p-4 rounded-2xl text-sm border border-[hsl(var(--admin-text))]/20 shadow-sm font-medium"
                                                         />
                                                     </div>
 

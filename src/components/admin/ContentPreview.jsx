@@ -121,6 +121,9 @@ function Principles({ principles }) {
                         <p key={i} className="text-sm leading-relaxed opacity-75">{p}</p>
                     ))}
                 </div>
+                {principles?.pullQuote && (
+                    <blockquote className="my-6 pl-5 border-l-2 text-base italic" style={{ borderColor: '#c9a24a', color: '#6b3f22' }}>{principles.pullQuote}</blockquote>
+                )}
                 <div className="mt-8 pt-6 border-t" style={{ borderColor: 'rgba(0,0,0,0.08)' }}>
                     <p className="italic font-bold" style={{ color: '#6b3f22' }}>{fallback(principles?.signer, 'Signed by…')}</p>
                     <p className="text-[11px] uppercase tracking-[0.25em] opacity-50 mt-1">{fallback(principles?.role, 'Role / title')}</p>
