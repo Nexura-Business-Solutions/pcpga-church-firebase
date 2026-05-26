@@ -139,3 +139,15 @@ export function generateDonorReportPdf(opts = {}) {
     const stamp = new Date().toISOString().slice(0, 10);
     pdf.save(`PCPGA_Donor_Report_${stamp}.pdf`);
 }
+
+// Open the report in a new tab as a real PDF — works as a print preview on
+// both desktop and phone (the device's PDF viewer can then print or share).
+export function previewDonorReportPdf(opts = {}) {
+    const pdf = buildDonorReportPdf(opts);
+    const url = pdf.output('bloburl');
+    const win = window.open(url, '_blank');
+    if (!win) {
+        // Popup blocked — fall back to navigating the current tab.
+        window.location.assign(url);
+    }
+}

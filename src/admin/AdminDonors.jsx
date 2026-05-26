@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { listDonors, listDonations } from '../lib/firestore.js';
-import { generateDonorReportPdf } from '../lib/donorReportPdf.js';
+import { generateDonorReportPdf, previewDonorReportPdf } from '../lib/donorReportPdf.js';
 import AdminLayout from '../components/admin/AdminLayout.jsx';
 
 // Normalize any timestamp shape (Firestore Timestamp, ISO string, millis) → JS Date | null
@@ -143,8 +143,8 @@ export default function AdminDonors() {
         month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit',
     });
 
-    function downloadReport() {
-        generateDonorReportPdf({
+    function reportPayload() {
+        return {
             donors: filteredDonors.map((d) => ({
                 name: d.name,
                 email: d.email,
@@ -154,8 +154,10 @@ export default function AdminDonors() {
             })),
             rangeLabel,
             generatedLabel,
-        });
+        };
     }
+    const downloadReport = () => generateDonorReportPdf(reportPayload());
+    const previewReport = () => previewDonorReportPdf(reportPayload());
 
     const inputCls =
         'h-12 px-4 bg-[hsl(var(--admin-text))]/5 border border-[hsl(var(--admin-border))] rounded-xl text-[11px] font-bold text-[hsl(var(--admin-text))] outline-none focus:border-teal/40 transition-all';
@@ -216,10 +218,17 @@ export default function AdminDonors() {
                         <h1 className="text-4xl font-bold text-[hsl(var(--admin-text))] tracking-tighter font-display mb-3">Donor Database</h1>
                         <p className="text-[hsl(var(--admin-text-dim))] text-[11px] font-bold tracking-[0.3em] uppercase">Historical Stewardship Records</p>
                     </div>
-                    <div className="flex flex-wrap items-center gap-4 no-print">
+                    <div className="flex flex-wrap items-center gap-3 no-print">
+                        <button
+                            onClick={previewReport}
+                            className="h-14 px-7 bg-teal text-white text-[11px] font-bold tracking-[0.2em] uppercase rounded-2xl hover:shadow-2xl hover:shadow-teal/30 active:scale-95 transition-all flex items-center gap-3"
+                        >
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z" /><circle cx="12" cy="12" r="3" /></svg>
+                            Preview / Print
+                        </button>
                         <button
                             onClick={downloadReport}
-                            className="h-14 px-8 bg-[hsl(var(--admin-text))] text-[hsl(var(--admin-bg))] text-[11px] font-bold tracking-[0.2em] uppercase rounded-2xl hover:shadow-2xl hover:shadow-black/20 transition-all flex items-center gap-3"
+                            className="h-14 px-7 bg-[hsl(var(--admin-text))] text-[hsl(var(--admin-bg))] text-[11px] font-bold tracking-[0.2em] uppercase rounded-2xl hover:shadow-2xl hover:shadow-black/20 active:scale-95 transition-all flex items-center gap-3"
                         >
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" /></svg>
                             Download PDF
@@ -248,14 +257,15 @@ export default function AdminDonors() {
                         </div>
 
                         {/* Date range */}
-                        <div className="flex flex-wrap items-center gap-2">
-                            <div className="flex flex-wrap items-center gap-1 p-2 bg-[hsl(var(--admin-text))]/5 rounded-xl border border-[hsl(var(--admin-border))]">
-                                <span className="px-2 text-[10px] font-bold uppercase tracking-widest text-[hsl(var(--admin-text-dim))]/40">Range</span>
+                        <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-2">
+                            <div className="flex items-center gap-1 p-2 bg-[hsl(var(--admin-text))]/5 rounded-xl border border-[hsl(var(--admin-border))]">
+                                <span className="px-2 text-[10px] font-bold uppercase tracking-widest text-[hsl(var(--admin-text-dim))]/50">Range</span>
                                 {PRESETS.map((p) => (
                                     <button
                                         key={p.id}
+                                        type="button"
                                         onClick={() => applyPreset(p.id)}
-                                        className={`px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all ${preset === p.id ? 'bg-teal text-white' : 'text-[hsl(var(--admin-text-dim))]/40 hover:text-[hsl(var(--admin-text))]'}`}
+                                        className={`flex-1 sm:flex-none px-3 py-2 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all active:scale-95 ${preset === p.id ? 'bg-teal text-white shadow-sm' : 'text-[hsl(var(--admin-text-dim))]/70 hover:text-[hsl(var(--admin-text))] hover:bg-[hsl(var(--admin-text))]/5'}`}
                                     >
                                         {p.label}
                                     </button>
@@ -281,9 +291,9 @@ export default function AdminDonors() {
                         </div>
 
                         {/* Sort + count */}
-                        <div className="flex flex-wrap items-center justify-between gap-3">
-                            <div className="flex items-center gap-2 px-2 py-2 bg-[hsl(var(--admin-text))]/5 rounded-xl border border-[hsl(var(--admin-border))]">
-                                <span className="px-2 text-[10px] font-bold uppercase tracking-widest text-[hsl(var(--admin-text-dim))]/40">Sort</span>
+                        <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center justify-between gap-3">
+                            <div className="flex items-center gap-1 p-2 bg-[hsl(var(--admin-text))]/5 rounded-xl border border-[hsl(var(--admin-border))]">
+                                <span className="px-2 text-[10px] font-bold uppercase tracking-widest text-[hsl(var(--admin-text-dim))]/50">Sort</span>
                                 {[
                                     { id: 'total', label: 'Total' },
                                     { id: 'count', label: 'Count' },
@@ -291,14 +301,15 @@ export default function AdminDonors() {
                                 ].map((opt) => (
                                     <button
                                         key={opt.id}
+                                        type="button"
                                         onClick={() => setSortKey(opt.id)}
-                                        className={`px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all ${sortKey === opt.id ? 'bg-teal text-white' : 'text-[hsl(var(--admin-text-dim))]/40 hover:text-[hsl(var(--admin-text))]'}`}
+                                        className={`flex-1 sm:flex-none px-3 py-2 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all active:scale-95 ${sortKey === opt.id ? 'bg-teal text-white shadow-sm' : 'text-[hsl(var(--admin-text-dim))]/70 hover:text-[hsl(var(--admin-text))] hover:bg-[hsl(var(--admin-text))]/5'}`}
                                     >
                                         {opt.label}
                                     </button>
                                 ))}
                             </div>
-                            <div className="flex items-center gap-2 px-4 py-2 bg-teal/5 rounded-xl border border-teal/10">
+                            <div className="flex items-center gap-2 px-4 py-2 bg-teal/5 rounded-xl border border-teal/10 self-start sm:self-auto">
                                 <div className="w-2 h-2 rounded-full bg-teal animate-pulse" />
                                 <span className="text-[10px] font-bold uppercase tracking-widest text-teal">{filteredDonors.length} {rangeActive ? `in ${rangeLabel}` : 'Donors'}</span>
                             </div>
