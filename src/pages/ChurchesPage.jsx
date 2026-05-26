@@ -125,7 +125,7 @@ export default function ChurchesPage() {
                         </div>
 
                         {/* Results List */}
-                        <div className="flex-1 lg:overflow-y-auto custom-scrollbar p-4 lg:p-6 bg-church-light/30 max-h-[60vh] lg:max-h-none">
+                        <div className="flex-1 lg:overflow-y-auto custom-scrollbar p-4 lg:p-6 bg-church-light/30 lg:max-h-none">
                             <div className="mb-4 px-2 flex items-center justify-between">
                                 <h3 className="text-[10px] font-bold text-church-gray/50 tracking-[0.2em] uppercase">
                                     {loading ? 'Scanning MAP...' : `${filtered.length} Congregations Found`}
