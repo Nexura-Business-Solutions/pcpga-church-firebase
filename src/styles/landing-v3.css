@@ -2651,3 +2651,9 @@ body.lp-v3 .hero__bg::after {
 /* In-page sermon video player (YouTube embed fills the media frame) */
 body.lp-v3 .sermon__player { position: absolute; inset: 0; }
 body.lp-v3 .sermon__player iframe { width: 100%; height: 100%; border: 0; display: block; }
+
+/* Lock background scroll while the mobile menu (or a modal) is open. The page
+   scroller is <html>, so lock it via :has() — body overflow alone won't hold. */
+body.lp-v3.mobile-open { overflow: hidden; }
+html:has(body.lp-v3.mobile-open),
+html:has(body.lp-v3.modal-open) { overflow: hidden; }
