@@ -1,4 +1,5 @@
-import { useState, useMemo, useRef, useEffect } from 'react';
+import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import * as Lucide from 'lucide-react';
 
 // Curated, professional icons that suit a church / ministry site (shown first).
@@ -13,25 +14,58 @@ const CURATED = [
     'Crown', 'Award', 'Medal', 'Target', 'Footprints', 'Route', 'Milestone', 'Mountain',
 ];
 
-// Keys that lucide exports but are not renderable icons.
+// Keys lucide exports that are not renderable icons.
 const NOT_ICONS = new Set(['createLucideIcon', 'Icon', 'icons', 'default', 'LucideProvider']);
-
 // PascalCase exports that aren't the `*Icon` aliases or helpers = the icon set.
 const ALL_ICONS = Object.keys(Lucide).filter(
     (k) => /^[A-Z]/.test(k) && !k.endsWith('Icon') && !NOT_ICONS.has(k),
 );
 
+const PANEL_W = 288; // w-72
+
 export default function IconPicker({ value, onChange }) {
     const [open, setOpen] = useState(false);
     const [q, setQ] = useState('');
-    const ref = useRef(null);
+    const [pos, setPos] = useState({ top: 0, left: 0 });
+    const [theme, setTheme] = useState(undefined);
+    const triggerRef = useRef(null);
+    const panelRef = useRef(null);
+
+    const place = useCallback(() => {
+        const el = triggerRef.current;
+        if (!el) return;
+        const r = el.getBoundingClientRect();
+        const margin = 8;
+        let left = r.left;
+        if (left + PANEL_W > window.innerWidth - margin) left = window.innerWidth - PANEL_W - margin;
+        if (left < margin) left = margin;
+        // Prefer below; flip above if not enough room.
+        const belowSpace = window.innerHeight - r.bottom;
+        const top = belowSpace < 320 && r.top > belowSpace ? r.top - 8 - 320 : r.bottom + margin;
+        setPos({ top: Math.max(margin, top), left });
+    }, []);
 
     useEffect(() => {
         if (!open) return;
-        const onClick = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
+        // Mirror the admin theme onto the portal (it renders on document.body,
+        // outside the data-theme wrapper) so the panel matches light/dark.
+        setTheme(triggerRef.current?.closest('[data-theme]')?.getAttribute('data-theme') || undefined);
+        place();
+        const onClick = (e) => {
+            if (triggerRef.current?.contains(e.target)) return;
+            if (panelRef.current?.contains(e.target)) return;
+            setOpen(false);
+        };
+        const onScrollResize = () => place();
         document.addEventListener('mousedown', onClick);
-        return () => document.removeEventListener('mousedown', onClick);
-    }, [open]);
+        window.addEventListener('scroll', onScrollResize, true);
+        window.addEventListener('resize', onScrollResize);
+        return () => {
+            document.removeEventListener('mousedown', onClick);
+            window.removeEventListener('scroll', onScrollResize, true);
+            window.removeEventListener('resize', onScrollResize);
+        };
+    }, [open, place]);
 
     const Current = (value && Lucide[value]) || Lucide.Shapes;
 
@@ -42,8 +76,9 @@ export default function IconPicker({ value, onChange }) {
     }, [q]);
 
     return (
-        <div className="relative" ref={ref}>
+        <>
             <button
+                ref={triggerRef}
                 type="button"
                 onClick={() => setOpen((o) => !o)}
                 title={value || 'Pick an icon'}
@@ -52,8 +87,13 @@ export default function IconPicker({ value, onChange }) {
                 <Current className="w-5 h-5" />
             </button>
 
-            {open && (
-                <div className="absolute z-50 mt-2 left-0 w-72 p-3 rounded-2xl bg-[hsl(var(--admin-surface))] border border-[hsl(var(--admin-border))] shadow-2xl">
+            {open && createPortal(
+                <div
+                    ref={panelRef}
+                    data-theme={theme}
+                    className="fixed z-[9999] w-72 p-3 rounded-2xl bg-[hsl(var(--admin-surface))] border border-[hsl(var(--admin-border))] shadow-2xl"
+                    style={{ top: pos.top, left: pos.left }}
+                >
                     <div className="relative mb-3">
                         <Lucide.Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-[hsl(var(--admin-text-dim))]/40" />
                         <input
@@ -86,8 +126,9 @@ export default function IconPicker({ value, onChange }) {
                             <p className="col-span-6 text-center text-[10px] text-[hsl(var(--admin-text-dim))]/40 py-6">No icons match “{q}”.</p>
                         )}
                     </div>
-                </div>
+                </div>,
+                document.body,
             )}
-        </div>
+        </>
     );
 }
