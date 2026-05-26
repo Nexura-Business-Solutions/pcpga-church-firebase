@@ -1,14 +1,18 @@
 rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
+    // Admins are keyed by lowercased email (admins/{email}), matching
+    // firestore.rules — NOT by uid. Checking uid here denied every upload.
     function isAdmin() {
       return request.auth != null
-        && firestore.exists(/databases/(default)/documents/admins/$(request.auth.uid));
+        && firestore.exists(/databases/(default)/documents/admins/$(request.auth.token.email));
     }
 
     match /sermons/{file=**}  { allow read: if true; allow write: if isAdmin(); }
     match /hero/{file=**}     { allow read: if true; allow write: if isAdmin(); }
     match /churches/{file=**} { allow read: if true; allow write: if isAdmin(); }
     match /library/{file=**}  { allow read: if true; allow write: if isAdmin(); }
+    // Content editor: hero image, GCash/Maya QR, and announcement media.
+    match /content/{file=**}  { allow read: if true; allow write: if isAdmin(); }
   }
 }
