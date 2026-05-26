@@ -60,7 +60,7 @@ export default function AdminDashboard() {
                     <div className="flex items-center gap-4">
                         <button
                             onClick={() => setIsTourActive(true)}
-                            className="px-6 py-3 bg-white border border-[hsl(var(--admin-border))] rounded-2xl text-[10px] font-bold uppercase tracking-widest text-accent hover:bg-accent/5 transition-all shadow-sm flex items-center gap-2"
+                            className="px-6 py-3 bg-[hsl(var(--admin-surface))] border border-[hsl(var(--admin-border))] rounded-2xl text-[10px] font-bold uppercase tracking-widest text-accent hover:bg-accent/5 transition-all shadow-sm flex items-center gap-2"
                         >
                             <Sparkles className="w-3 h-3" /> Guided Tour
                         </button>

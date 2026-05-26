@@ -151,7 +151,7 @@ export default function GuidedTour({ steps, onComplete, isActive }) {
     return (
         <div className="fixed inset-0 z-[1000] pointer-events-none font-sans overflow-hidden">
             <motion.div
-                className="absolute inset-0 bg-church-dark/95 backdrop-blur-[12px] pointer-events-auto"
+                className="absolute inset-0 bg-[hsl(17_47%_10%)]/90 backdrop-blur-[12px] pointer-events-auto"
                 style={{ willChange: 'clip-path' }}
                 initial={{ opacity: 0 }}
                 animate={{
@@ -181,7 +181,7 @@ export default function GuidedTour({ steps, onComplete, isActive }) {
                         transition: { type: 'spring', damping: 25, stiffness: 200 }
                     }}
                     exit={isMobile ? { y: 100, opacity: 0 } : { opacity: 0, scale: 0.9, y: 15 }}
-                    className="absolute bg-white/95 backdrop-blur-3xl p-8 md:p-10 rounded-[3rem] shadow-[0_40px_100px_-20px_rgba(0,0,0,0.8)] pointer-events-auto border border-white w-full max-h-[85vh] overflow-y-auto"
+                    className="absolute bg-[hsl(var(--admin-surface))]/95 backdrop-blur-3xl p-8 md:p-10 rounded-[3rem] shadow-[0_40px_100px_-20px_rgba(0,0,0,0.8)] pointer-events-auto border border-[hsl(var(--admin-border))] w-full max-h-[85vh] overflow-y-auto"
                     style={{
                         top: pos.top,
                         bottom: pos.bottom,
@@ -191,8 +191,8 @@ export default function GuidedTour({ steps, onComplete, isActive }) {
                 >
                     {!isMobile && pos.placement !== 'overlay' && (
                         <div className={`absolute left-1/2 -translate-x-1/2 w-0 h-0 border-x-[16px] border-x-transparent ${pos.placement === 'bottom'
-                            ? 'bottom-full border-b-[16px] border-b-white'
-                            : 'top-full border-t-[16px] border-t-white'
+                            ? 'bottom-full border-b-[16px] border-b-[hsl(var(--admin-surface))]'
+                            : 'top-full border-t-[16px] border-t-[hsl(var(--admin-surface))]'
                             }`} />
                     )}
 
@@ -201,21 +201,21 @@ export default function GuidedTour({ steps, onComplete, isActive }) {
                             {currentStep + 1}
                         </div>
                         <div className="min-w-0 pt-2">
-                            <h4 className="font-black text-church-dark text-2xl md:text-3xl tracking-tighter leading-none mb-2 truncate">{steps[currentStep].title}</h4>
+                            <h4 className="font-black text-[hsl(var(--admin-text))] text-2xl md:text-3xl tracking-tighter leading-none mb-2 truncate">{steps[currentStep].title}</h4>
                             <p className="text-[10px] uppercase font-black tracking-[0.4em] text-accent/50 leading-none">STEP {currentStep + 1} • {steps.length}</p>
                         </div>
                     </div>
 
-                    <p className="text-[16px] md:text-[17px] text-church-gray mb-12 leading-relaxed font-bold opacity-100 antialiased">
+                    <p className="text-[16px] md:text-[17px] text-[hsl(var(--admin-text-dim))] mb-12 leading-relaxed font-bold opacity-100 antialiased">
                         {steps[currentStep].message}
                     </p>
 
-                    <div className="flex items-center justify-between pt-8 border-t border-church-light/90">
+                    <div className="flex items-center justify-between pt-8 border-t border-[hsl(var(--admin-border))]">
                         <div className="flex gap-3">
                             <button
                                 onClick={prev}
                                 disabled={currentStep === 0}
-                                className="px-6 py-4 rounded-2xl text-[10px] font-black uppercase tracking-[0.25em] text-church-gray hover:bg-church-light transition-all disabled:opacity-20"
+                                className="px-6 py-4 rounded-2xl text-[10px] font-black uppercase tracking-[0.25em] text-[hsl(var(--admin-text-dim))] hover:bg-[hsl(var(--admin-text))]/5 transition-all disabled:opacity-20"
                             >
                                 PREV
                             </button>
@@ -228,7 +228,7 @@ export default function GuidedTour({ steps, onComplete, isActive }) {
                         </div>
                         <button
                             onClick={next}
-                            className="px-10 md:px-14 py-5 md:py-6 bg-church-dark text-white rounded-[1.75rem] text-[10px] font-black uppercase tracking-[0.3em] shadow-2xl hover:scale-[1.05] active:scale-[0.98] transition-all bg-gradient-to-br from-church-dark to-black ring-4 ring-black/5"
+                            className="px-10 md:px-14 py-5 md:py-6 bg-accent text-white rounded-[1.75rem] text-[10px] font-black uppercase tracking-[0.3em] shadow-2xl hover:scale-[1.05] active:scale-[0.98] transition-all ring-4 ring-accent/10"
                         >
                             {currentStep === steps.length - 1 ? 'FINISH' : 'NEXT'}
                         </button>

@@ -274,7 +274,7 @@ export default function AdminContent() {
                         <div className="flex gap-4">
                             <button
                                 onClick={() => setIsTourActive(true)}
-                                className="px-6 py-3 bg-white border border-[hsl(var(--admin-border))] rounded-2xl text-[10px] font-bold uppercase tracking-widest text-coral hover:bg-coral/5 transition-all shadow-sm hover:scale-105 active:scale-95 flex items-center gap-2"
+                                className="px-6 py-3 bg-[hsl(var(--admin-bg-alt))] border border-[hsl(var(--admin-border))] rounded-2xl text-[10px] font-bold uppercase tracking-widest text-coral hover:bg-coral/5 transition-all shadow-sm hover:scale-105 active:scale-95 flex items-center gap-2"
                             >
                                 <Sparkles className="w-3 h-3" /> Take a Tour
                             </button>
@@ -292,8 +292,8 @@ export default function AdminContent() {
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id)}
                                 className={`flex items-center gap-3 px-6 py-3 rounded-2xl text-[11px] font-bold uppercase tracking-widest transition-all duration-300 ${activeTab === tab.id
-                                    ? 'bg-white text-coral shadow-lg'
-                                    : 'text-[hsl(var(--admin-text-dim))] hover:bg-white/40 hover:text-coral/70'
+                                    ? 'bg-[hsl(var(--admin-surface))] text-coral shadow-lg'
+                                    : 'text-[hsl(var(--admin-text-dim))] hover:bg-[hsl(var(--admin-surface))]/60 hover:text-coral/70'
                                     }`}
                             >
                                 <tab.icon className="w-4 h-4" />
@@ -311,7 +311,7 @@ export default function AdminContent() {
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0, y: -10 }}
                                 transition={{ duration: 0.3 }}
-                                className="bg-white rounded-[2.5rem] border border-[hsl(var(--admin-border))] p-8 md:p-12 shadow-sm min-h-[600px]"
+                                className="bg-[hsl(var(--admin-surface))] rounded-[2.5rem] border border-[hsl(var(--admin-border))] p-8 md:p-12 shadow-sm min-h-[600px]"
                             >
                                 {/* HERO TAB */}
                                 {activeTab === 'hero' && (
@@ -484,7 +484,7 @@ export default function AdminContent() {
                                                             p[i].icon = e.target.value;
                                                             setMission({ ...mission, missionPoints: p });
                                                         }}
-                                                        className="w-16 h-16 bg-white border-0 rounded-2xl text-2xl flex items-center justify-center text-center focus:ring-2 focus:ring-coral/20"
+                                                        className="w-16 h-16 bg-[hsl(var(--admin-bg-alt))] border-0 rounded-2xl text-2xl flex items-center justify-center text-center focus:ring-2 focus:ring-coral/20"
                                                     />
                                                     <input
                                                         type="text"
@@ -494,7 +494,7 @@ export default function AdminContent() {
                                                             p[i].title = e.target.value;
                                                             setMission({ ...mission, missionPoints: p });
                                                         }}
-                                                        className="flex-1 bg-white border-0 rounded-2xl p-4 text-sm font-bold focus:ring-2 focus:ring-coral/20"
+                                                        className="flex-1 bg-[hsl(var(--admin-bg-alt))] border-0 rounded-2xl p-4 text-sm font-bold focus:ring-2 focus:ring-coral/20"
                                                     />
                                                     <button onClick={() => removeItem(mission.missionPoints, (l) => setMission({ ...mission, missionPoints: l }), i)} className="p-3 text-red-500 hover:bg-red-50 rounded-xl transition-colors">🗑️</button>
                                                 </div>
@@ -506,7 +506,7 @@ export default function AdminContent() {
                                                         p[i].sub = e.target.value;
                                                         setMission({ ...mission, missionPoints: p });
                                                     }}
-                                                    className="w-full bg-white border-0 rounded-2xl p-5 text-sm resize-none focus:ring-2 focus:ring-coral/20 font-medium opacity-70"
+                                                    className="w-full bg-[hsl(var(--admin-bg-alt))] border-0 rounded-2xl p-5 text-sm resize-none focus:ring-2 focus:ring-coral/20 font-medium opacity-70"
                                                 />
                                             </div>
                                         ))}
@@ -535,7 +535,7 @@ export default function AdminContent() {
                                             />
                                         )}
                                         {(Array.isArray(mission.commitments) ? mission.commitments : []).map((item, i) => (
-                                            <div key={i} className="p-8 bg-church-dark rounded-3xl space-y-6 relative overflow-hidden group border border-white/5">
+                                            <div key={i} className="p-8 bg-[hsl(17_47%_13%)] rounded-3xl space-y-6 relative overflow-hidden group border border-white/5">
                                                 <div className="flex items-center gap-4">
                                                     <input
                                                         type="text"
@@ -608,7 +608,7 @@ export default function AdminContent() {
                                                                     pillars[i].icon = e.target.value;
                                                                     setPrinciples({ ...principles, pillars });
                                                                 }}
-                                                                className="w-12 h-12 bg-white rounded-xl text-center text-xl focus:ring-2 focus:ring-coral transition-all border-0 shadow-sm"
+                                                                className="w-12 h-12 bg-[hsl(var(--admin-bg-alt))] rounded-xl text-center text-xl focus:ring-2 focus:ring-coral transition-all border-0 shadow-sm"
                                                             />
                                                             <input
                                                                 type="text"
@@ -618,7 +618,7 @@ export default function AdminContent() {
                                                                     pillars[i].title = e.target.value;
                                                                     setPrinciples({ ...principles, pillars });
                                                                 }}
-                                                                className="flex-1 bg-white p-3 rounded-xl text-sm font-bold focus:ring-2 focus:ring-coral border-0 shadow-sm"
+                                                                className="flex-1 bg-[hsl(var(--admin-bg-alt))] p-3 rounded-xl text-sm font-bold focus:ring-2 focus:ring-coral border-0 shadow-sm"
                                                             />
                                                             <button onClick={() => removeItem(principles.pillars, (l) => setPrinciples({ ...principles, pillars: l }), i)} className="p-3 text-red-500 hover:bg-red-50 rounded-xl transition-colors">🗑️</button>
                                                         </div>
@@ -630,7 +630,7 @@ export default function AdminContent() {
                                                                 pillars[i].desc = e.target.value;
                                                                 setPrinciples({ ...principles, pillars });
                                                             }}
-                                                            className="w-full bg-white p-4 rounded-xl text-sm resize-none focus:ring-2 focus:ring-coral border-0 shadow-sm"
+                                                            className="w-full bg-[hsl(var(--admin-bg-alt))] p-4 rounded-xl text-sm resize-none focus:ring-2 focus:ring-coral border-0 shadow-sm"
                                                         />
                                                     </div>
                                                 ))}
@@ -670,7 +670,7 @@ export default function AdminContent() {
                                                                 quotes[i].text = e.target.value;
                                                                 setPrinciples({ ...principles, quotes });
                                                             }}
-                                                            className="w-full bg-white p-5 rounded-xl text-lg font-display font-medium leading-relaxed focus:ring-2 focus:ring-coral border-0 shadow-sm"
+                                                            className="w-full bg-[hsl(var(--admin-bg-alt))] p-5 rounded-xl text-lg font-display font-medium leading-relaxed focus:ring-2 focus:ring-coral border-0 shadow-sm"
                                                         />
                                                         <div className="flex items-center gap-4">
                                                             <div className="flex-1">
@@ -683,7 +683,7 @@ export default function AdminContent() {
                                                                         quotes[i].highlight = e.target.value;
                                                                         setPrinciples({ ...principles, quotes });
                                                                     }}
-                                                                    className="w-full bg-white p-3 rounded-xl text-xs font-bold focus:ring-2 focus:ring-coral border-0 shadow-sm"
+                                                                    className="w-full bg-[hsl(var(--admin-bg-alt))] p-3 rounded-xl text-xs font-bold focus:ring-2 focus:ring-coral border-0 shadow-sm"
                                                                 />
                                                             </div>
                                                             <div className="flex-1">
@@ -696,7 +696,7 @@ export default function AdminContent() {
                                                                         quotes[i].color = e.target.value;
                                                                         setPrinciples({ ...principles, quotes });
                                                                     }}
-                                                                    className="w-full bg-white p-3 rounded-xl text-xs font-bold focus:ring-2 focus:ring-coral border-0 shadow-sm"
+                                                                    className="w-full bg-[hsl(var(--admin-bg-alt))] p-3 rounded-xl text-xs font-bold focus:ring-2 focus:ring-coral border-0 shadow-sm"
                                                                 />
                                                             </div>
                                                         </div>
@@ -743,7 +743,7 @@ export default function AdminContent() {
                                                                 s[i].value = e.target.value;
                                                                 setStats({ ...stats, stats: s });
                                                             }}
-                                                            className="w-full bg-white p-3 rounded-xl text-xl font-bold text-coral text-center border-0 shadow-sm"
+                                                            className="w-full bg-[hsl(var(--admin-bg-alt))] p-3 rounded-xl text-xl font-bold text-coral text-center border-0 shadow-sm"
                                                         />
                                                         <input
                                                             type="text"
@@ -753,7 +753,7 @@ export default function AdminContent() {
                                                                 s[i].label = e.target.value;
                                                                 setStats({ ...stats, stats: s });
                                                             }}
-                                                            className="w-full bg-white p-2 rounded-xl text-[9px] font-bold uppercase tracking-tighter text-center border-0 shadow-sm"
+                                                            className="w-full bg-[hsl(var(--admin-bg-alt))] p-2 rounded-xl text-[9px] font-bold uppercase tracking-tighter text-center border-0 shadow-sm"
                                                         />
                                                     </div>
                                                 ))}
@@ -812,7 +812,7 @@ export default function AdminContent() {
                                                                     times[i].label = e.target.value;
                                                                     setStats({ ...stats, serviceTimes: times });
                                                                 }}
-                                                                className="w-full bg-white p-2 rounded-xl text-[9px] font-bold uppercase tracking-widest border-0 shadow-sm"
+                                                                className="w-full bg-[hsl(var(--admin-bg-alt))] p-2 rounded-xl text-[9px] font-bold uppercase tracking-widest border-0 shadow-sm"
                                                             />
                                                             <input
                                                                 type="text"
@@ -822,7 +822,7 @@ export default function AdminContent() {
                                                                     times[i].value = e.target.value;
                                                                     setStats({ ...stats, serviceTimes: times });
                                                                 }}
-                                                                className="w-full bg-white p-3 rounded-xl text-xs font-bold border-0 shadow-sm"
+                                                                className="w-full bg-[hsl(var(--admin-bg-alt))] p-3 rounded-xl text-xs font-bold border-0 shadow-sm"
                                                             />
                                                         </div>
                                                     ))}
@@ -866,7 +866,7 @@ export default function AdminContent() {
                                                                 newComs[i].icon = e.target.value;
                                                                 setCommittees(newComs);
                                                             }}
-                                                            className="w-14 h-14 bg-white rounded-2xl text-center text-2xl border-0 shadow-sm"
+                                                            className="w-14 h-14 bg-[hsl(var(--admin-bg-alt))] rounded-2xl text-center text-2xl border-0 shadow-sm"
                                                         />
                                                         <input
                                                             type="text"
@@ -876,7 +876,7 @@ export default function AdminContent() {
                                                                 newComs[i].name = e.target.value;
                                                                 setCommittees(newComs);
                                                             }}
-                                                            className="flex-1 bg-white p-4 rounded-2xl text-sm font-bold border-0 shadow-sm"
+                                                            className="flex-1 bg-[hsl(var(--admin-bg-alt))] p-4 rounded-2xl text-sm font-bold border-0 shadow-sm"
                                                         />
                                                     </div>
 
@@ -890,7 +890,7 @@ export default function AdminContent() {
                                                                 newComs[i].description = e.target.value;
                                                                 setCommittees(newComs);
                                                             }}
-                                                            className="w-full bg-white p-5 rounded-2xl text-sm border-0 shadow-sm resize-none font-medium"
+                                                            className="w-full bg-[hsl(var(--admin-bg-alt))] p-5 rounded-2xl text-sm border-0 shadow-sm resize-none font-medium"
                                                         />
                                                     </div>
 
@@ -918,7 +918,7 @@ export default function AdminContent() {
                                                                                 newComs[i].details[di] = e.target.value;
                                                                                 setCommittees(newComs);
                                                                             }}
-                                                                            className="flex-1 bg-white p-3 rounded-xl text-xs border-0 shadow-sm"
+                                                                            className="flex-1 bg-[hsl(var(--admin-bg-alt))] p-3 rounded-xl text-xs border-0 shadow-sm"
                                                                         />
                                                                         <button
                                                                             onClick={() => {
@@ -947,7 +947,7 @@ export default function AdminContent() {
                                                             </div>
                                                             <div className="space-y-3">
                                                                 {(Array.isArray(com.officers) ? com.officers : []).map((off, oi) => (
-                                                                    <div key={oi} className="p-4 bg-white rounded-2xl shadow-sm border border-[hsl(var(--admin-border))] flex items-center gap-4">
+                                                                    <div key={oi} className="p-4 bg-[hsl(var(--admin-bg-alt))] rounded-2xl shadow-sm border border-[hsl(var(--admin-border))] flex items-center gap-4">
                                                                         <div className="relative w-16 h-16 rounded-full overflow-hidden border-2 border-dashed border-coral/20 shrink-0 group/avatar cursor-pointer">
                                                                             {off.photo ? (
                                                                                 <img src={off.photo} alt={off.name} className="w-full h-full object-cover" />
@@ -1041,22 +1041,22 @@ export default function AdminContent() {
                                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                                 <div className="space-y-1">
                                                                     <label className="text-[9px] font-bold uppercase tracking-widest text-coral ml-1">Presbytery Name</label>
-                                                                    <input type="text" value={p.name} onChange={e => { const updated = [...presbyteries]; updated[idx] = { ...updated[idx], name: e.target.value }; setPresbyteries(updated); }} className="w-full bg-white p-3 rounded-xl text-xs font-bold border-0 shadow-sm" />
+                                                                    <input type="text" value={p.name} onChange={e => { const updated = [...presbyteries]; updated[idx] = { ...updated[idx], name: e.target.value }; setPresbyteries(updated); }} className="w-full bg-[hsl(var(--admin-bg-alt))] p-3 rounded-xl text-xs font-bold border-0 shadow-sm" />
                                                                 </div>
                                                                 <div className="space-y-1">
                                                                     <label className="text-[9px] font-bold uppercase tracking-widest text-coral ml-1">Region</label>
-                                                                    <select value={p.region} onChange={e => { const updated = [...presbyteries]; updated[idx] = { ...updated[idx], region: e.target.value }; setPresbyteries(updated); }} className="w-full bg-white p-3 rounded-xl text-xs font-bold border-0 shadow-sm">
+                                                                    <select value={p.region} onChange={e => { const updated = [...presbyteries]; updated[idx] = { ...updated[idx], region: e.target.value }; setPresbyteries(updated); }} className="w-full bg-[hsl(var(--admin-bg-alt))] p-3 rounded-xl text-xs font-bold border-0 shadow-sm">
                                                                         {['NCR', 'Luzon', 'Visayas', 'Mindanao', 'CAR'].map(r => (<option key={r} value={r}>{r}</option>))}
                                                                     </select>
                                                                 </div>
                                                             </div>
                                                             <div className="space-y-1">
                                                                 <label className="text-[9px] font-bold uppercase tracking-widest text-coral ml-1">Regional Narrative / Description</label>
-                                                                <textarea value={p.description} onChange={e => { const updated = [...presbyteries]; updated[idx].description = e.target.value; setPresbyteries(updated); }} rows={2} className="w-full bg-white p-4 rounded-xl text-sm border-0 shadow-sm resize-none font-medium" />
+                                                                <textarea value={p.description} onChange={e => { const updated = [...presbyteries]; updated[idx].description = e.target.value; setPresbyteries(updated); }} rows={2} className="w-full bg-[hsl(var(--admin-bg-alt))] p-4 rounded-xl text-sm border-0 shadow-sm resize-none font-medium" />
                                                             </div>
                                                             <div className="space-y-1">
                                                                 <label className="text-[9px] font-bold uppercase tracking-widest text-coral ml-1">Official Website URL</label>
-                                                                <input type="text" placeholder="https://..." value={p.website || ''} onChange={e => { const updated = [...presbyteries]; updated[idx] = { ...updated[idx], website: e.target.value }; setPresbyteries(updated); }} className="w-full bg-white p-3 rounded-xl text-[10px] font-bold border-0 shadow-sm" />
+                                                                <input type="text" placeholder="https://..." value={p.website || ''} onChange={e => { const updated = [...presbyteries]; updated[idx] = { ...updated[idx], website: e.target.value }; setPresbyteries(updated); }} className="w-full bg-[hsl(var(--admin-bg-alt))] p-3 rounded-xl text-[10px] font-bold border-0 shadow-sm" />
                                                             </div>
                                                             <div className="space-y-3">
                                                                 <div className="flex justify-between items-center mb-1">
@@ -1069,7 +1069,7 @@ export default function AdminContent() {
                                                                         const offRole = typeof off === 'string' ? '' : off.role;
                                                                         const offPhoto = typeof off === 'string' ? '' : (off.photo || '');
                                                                         return (
-                                                                            <div key={oIdx} className="p-4 bg-white rounded-2xl shadow-sm border border-[hsl(var(--admin-border))] flex items-center gap-4">
+                                                                            <div key={oIdx} className="p-4 bg-[hsl(var(--admin-bg-alt))] rounded-2xl shadow-sm border border-[hsl(var(--admin-border))] flex items-center gap-4">
                                                                                 <div className="relative w-16 h-16 rounded-full overflow-hidden border-2 border-dashed border-coral/20 shrink-0 group/avatar cursor-pointer">
                                                                                     {offPhoto ? (
                                                                                         <img src={offPhoto} alt={offName} className="w-full h-full object-cover" />
