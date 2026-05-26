@@ -2202,7 +2202,10 @@ body.lp-v3 .nav__burger {
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 }
-body.lp-v3 .nav__burger span {
+/* `.nav .nav__burger` (not just `.nav__burger`) to out-specify a legacy
+   index.css rule (`.nav:not(.nav--scrolled) .nav__burger span`) that otherwise
+   forces the bars to paper-cream — invisible on the landing's cream nav. */
+body.lp-v3 .nav .nav__burger span {
   position: absolute;
   left: 10px; right: 10px;
   height: 1.5px;
