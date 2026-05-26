@@ -134,9 +134,13 @@ export default function AdminDonors() {
     }, [baseRows, searchTerm, sortKey]);
 
     const displayedTotal = filteredDonors.reduce((sum, d) => sum + d.total, 0);
+    const displayedGifts = filteredDonors.reduce((sum, d) => sum + d.count, 0);
     const rangeLabel = rangeActive
         ? `${startDate ? toDateLabel(startDate) : '—'} → ${endDate ? toDateLabel(endDate) : 'now'}`
         : 'All time';
+    const generatedLabel = new Date().toLocaleString('en-US', {
+        month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit',
+    });
 
     const inputCls =
         'h-12 px-4 bg-[hsl(var(--admin-text))]/5 border border-[hsl(var(--admin-border))] rounded-xl text-[11px] font-bold text-[hsl(var(--admin-text))] outline-none focus:border-teal/40 transition-all';
@@ -144,7 +148,55 @@ export default function AdminDonors() {
     return (
         <AdminLayout>
             <div className="max-w-6xl mx-auto selection:bg-teal/10">
-                <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8 md:mb-16 px-2">
+                {/* Print-only stewardship report (screen UI is hidden via .screen-only in print) */}
+                <div className="print-only print-report">
+                    <div className="pr-letterhead">
+                        <p className="pr-title">Presbyterian Church of the Philippines</p>
+                        <p className="pr-sub">Donor Giving Report</p>
+                    </div>
+                    <div className="pr-meta">
+                        <span>Period: <b>{rangeLabel}</b></span>
+                        <span>Donors: <b>{filteredDonors.length}</b></span>
+                        <span>Gifts: <b>{displayedGifts}</b></span>
+                        <span>Total: <b>₱{displayedTotal.toLocaleString()}</b></span>
+                        <span>Generated: <b>{generatedLabel}</b></span>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Donor</th>
+                                <th>Email</th>
+                                <th className="num">Gifts</th>
+                                <th className="num">{rangeActive ? 'Given in Range' : 'Total Given'}</th>
+                                <th className="num">Last Gift</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {filteredDonors.map((d, i) => (
+                                <tr key={d.key}>
+                                    <td>{i + 1}</td>
+                                    <td>{d.name}</td>
+                                    <td>{d.email || '—'}</td>
+                                    <td className="num">{d.count}</td>
+                                    <td className="num">₱{d.total.toLocaleString()}</td>
+                                    <td className="num">{toDateLabel(d.lastAt)}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colSpan={3}>TOTAL</td>
+                                <td className="num">{displayedGifts}</td>
+                                <td className="num">₱{displayedTotal.toLocaleString()}</td>
+                                <td className="num" />
+                            </tr>
+                        </tfoot>
+                    </table>
+                    <p className="pr-footer">Presbyterian Church of the Philippines · Stewardship Records · Confidential</p>
+                </div>
+
+                <div className="screen-only flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8 md:mb-16 px-2">
                     <div>
                         <h1 className="text-4xl font-bold text-[hsl(var(--admin-text))] tracking-tighter font-display mb-3">Donor Database</h1>
                         <p className="text-[hsl(var(--admin-text-dim))] text-[11px] font-bold tracking-[0.3em] uppercase">Historical Stewardship Records</p>
@@ -164,7 +216,7 @@ export default function AdminDonors() {
                     </div>
                 </div>
 
-                <div className="bg-[hsl(var(--admin-surface))] rounded-[2.5rem] border border-[hsl(var(--admin-border))] shadow-2xl overflow-hidden relative">
+                <div className="screen-only bg-[hsl(var(--admin-surface))] rounded-[2.5rem] border border-[hsl(var(--admin-border))] shadow-2xl overflow-hidden relative">
                     <div className="p-5 sm:p-8 border-b border-[hsl(var(--admin-border))] flex flex-col gap-5">
                         {/* Search */}
                         <div className="relative w-full md:max-w-md">

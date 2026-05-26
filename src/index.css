@@ -2387,3 +2387,81 @@ html { scrollbar-color: var(--brass) var(--paper-2); scrollbar-width: thin; }
   justify-content: center;
   flex-wrap: wrap;
 }
+
+/* ============================================================
+   Print — clean stewardship report (Donor Database)
+   Screen chrome is hidden; an ink-friendly report is revealed.
+   ============================================================ */
+.print-only { display: none; }
+
+@media print {
+  /* Hide the app chrome and all on-screen-only UI */
+  aside, header, .no-print, .screen-only { display: none !important; }
+  .print-only { display: block !important; }
+
+  /* Force an ink-friendly light palette regardless of the active theme */
+  [data-theme] {
+    --admin-bg: 0 0% 100%;
+    --admin-surface: 0 0% 100%;
+    --admin-sidebar: 0 0% 100%;
+    --admin-border: 0 0% 0% / 0.18;
+    --admin-text: 0 0% 8%;
+    --admin-text-dim: 0 0% 35%;
+    --teal: 17 47% 13%;
+    --accent: 40 49% 40%;
+  }
+  html, body, #root, main, [data-theme] {
+    background: #fff !important;
+    color: #000 !important;
+  }
+  main { padding: 0 !important; overflow: visible !important; }
+
+  /* Flatten decorative styling that wastes ink / breaks on paper */
+  * {
+    box-shadow: none !important;
+    text-shadow: none !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    animation: none !important;
+    transition: none !important;
+  }
+
+  /* Report body */
+  .print-report { font-family: Georgia, 'Times New Roman', serif; color: #111; }
+  .print-report .pr-letterhead {
+    text-align: center;
+    border-bottom: 2px solid #1a1a1a;
+    padding-bottom: 14px;
+    margin-bottom: 6px;
+  }
+  .print-report .pr-title { font-size: 19px; font-weight: 700; letter-spacing: 0.01em; margin: 0; }
+  .print-report .pr-sub { font-size: 12px; letter-spacing: 0.28em; text-transform: uppercase; color: #555; margin: 6px 0 0; }
+  .print-report .pr-meta {
+    display: flex; flex-wrap: wrap; justify-content: space-between;
+    gap: 6px 24px; font-size: 10.5px; color: #444;
+    padding: 10px 2px 16px; border-bottom: 1px solid #ccc; margin-bottom: 14px;
+  }
+  .print-report .pr-meta b { color: #111; font-weight: 700; }
+
+  .print-report table { width: 100%; border-collapse: collapse; }
+  .print-report thead { display: table-header-group; }
+  .print-report th, .print-report td {
+    padding: 7px 10px; border-bottom: 1px solid #e2e2e2; font-size: 11px; text-align: left;
+  }
+  .print-report th {
+    border-bottom: 1.5px solid #333; text-transform: uppercase;
+    letter-spacing: 0.08em; font-size: 9px; color: #555; font-weight: 700;
+  }
+  .print-report tr { break-inside: avoid; }
+  .print-report .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .print-report tfoot td {
+    border-top: 2px solid #333; border-bottom: none;
+    font-weight: 700; font-size: 12px; padding-top: 10px;
+  }
+  .print-report .pr-footer {
+    margin-top: 22px; padding-top: 10px; border-top: 1px solid #ccc;
+    font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: #888; text-align: center;
+  }
+
+  @page { margin: 1.6cm; }
+}
