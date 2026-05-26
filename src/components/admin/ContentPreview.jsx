@@ -110,28 +110,20 @@ function IconCards({ items, dark }) {
 }
 
 function Principles({ principles }) {
-    const pillars = (principles?.pillars || []).filter((p) => p && (p.title || p.desc));
-    const quote = (principles?.quotes || [])[0];
+    const paras = (principles?.paragraphs || []).filter((p) => p && String(p).trim());
     return (
         <Frame>
-            <div className="px-6 py-10 space-y-4">
-                {pillars.length ? pillars.map((p, i) => (
-                    <div key={i} className="flex gap-4 items-start p-4 rounded-2xl" style={{ background: '#fff', border: '1px solid rgba(0,0,0,0.06)' }}>
-                        <div className="w-10 h-10 shrink-0 rounded-xl flex items-center justify-center" style={{ background: 'rgba(168,116,47,0.1)', color: '#a8742f' }}>
-                            <Icon name={p.icon} className="w-5 h-5" />
-                        </div>
-                        <div>
-                            <p className="font-bold mb-1">{fallback(p.title, 'Principle')}</p>
-                            <p className="text-xs opacity-70 leading-relaxed">{fallback(p.desc, 'Description of this core principle.')}</p>
-                        </div>
-                    </div>
-                )) : <Empty label="Add pillars to preview" />}
-                {quote?.text && (
-                    <blockquote className="text-center px-6 py-8 text-xl italic" style={{ color: '#6b3f22' }}>
-                        “{quote.text}”
-                        {quote.highlight && <span className="block mt-3 text-xs not-italic uppercase tracking-[0.3em] opacity-60">{quote.highlight}</span>}
-                    </blockquote>
-                )}
+            <div className="px-8 py-14">
+                <h2 className="text-2xl md:text-3xl font-bold leading-snug mb-8">{fallback(principles?.title, 'A heading for the pastoral message.')}</h2>
+                <div className="space-y-4">
+                    {(paras.length ? paras : ['The body of the pastoral message appears here, paragraph by paragraph.']).map((p, i) => (
+                        <p key={i} className="text-sm leading-relaxed opacity-75">{p}</p>
+                    ))}
+                </div>
+                <div className="mt-8 pt-6 border-t" style={{ borderColor: 'rgba(0,0,0,0.08)' }}>
+                    <p className="italic font-bold" style={{ color: '#6b3f22' }}>{fallback(principles?.signer, 'Signed by…')}</p>
+                    <p className="text-[11px] uppercase tracking-[0.25em] opacity-50 mt-1">{fallback(principles?.role, 'Role / title')}</p>
+                </div>
             </div>
         </Frame>
     );
@@ -206,10 +198,9 @@ function Donations({ donations }) {
     return (
         <Frame>
             <div className="px-8 py-12 text-center">
-                {donations?.scriptureText && (
-                    <blockquote className="text-lg italic mb-2" style={{ color: '#6b3f22' }}>“{donations.scriptureText}”</blockquote>
-                )}
-                {donations?.scriptureRef && <p className="text-[10px] uppercase tracking-[0.3em] opacity-60 mb-8">{donations.scriptureRef}</p>}
+                <h2 className="text-2xl font-bold mb-2">{fallback(donations?.heading, 'Give Generously')}</h2>
+                <p className="text-sm opacity-75 max-w-md mx-auto mb-3">{fallback(donations?.subtitle, 'Your generosity sustains the ministry of the church.')}</p>
+                {donations?.scriptureRef && <p className="text-[10px] uppercase tracking-[0.3em] opacity-60 mb-8">— {donations.scriptureRef}</p>}
                 <div className="flex justify-center gap-6">
                     {[['GCash', donations?.gcashQR], ['Maya', donations?.mayaQR]].map(([name, qr]) => (
                         <div key={name} className="text-center">
@@ -228,7 +219,7 @@ function Donations({ donations }) {
 function Announcement({ announcement }) {
     if (!announcement || announcement.isActive === false) return <Empty label="Announcement is inactive" />;
     const tones = {
-        info: '#3a6ea5', success: '#3a7d44', warning: '#a8742f', alert: '#a53a3a',
+        info: '#3a6ea5', event: '#3a7d44', warning: '#a8742f', urgent: '#a53a3a',
     };
     const tone = tones[announcement.type] || tones.info;
     return (

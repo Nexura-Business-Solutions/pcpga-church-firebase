@@ -24,7 +24,6 @@ import {
     Globe,
     Target,
     Activity,
-    MessageSquare,
     Clock,
     Bell,
     ImagePlus,
@@ -38,7 +37,7 @@ const TABS = [
     { id: 'mission', label: 'Narrative', icon: Scroll },
     { id: 'points', label: 'Mission', icon: Footprints },
     { id: 'commitments', label: 'Spirit', icon: Amphora },
-    { id: 'principles', label: 'Core', icon: Cross },
+    { id: 'principles', label: 'Message', icon: Cross },
     { id: 'stats', label: 'Visitor', icon: BarChart3 },
     { id: 'committees', label: 'Governance', icon: Landmark },
     { id: 'presbyteries', label: 'Regional', icon: Globe },
@@ -90,10 +89,11 @@ export default function AdminContent() {
             });
             const py = await getSettings('presbyteries');
             setPresbyteries(Array.isArray(py) && py.length > 0 ? py : defaultPresbyteries);
-            setPrinciples(cp && cp.pillars ? cp : {
-                pillars: [{ title: '', desc: '', icon: 'Cross' }],
-                quotes: [{ text: '', highlight: '', color: '' }]
-            });
+            // 'core-principles' holds the pastoral Message section (title +
+            // paragraphs + signer + role) — the shape MessageSection.jsx reads.
+            setPrinciples(cp && (cp.title || cp.paragraphs)
+                ? { title: '', paragraphs: [''], signer: '', role: '', ...cp }
+                : { title: '', paragraphs: [''], signer: '', role: '' });
             setStats(iv && iv.stats ? iv : {
                 stats: [{ value: '', label: '' }],
                 visitTitle: '', visitSubtitle: '',
@@ -585,132 +585,68 @@ export default function AdminContent() {
 
                                 {/* PRINCIPLES & QUOTES TAB */}
                                 {activeTab === 'principles' && (
-                                    <div className="space-y-16">
-                                        <div className="space-y-8">
-                                            <h3 className="text-[10px] font-bold uppercase tracking-widest text-coral border-b border-[hsl(var(--admin-border))] pb-4">Core Principles</h3>
-                                            <div className="grid grid-cols-1 gap-6">
-                                                {(!principles.pillars || principles.pillars.length === 0) && (
-                                                    <AdminEmptyState
-                                                        title="No Core Pillars"
-                                                        description="Highlight the main pillars of your church community."
-                                                        icon={<Landmark className="w-12 h-12 text-coral/20" />}
-                                                        actionText="Add Core Pillar"
-                                                        onAction={() => addItem(principles.pillars || [], (l) => setPrinciples({ ...principles, pillars: l }), { icon: 'Cross', title: 'New Pillar', desc: '' })}
-                                                    />
-                                                )}
-                                                {(Array.isArray(principles.pillars) ? principles.pillars : []).map((p, i) => (
-                                                    <div key={i} className="p-8 bg-[hsl(var(--admin-bg-alt))] rounded-3xl border border-[hsl(var(--admin-border))] space-y-4">
-                                                        <div className="flex items-center gap-4">
-                                                            <input
-                                                                type="text"
-                                                                value={p.icon}
-                                                                onChange={e => {
-                                                                    const pillars = [...principles.pillars];
-                                                                    pillars[i].icon = e.target.value;
-                                                                    setPrinciples({ ...principles, pillars });
-                                                                }}
-                                                                className="w-12 h-12 bg-[hsl(var(--admin-bg-alt))] rounded-xl text-center text-xl focus:ring-2 focus:ring-coral transition-all border-0 shadow-sm"
-                                                            />
-                                                            <input
-                                                                type="text"
-                                                                value={p.title}
-                                                                onChange={e => {
-                                                                    const pillars = [...principles.pillars];
-                                                                    pillars[i].title = e.target.value;
-                                                                    setPrinciples({ ...principles, pillars });
-                                                                }}
-                                                                className="flex-1 bg-[hsl(var(--admin-bg-alt))] p-3 rounded-xl text-sm font-bold focus:ring-2 focus:ring-coral border-0 shadow-sm"
-                                                            />
-                                                            <button onClick={() => removeItem(principles.pillars, (l) => setPrinciples({ ...principles, pillars: l }), i)} className="p-3 text-red-500 hover:bg-red-50 rounded-xl transition-colors">🗑️</button>
-                                                        </div>
+                                    <div className="space-y-12">
+                                        <div>
+                                            <label className="block text-coral text-[10px] tracking-[0.25em] uppercase mb-4 font-bold">Message Heading</label>
+                                            <textarea
+                                                rows={3}
+                                                value={principles.title || ''}
+                                                onChange={(e) => setPrinciples({ ...principles, title: e.target.value })}
+                                                placeholder="We are a church built on the old foundation…"
+                                                className="w-full bg-[hsl(var(--admin-bg-alt))] border-0 rounded-2xl p-5 text-lg font-display font-medium leading-relaxed focus:ring-2 focus:ring-coral/20 outline-none transition-all resize-none"
+                                            />
+                                        </div>
+
+                                        <div className="space-y-6">
+                                            <h3 className="text-[10px] font-bold uppercase tracking-widest text-coral border-b border-[hsl(var(--admin-border))] pb-4">Body Paragraphs</h3>
+                                            <div className="grid grid-cols-1 gap-4">
+                                                {(Array.isArray(principles.paragraphs) ? principles.paragraphs : ['']).map((para, i) => (
+                                                    <div key={i} className="flex gap-3 items-start">
+                                                        <span className="mt-5 text-[10px] font-bold text-[hsl(var(--admin-text-dim))]/40 w-5 text-right">{i + 1}</span>
                                                         <textarea
-                                                            rows={2}
-                                                            value={p.desc}
-                                                            onChange={e => {
-                                                                const pillars = [...principles.pillars];
-                                                                pillars[i].desc = e.target.value;
-                                                                setPrinciples({ ...principles, pillars });
+                                                            rows={4}
+                                                            value={para}
+                                                            onChange={(e) => {
+                                                                const paragraphs = [...(principles.paragraphs || [])];
+                                                                paragraphs[i] = e.target.value;
+                                                                setPrinciples({ ...principles, paragraphs });
                                                             }}
-                                                            className="w-full bg-[hsl(var(--admin-bg-alt))] p-4 rounded-xl text-sm resize-none focus:ring-2 focus:ring-coral border-0 shadow-sm"
+                                                            placeholder="Write a paragraph of the pastoral message…"
+                                                            className="flex-1 bg-[hsl(var(--admin-bg-alt))] p-5 rounded-2xl text-sm leading-relaxed resize-none focus:ring-2 focus:ring-coral/20 border-0 outline-none transition-all"
                                                         />
+                                                        <button
+                                                            onClick={() => removeItem(principles.paragraphs || [''], (l) => setPrinciples({ ...principles, paragraphs: l }), i)}
+                                                            className="mt-3 p-3 text-red-500 hover:bg-red-50 rounded-xl transition-colors"
+                                                        >🗑️</button>
                                                     </div>
                                                 ))}
-                                                {principles.pillars?.length > 0 && (
-                                                    <button
-                                                        onClick={() => addItem(principles.pillars, (l) => setPrinciples({ ...principles, pillars: l }), { icon: '🏛️', title: 'New Pillar', desc: '' })}
-                                                        className="w-full py-6 rounded-2xl border-2 border-dashed border-[hsl(var(--admin-border))] text-[10px] font-bold uppercase tracking-widest text-coral hover:bg-coral/5 transition-all"
-                                                    >
-                                                        + Add Core Pillar
-                                                    </button>
-                                                )}
+                                                <button
+                                                    onClick={() => addItem(principles.paragraphs || [], (l) => setPrinciples({ ...principles, paragraphs: l }), '')}
+                                                    className="w-full py-5 rounded-2xl border-2 border-dashed border-[hsl(var(--admin-border))] text-[10px] font-bold uppercase tracking-widest text-coral hover:bg-coral/5 transition-all"
+                                                >
+                                                    + Add Paragraph
+                                                </button>
                                             </div>
                                         </div>
 
-                                        <div className="space-y-8">
-                                            <h3 className="text-[10px] font-bold uppercase tracking-widest text-coral border-b border-[hsl(var(--admin-border))] pb-4">Dynamic Quote Messages</h3>
-                                            <div className="grid grid-cols-1 gap-6">
-                                                {(!principles.quotes || principles.quotes.length === 0) && (
-                                                    <AdminEmptyState
-                                                        title="No Dynamic Quotes"
-                                                        description="Add engaging text with highlighted words to show on the public page."
-                                                        icon={<MessageSquare className="w-12 h-12 text-coral/20" />}
-                                                        actionText="Add Dynamic Quote"
-                                                        onAction={() => addItem(principles.quotes || [], (l) => setPrinciples({ ...principles, quotes: l }), { text: "New Quote Here.", highlight: "Here", color: "text-accent" })}
-                                                    />
-                                                )}
-                                                {(Array.isArray(principles.quotes) ? principles.quotes : []).map((q, i) => (
-                                                    <div key={i} className="p-8 bg-[hsl(var(--admin-bg-alt))] rounded-3xl border border-[hsl(var(--admin-border))] space-y-4">
-                                                        <div className="flex justify-end">
-                                                            <button onClick={() => removeItem(principles.quotes, (l) => setPrinciples({ ...principles, quotes: l }), i)} className="p-2 text-red-500 hover:bg-red-50 rounded-lg text-xs font-bold uppercase tracking-widest transition-colors opacity-40 hover:opacity-100">Remove Quote 🗑️</button>
-                                                        </div>
-                                                        <textarea
-                                                            rows={3}
-                                                            value={q.text}
-                                                            onChange={e => {
-                                                                const quotes = [...principles.quotes];
-                                                                quotes[i].text = e.target.value;
-                                                                setPrinciples({ ...principles, quotes });
-                                                            }}
-                                                            className="w-full bg-[hsl(var(--admin-bg-alt))] p-5 rounded-xl text-lg font-display font-medium leading-relaxed focus:ring-2 focus:ring-coral border-0 shadow-sm"
-                                                        />
-                                                        <div className="flex items-center gap-4">
-                                                            <div className="flex-1">
-                                                                <label className="text-[10px] font-bold uppercase tracking-widest opacity-30 mb-2 block ml-1">Highlight Word</label>
-                                                                <input
-                                                                    type="text"
-                                                                    value={q.highlight}
-                                                                    onChange={e => {
-                                                                        const quotes = [...principles.quotes];
-                                                                        quotes[i].highlight = e.target.value;
-                                                                        setPrinciples({ ...principles, quotes });
-                                                                    }}
-                                                                    className="w-full bg-[hsl(var(--admin-bg-alt))] p-3 rounded-xl text-xs font-bold focus:ring-2 focus:ring-coral border-0 shadow-sm"
-                                                                />
-                                                            </div>
-                                                            <div className="flex-1">
-                                                                <label className="text-[10px] font-bold uppercase tracking-widest opacity-30 mb-2 block ml-1">Color Class</label>
-                                                                <input
-                                                                    type="text"
-                                                                    value={q.color}
-                                                                    onChange={e => {
-                                                                        const quotes = [...principles.quotes];
-                                                                        quotes[i].color = e.target.value;
-                                                                        setPrinciples({ ...principles, quotes });
-                                                                    }}
-                                                                    className="w-full bg-[hsl(var(--admin-bg-alt))] p-3 rounded-xl text-xs font-bold focus:ring-2 focus:ring-coral border-0 shadow-sm"
-                                                                />
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                ))}
-                                                {principles.quotes?.length > 0 && (
-                                                    <button
-                                                        onClick={() => addItem(principles.quotes, (l) => setPrinciples({ ...principles, quotes: l }), { text: "New Quote Here.", highlight: "Here", color: "text-accent" })}
-                                                        className="w-full py-6 rounded-2xl border-2 border-dashed border-[hsl(var(--admin-border))] text-[10px] font-bold uppercase tracking-widest text-coral hover:bg-coral/5 transition-all"
-                                                    >
-                                                        + Add Quote Message
-                                                    </button>
-                                                )}
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-6 border-t border-[hsl(var(--admin-border))]">
+                                            <div>
+                                                <label className="block text-coral text-[10px] tracking-[0.25em] uppercase mb-4 font-bold">Signed By</label>
+                                                <input
+                                                    value={principles.signer || ''}
+                                                    onChange={(e) => setPrinciples({ ...principles, signer: e.target.value })}
+                                                    placeholder="Rev. Dr. Eduardo T. Reyes"
+                                                    className="w-full bg-[hsl(var(--admin-bg-alt))] border-0 rounded-2xl p-5 text-sm font-medium focus:ring-2 focus:ring-coral/20 outline-none transition-all"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-coral text-[10px] tracking-[0.25em] uppercase mb-4 font-bold">Title / Role</label>
+                                                <input
+                                                    value={principles.role || ''}
+                                                    onChange={(e) => setPrinciples({ ...principles, role: e.target.value })}
+                                                    placeholder="Moderator, General Assembly"
+                                                    className="w-full bg-[hsl(var(--admin-bg-alt))] border-0 rounded-2xl p-5 text-sm font-medium focus:ring-2 focus:ring-coral/20 outline-none transition-all"
+                                                />
                                             </div>
                                         </div>
                                     </div>
@@ -1154,16 +1090,7 @@ export default function AdminContent() {
 
                                         <div className="space-y-8 pt-6 border-t border-[hsl(var(--admin-border))]">
                                             <div>
-                                                <label className="block text-coral text-[10px] tracking-[0.25em] uppercase mb-4 font-bold">Inspirational Reflection</label>
-                                                <textarea
-                                                    value={donations.scriptureText || ''}
-                                                    onChange={(e) => setDonations({ ...donations, scriptureText: e.target.value })}
-                                                    rows={4}
-                                                    className="w-full bg-[hsl(var(--admin-bg-alt))] border-0 rounded-2xl p-5 text-sm italic focus:ring-2 focus:ring-coral/20 outline-none transition-all resize-none"
-                                                />
-                                            </div>
-                                            <div>
-                                                <label className="block text-coral text-[10px] tracking-[0.25em] uppercase mb-4 font-bold">Citation</label>
+                                                <label className="block text-coral text-[10px] tracking-[0.25em] uppercase mb-4 font-bold">Scripture Citation</label>
                                                 <input
                                                     value={donations.scriptureRef || ''}
                                                     onChange={(e) => setDonations({ ...donations, scriptureRef: e.target.value })}
