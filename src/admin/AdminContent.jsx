@@ -8,6 +8,7 @@ import GuidedTour from '../components/admin/GuidedTour.jsx';
 import { AdminSkeleton, AdminHeaderSkeleton, AdminCardSkeleton } from '../components/admin/AdminSkeleton.jsx';
 import AdminEmptyState from '../components/admin/AdminEmptyState.jsx';
 import AdminLayout from '../components/admin/AdminLayout.jsx';
+import ContentPreview from '../components/admin/ContentPreview.jsx';
 import {
     Home,
     Palette,
@@ -242,7 +243,7 @@ export default function AdminContent() {
     if (loading) return (
         <AdminLayout>
             <div className="min-h-screen bg-[hsl(var(--admin-bg))] p-8 lg:p-12 pb-32">
-                <div className="max-w-6xl mx-auto">
+                <div className="max-w-7xl mx-auto">
                     <AdminHeaderSkeleton />
                     <div className="flex gap-2 mb-12 inline-flex">
                         {[...Array(6)].map((_, i) => <AdminSkeleton key={i} className="h-12 w-32 rounded-2xl" />)}
@@ -256,7 +257,7 @@ export default function AdminContent() {
     return (
         <AdminLayout>
             <div className="min-h-screen bg-[hsl(var(--admin-bg))] p-8 lg:p-12 pb-32">
-                <div className="max-w-6xl mx-auto">
+                <div className="max-w-7xl mx-auto">
                     {/* Header */}
                     <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-16">
                         <div>
@@ -302,8 +303,8 @@ export default function AdminContent() {
                         ))}
                     </div>
 
-                    {/* Editor Content */}
-                    <div className="grid grid-cols-1 gap-12">
+                    {/* Editor Content — form (left) + live preview (right on xl) */}
+                    <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 items-start">
                         <AnimatePresence mode="wait">
                             <motion.div
                                 key={activeTab}
@@ -1474,9 +1475,40 @@ export default function AdminContent() {
                             </motion.div>
                         </AnimatePresence>
 
+                        {/* Live preview column (desktop) */}
+                        <div className="hidden xl:block xl:sticky xl:top-24">
+                            <div className="flex items-center gap-2 mb-3 px-1">
+                                <span className="w-2 h-2 rounded-full bg-accent animate-pulse" />
+                                <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-[hsl(var(--admin-text-dim))]">Live Preview</span>
+                                <span className="text-[10px] text-[hsl(var(--admin-text-dim))]/40 tracking-wide ml-1">— how this section looks on the site</span>
+                            </div>
+                            <AnimatePresence mode="wait">
+                                <motion.div
+                                    key={activeTab}
+                                    initial={{ opacity: 0, scale: 0.98 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    exit={{ opacity: 0, scale: 0.98 }}
+                                    transition={{ duration: 0.25 }}
+                                >
+                                    <ContentPreview
+                                        tab={activeTab}
+                                        hero={hero}
+                                        identity={identity}
+                                        mission={mission}
+                                        principles={principles}
+                                        stats={stats}
+                                        committees={committees}
+                                        presbyteries={presbyteries}
+                                        donations={donations}
+                                        announcement={announcement}
+                                    />
+                                </motion.div>
+                            </AnimatePresence>
+                        </div>
+
                         {/* Feedback & Save Bar */}
                         <div className="fixed bottom-0 left-0 right-0 p-8 flex flex-col items-center pointer-events-none z-[100]">
-                            <div className="w-full max-w-6xl mx-auto flex justify-center">
+                            <div className="w-full max-w-7xl mx-auto flex justify-center">
                                 <button
                                     id="tour-save"
                                     onClick={handleSave}
