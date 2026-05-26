@@ -84,7 +84,7 @@ export default function AdminDonations() {
                                 placeholder="Search by name or reference..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                className="w-full h-14 pl-14 pr-6 bg-[hsl(var(--admin-text))]/5 border border-transparent rounded-2xl text-xs font-bold outline-none focus:border-teal/40 transition-all font-display placeholder:text-[hsl(var(--admin-text-dim))]/20"
+                                className="w-full h-14 pl-14 pr-6 bg-[hsl(var(--admin-text))]/5 border border-[hsl(var(--admin-text))]/20 rounded-2xl text-xs font-bold outline-none focus:border-teal/40 transition-all font-display placeholder:text-[hsl(var(--admin-text-dim))]/20"
                             />
                         </div>
                         <div className="flex items-center gap-3">

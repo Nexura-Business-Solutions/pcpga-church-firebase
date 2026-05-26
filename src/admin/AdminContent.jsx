@@ -366,7 +366,7 @@ export default function AdminContent() {
                                                         value={hero[field.key] || ''}
                                                         onChange={(e) => setHero({ ...hero, [field.key]: e.target.value })}
                                                         placeholder={field.placeholder}
-                                                        className="w-full bg-[hsl(var(--admin-bg-alt))] border-0 rounded-2xl p-5 text-sm font-medium focus:ring-2 focus:ring-coral/20 outline-none transition-all"
+                                                        className="w-full bg-[hsl(var(--admin-bg-alt))] border border-[hsl(var(--admin-text))]/20 rounded-2xl p-5 text-sm font-medium focus:ring-2 focus:ring-coral/20 outline-none transition-all"
                                                     />
                                                 </div>
                                             ))}
@@ -384,7 +384,7 @@ export default function AdminContent() {
                                                     type="text"
                                                     value={identity.name || ''}
                                                     onChange={e => setIdentity({ ...identity, name: e.target.value })}
-                                                    className="w-full bg-[hsl(var(--admin-bg-alt))] border-0 rounded-2xl p-5 text-sm focus:ring-2 focus:ring-coral/20 transition-all font-medium"
+                                                    className="w-full bg-[hsl(var(--admin-bg-alt))] border border-[hsl(var(--admin-text))]/20 rounded-2xl p-5 text-sm focus:ring-2 focus:ring-coral/20 transition-all font-medium"
                                                     placeholder="e.g. Presbyterian Church"
                                                 />
                                             </div>
@@ -394,7 +394,7 @@ export default function AdminContent() {
                                                     type="text"
                                                     value={identity.sub || ''}
                                                     onChange={e => setIdentity({ ...identity, sub: e.target.value })}
-                                                    className="w-full bg-[hsl(var(--admin-bg-alt))] border-0 rounded-2xl p-5 text-sm focus:ring-2 focus:ring-coral/20 transition-all font-medium"
+                                                    className="w-full bg-[hsl(var(--admin-bg-alt))] border border-[hsl(var(--admin-text))]/20 rounded-2xl p-5 text-sm focus:ring-2 focus:ring-coral/20 transition-all font-medium"
                                                     placeholder="e.g. Philippines"
                                                 />
                                             </div>
@@ -405,7 +405,7 @@ export default function AdminContent() {
                                                 rows={4}
                                                 value={identity.footerDesc || ''}
                                                 onChange={e => setIdentity({ ...identity, footerDesc: e.target.value })}
-                                                className="w-full bg-[hsl(var(--admin-bg-alt))] border-0 rounded-2xl p-5 text-sm focus:ring-2 focus:ring-coral/20 transition-all font-medium resize-none"
+                                                className="w-full bg-[hsl(var(--admin-bg-alt))] border border-[hsl(var(--admin-text))]/20 rounded-2xl p-5 text-sm focus:ring-2 focus:ring-coral/20 transition-all font-medium resize-none"
                                                 placeholder="The short narrative at the bottom of the site..."
                                             />
                                         </div>
@@ -420,7 +420,7 @@ export default function AdminContent() {
                                                         type="text"
                                                         value={identity.social?.[field] || ''}
                                                         onChange={e => setIdentity({ ...identity, social: { ...identity.social, [field]: e.target.value } })}
-                                                        className="w-full bg-[hsl(var(--admin-bg-alt))] border-0 rounded-2xl p-5 text-sm focus:ring-2 focus:ring-coral/20 transition-all font-medium"
+                                                        className="w-full bg-[hsl(var(--admin-bg-alt))] border border-[hsl(var(--admin-text))]/20 rounded-2xl p-5 text-sm focus:ring-2 focus:ring-coral/20 transition-all font-medium"
                                                         placeholder={`Link or address for ${field}`}
                                                     />
                                                 </div>
@@ -438,7 +438,7 @@ export default function AdminContent() {
                                                 type="text"
                                                 value={mission.motto || ''}
                                                 onChange={e => setMission({ ...mission, motto: e.target.value })}
-                                                className="w-full bg-[hsl(var(--admin-bg-alt))] border-0 rounded-2xl p-5 text-lg font-bold text-coral focus:ring-2 focus:ring-coral/20 transition-all"
+                                                className="w-full bg-[hsl(var(--admin-bg-alt))] border border-[hsl(var(--admin-text))]/20 rounded-2xl p-5 text-lg font-bold text-coral focus:ring-2 focus:ring-coral/20 transition-all"
                                             />
                                         </div>
                                         <div className="space-y-4">
@@ -447,7 +447,7 @@ export default function AdminContent() {
                                                 rows={5}
                                                 value={mission.vision || ''}
                                                 onChange={e => setMission({ ...mission, vision: e.target.value })}
-                                                className="w-full bg-[hsl(var(--admin-bg-alt))] border-0 rounded-2xl p-5 text-sm focus:ring-2 focus:ring-coral/20 transition-all font-medium leading-relaxed resize-none"
+                                                className="w-full bg-[hsl(var(--admin-bg-alt))] border border-[hsl(var(--admin-text))]/20 rounded-2xl p-5 text-sm focus:ring-2 focus:ring-coral/20 transition-all font-medium leading-relaxed resize-none"
                                             />
                                         </div>
                                         <div className="space-y-4 pt-6 border-t border-[hsl(var(--admin-border))]">
@@ -456,7 +456,7 @@ export default function AdminContent() {
                                                 rows={4}
                                                 value={mission.summary || ''}
                                                 onChange={e => setMission({ ...mission, summary: e.target.value })}
-                                                className="w-full bg-[hsl(var(--admin-bg-alt))] border-0 rounded-2xl p-5 text-sm italic focus:ring-2 focus:ring-coral/20 transition-all font-medium leading-relaxed resize-none"
+                                                className="w-full bg-[hsl(var(--admin-bg-alt))] border border-[hsl(var(--admin-text))]/20 rounded-2xl p-5 text-sm italic focus:ring-2 focus:ring-coral/20 transition-all font-medium leading-relaxed resize-none"
                                             />
                                         </div>
                                     </div>
@@ -485,7 +485,7 @@ export default function AdminContent() {
                                                             p[i].icon = e.target.value;
                                                             setMission({ ...mission, missionPoints: p });
                                                         }}
-                                                        className="w-16 h-16 bg-[hsl(var(--admin-bg-alt))] border-0 rounded-2xl text-2xl flex items-center justify-center text-center focus:ring-2 focus:ring-coral/20"
+                                                        className="w-16 h-16 bg-[hsl(var(--admin-bg-alt))] border border-[hsl(var(--admin-text))]/20 rounded-2xl text-2xl flex items-center justify-center text-center focus:ring-2 focus:ring-coral/20"
                                                     />
                                                     <input
                                                         type="text"
@@ -495,7 +495,7 @@ export default function AdminContent() {
                                                             p[i].title = e.target.value;
                                                             setMission({ ...mission, missionPoints: p });
                                                         }}
-                                                        className="flex-1 bg-[hsl(var(--admin-bg-alt))] border-0 rounded-2xl p-4 text-sm font-bold focus:ring-2 focus:ring-coral/20"
+                                                        className="flex-1 bg-[hsl(var(--admin-bg-alt))] border border-[hsl(var(--admin-text))]/20 rounded-2xl p-4 text-sm font-bold focus:ring-2 focus:ring-coral/20"
                                                     />
                                                     <button onClick={() => removeItem(mission.missionPoints, (l) => setMission({ ...mission, missionPoints: l }), i)} className="p-3 text-red-500 hover:bg-red-50 rounded-xl transition-colors">🗑️</button>
                                                 </div>
@@ -507,7 +507,7 @@ export default function AdminContent() {
                                                         p[i].sub = e.target.value;
                                                         setMission({ ...mission, missionPoints: p });
                                                     }}
-                                                    className="w-full bg-[hsl(var(--admin-bg-alt))] border-0 rounded-2xl p-5 text-sm resize-none focus:ring-2 focus:ring-coral/20 font-medium opacity-70"
+                                                    className="w-full bg-[hsl(var(--admin-bg-alt))] border border-[hsl(var(--admin-text))]/20 rounded-2xl p-5 text-sm resize-none focus:ring-2 focus:ring-coral/20 font-medium opacity-70"
                                                 />
                                             </div>
                                         ))}
@@ -546,7 +546,7 @@ export default function AdminContent() {
                                                             c[i].icon = e.target.value;
                                                             setMission({ ...mission, commitments: c });
                                                         }}
-                                                        className="w-16 h-16 bg-white/5 border-0 rounded-2xl text-2xl flex items-center justify-center text-center focus:ring-2 focus:ring-coral/40 text-white"
+                                                        className="w-16 h-16 bg-white/5 border border-white/15 rounded-2xl text-2xl flex items-center justify-center text-center focus:ring-2 focus:ring-coral/40 text-white"
                                                     />
                                                     <input
                                                         type="text"
@@ -556,7 +556,7 @@ export default function AdminContent() {
                                                             c[i].title = e.target.value;
                                                             setMission({ ...mission, commitments: c });
                                                         }}
-                                                        className="flex-1 bg-white/5 border-0 rounded-2xl p-4 text-sm font-bold focus:ring-2 focus:ring-coral/40 text-white"
+                                                        className="flex-1 bg-white/5 border border-white/15 rounded-2xl p-4 text-sm font-bold focus:ring-2 focus:ring-coral/40 text-white"
                                                     />
                                                     <button onClick={() => removeItem(mission.commitments, (l) => setMission({ ...mission, commitments: l }), i)} className="p-3 text-red-400 hover:bg-white/5 rounded-xl transition-colors">🗑️</button>
                                                 </div>
@@ -568,7 +568,7 @@ export default function AdminContent() {
                                                         c[i].sub = e.target.value;
                                                         setMission({ ...mission, commitments: c });
                                                     }}
-                                                    className="w-full bg-white/5 border-0 rounded-2xl p-5 text-sm resize-none focus:ring-2 focus:ring-coral/40 font-medium text-white/50"
+                                                    className="w-full bg-white/5 border border-white/15 rounded-2xl p-5 text-sm resize-none focus:ring-2 focus:ring-coral/40 font-medium text-white/50"
                                                 />
                                             </div>
                                         ))}
@@ -593,7 +593,7 @@ export default function AdminContent() {
                                                 value={principles.title || ''}
                                                 onChange={(e) => setPrinciples({ ...principles, title: e.target.value })}
                                                 placeholder="We are a church built on the old foundation…"
-                                                className="w-full bg-[hsl(var(--admin-bg-alt))] border-0 rounded-2xl p-5 text-lg font-display font-medium leading-relaxed focus:ring-2 focus:ring-coral/20 outline-none transition-all resize-none"
+                                                className="w-full bg-[hsl(var(--admin-bg-alt))] border border-[hsl(var(--admin-text))]/20 rounded-2xl p-5 text-lg font-display font-medium leading-relaxed focus:ring-2 focus:ring-coral/20 outline-none transition-all resize-none"
                                             />
                                         </div>
 
@@ -612,7 +612,7 @@ export default function AdminContent() {
                                                                 setPrinciples({ ...principles, paragraphs });
                                                             }}
                                                             placeholder="Write a paragraph of the pastoral message…"
-                                                            className="flex-1 bg-[hsl(var(--admin-bg-alt))] p-5 rounded-2xl text-sm leading-relaxed resize-none focus:ring-2 focus:ring-coral/20 border-0 outline-none transition-all"
+                                                            className="flex-1 bg-[hsl(var(--admin-bg-alt))] p-5 rounded-2xl text-sm leading-relaxed resize-none focus:ring-2 focus:ring-coral/20 border border-[hsl(var(--admin-text))]/20 outline-none transition-all"
                                                         />
                                                         <button
                                                             onClick={() => removeItem(principles.paragraphs || [''], (l) => setPrinciples({ ...principles, paragraphs: l }), i)}
@@ -636,7 +636,7 @@ export default function AdminContent() {
                                                     value={principles.signer || ''}
                                                     onChange={(e) => setPrinciples({ ...principles, signer: e.target.value })}
                                                     placeholder="Rev. Dr. Eduardo T. Reyes"
-                                                    className="w-full bg-[hsl(var(--admin-bg-alt))] border-0 rounded-2xl p-5 text-sm font-medium focus:ring-2 focus:ring-coral/20 outline-none transition-all"
+                                                    className="w-full bg-[hsl(var(--admin-bg-alt))] border border-[hsl(var(--admin-text))]/20 rounded-2xl p-5 text-sm font-medium focus:ring-2 focus:ring-coral/20 outline-none transition-all"
                                                 />
                                             </div>
                                             <div>
@@ -645,7 +645,7 @@ export default function AdminContent() {
                                                     value={principles.role || ''}
                                                     onChange={(e) => setPrinciples({ ...principles, role: e.target.value })}
                                                     placeholder="Moderator, General Assembly"
-                                                    className="w-full bg-[hsl(var(--admin-bg-alt))] border-0 rounded-2xl p-5 text-sm font-medium focus:ring-2 focus:ring-coral/20 outline-none transition-all"
+                                                    className="w-full bg-[hsl(var(--admin-bg-alt))] border border-[hsl(var(--admin-text))]/20 rounded-2xl p-5 text-sm font-medium focus:ring-2 focus:ring-coral/20 outline-none transition-all"
                                                 />
                                             </div>
                                         </div>
@@ -680,7 +680,7 @@ export default function AdminContent() {
                                                                 s[i].value = e.target.value;
                                                                 setStats({ ...stats, stats: s });
                                                             }}
-                                                            className="w-full bg-[hsl(var(--admin-bg-alt))] p-3 rounded-xl text-xl font-bold text-coral text-center border-0 shadow-sm"
+                                                            className="w-full bg-[hsl(var(--admin-bg-alt))] p-3 rounded-xl text-xl font-bold text-coral text-center border border-[hsl(var(--admin-text))]/20 shadow-sm"
                                                         />
                                                         <input
                                                             type="text"
@@ -690,7 +690,7 @@ export default function AdminContent() {
                                                                 s[i].label = e.target.value;
                                                                 setStats({ ...stats, stats: s });
                                                             }}
-                                                            className="w-full bg-[hsl(var(--admin-bg-alt))] p-2 rounded-xl text-[9px] font-bold uppercase tracking-tighter text-center border-0 shadow-sm"
+                                                            className="w-full bg-[hsl(var(--admin-bg-alt))] p-2 rounded-xl text-[9px] font-bold uppercase tracking-tighter text-center border border-[hsl(var(--admin-text))]/20 shadow-sm"
                                                         />
                                                     </div>
                                                 ))}
@@ -714,7 +714,7 @@ export default function AdminContent() {
                                                         type="text"
                                                         value={stats.visitTitle || ''}
                                                         onChange={e => setStats({ ...stats, visitTitle: e.target.value })}
-                                                        className="w-full bg-[hsl(var(--admin-bg-alt))] p-5 rounded-2xl text-lg font-bold border-0"
+                                                        className="w-full bg-[hsl(var(--admin-bg-alt))] p-5 rounded-2xl text-lg font-bold border border-[hsl(var(--admin-text))]/20"
                                                     />
                                                 </div>
                                                 <div className="space-y-4">
@@ -723,7 +723,7 @@ export default function AdminContent() {
                                                         rows={3}
                                                         value={stats.visitSubtitle || ''}
                                                         onChange={e => setStats({ ...stats, visitSubtitle: e.target.value })}
-                                                        className="w-full bg-[hsl(var(--admin-bg-alt))] p-5 rounded-2xl text-sm font-medium leading-relaxed border-0 resize-none"
+                                                        className="w-full bg-[hsl(var(--admin-bg-alt))] p-5 rounded-2xl text-sm font-medium leading-relaxed border border-[hsl(var(--admin-text))]/20 resize-none"
                                                     />
                                                 </div>
                                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-6">
@@ -749,7 +749,7 @@ export default function AdminContent() {
                                                                     times[i].label = e.target.value;
                                                                     setStats({ ...stats, serviceTimes: times });
                                                                 }}
-                                                                className="w-full bg-[hsl(var(--admin-bg-alt))] p-2 rounded-xl text-[9px] font-bold uppercase tracking-widest border-0 shadow-sm"
+                                                                className="w-full bg-[hsl(var(--admin-bg-alt))] p-2 rounded-xl text-[9px] font-bold uppercase tracking-widest border border-[hsl(var(--admin-text))]/20 shadow-sm"
                                                             />
                                                             <input
                                                                 type="text"
@@ -759,7 +759,7 @@ export default function AdminContent() {
                                                                     times[i].value = e.target.value;
                                                                     setStats({ ...stats, serviceTimes: times });
                                                                 }}
-                                                                className="w-full bg-[hsl(var(--admin-bg-alt))] p-3 rounded-xl text-xs font-bold border-0 shadow-sm"
+                                                                className="w-full bg-[hsl(var(--admin-bg-alt))] p-3 rounded-xl text-xs font-bold border border-[hsl(var(--admin-text))]/20 shadow-sm"
                                                             />
                                                         </div>
                                                     ))}
@@ -803,7 +803,7 @@ export default function AdminContent() {
                                                                 newComs[i].icon = e.target.value;
                                                                 setCommittees(newComs);
                                                             }}
-                                                            className="w-14 h-14 bg-[hsl(var(--admin-bg-alt))] rounded-2xl text-center text-2xl border-0 shadow-sm"
+                                                            className="w-14 h-14 bg-[hsl(var(--admin-bg-alt))] rounded-2xl text-center text-2xl border border-[hsl(var(--admin-text))]/20 shadow-sm"
                                                         />
                                                         <input
                                                             type="text"
@@ -813,7 +813,7 @@ export default function AdminContent() {
                                                                 newComs[i].name = e.target.value;
                                                                 setCommittees(newComs);
                                                             }}
-                                                            className="flex-1 bg-[hsl(var(--admin-bg-alt))] p-4 rounded-2xl text-sm font-bold border-0 shadow-sm"
+                                                            className="flex-1 bg-[hsl(var(--admin-bg-alt))] p-4 rounded-2xl text-sm font-bold border border-[hsl(var(--admin-text))]/20 shadow-sm"
                                                         />
                                                     </div>
 
@@ -827,7 +827,7 @@ export default function AdminContent() {
                                                                 newComs[i].description = e.target.value;
                                                                 setCommittees(newComs);
                                                             }}
-                                                            className="w-full bg-[hsl(var(--admin-bg-alt))] p-5 rounded-2xl text-sm border-0 shadow-sm resize-none font-medium"
+                                                            className="w-full bg-[hsl(var(--admin-bg-alt))] p-5 rounded-2xl text-sm border border-[hsl(var(--admin-text))]/20 shadow-sm resize-none font-medium"
                                                         />
                                                     </div>
 
@@ -855,7 +855,7 @@ export default function AdminContent() {
                                                                                 newComs[i].details[di] = e.target.value;
                                                                                 setCommittees(newComs);
                                                                             }}
-                                                                            className="flex-1 bg-[hsl(var(--admin-bg-alt))] p-3 rounded-xl text-xs border-0 shadow-sm"
+                                                                            className="flex-1 bg-[hsl(var(--admin-bg-alt))] p-3 rounded-xl text-xs border border-[hsl(var(--admin-text))]/20 shadow-sm"
                                                                         />
                                                                         <button
                                                                             onClick={() => {
@@ -906,7 +906,7 @@ export default function AdminContent() {
                                                                                     newComs[i].officers[oi].name = e.target.value;
                                                                                     setCommittees(newComs);
                                                                                 }}
-                                                                                className="w-full bg-[hsl(var(--admin-bg))] p-2.5 rounded-xl text-[11px] font-bold border-0"
+                                                                                className="w-full bg-[hsl(var(--admin-bg))] p-2.5 rounded-xl text-[11px] font-bold border border-[hsl(var(--admin-text))]/20"
                                                                             />
                                                                             <input
                                                                                 type="text"
@@ -917,7 +917,7 @@ export default function AdminContent() {
                                                                                     newComs[i].officers[oi].role = e.target.value;
                                                                                     setCommittees(newComs);
                                                                                 }}
-                                                                                className="w-full bg-[hsl(var(--admin-bg))] p-2.5 rounded-xl text-[10px] border-0 text-coral/60"
+                                                                                className="w-full bg-[hsl(var(--admin-bg))] p-2.5 rounded-xl text-[10px] border border-[hsl(var(--admin-text))]/20 text-coral/60"
                                                                             />
                                                                         </div>
                                                                         <button
@@ -978,22 +978,22 @@ export default function AdminContent() {
                                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                                 <div className="space-y-1">
                                                                     <label className="text-[9px] font-bold uppercase tracking-widest text-coral ml-1">Presbytery Name</label>
-                                                                    <input type="text" value={p.name} onChange={e => { const updated = [...presbyteries]; updated[idx] = { ...updated[idx], name: e.target.value }; setPresbyteries(updated); }} className="w-full bg-[hsl(var(--admin-bg-alt))] p-3 rounded-xl text-xs font-bold border-0 shadow-sm" />
+                                                                    <input type="text" value={p.name} onChange={e => { const updated = [...presbyteries]; updated[idx] = { ...updated[idx], name: e.target.value }; setPresbyteries(updated); }} className="w-full bg-[hsl(var(--admin-bg-alt))] p-3 rounded-xl text-xs font-bold border border-[hsl(var(--admin-text))]/20 shadow-sm" />
                                                                 </div>
                                                                 <div className="space-y-1">
                                                                     <label className="text-[9px] font-bold uppercase tracking-widest text-coral ml-1">Region</label>
-                                                                    <select value={p.region} onChange={e => { const updated = [...presbyteries]; updated[idx] = { ...updated[idx], region: e.target.value }; setPresbyteries(updated); }} className="w-full bg-[hsl(var(--admin-bg-alt))] p-3 rounded-xl text-xs font-bold border-0 shadow-sm">
+                                                                    <select value={p.region} onChange={e => { const updated = [...presbyteries]; updated[idx] = { ...updated[idx], region: e.target.value }; setPresbyteries(updated); }} className="w-full bg-[hsl(var(--admin-bg-alt))] p-3 rounded-xl text-xs font-bold border border-[hsl(var(--admin-text))]/20 shadow-sm">
                                                                         {['NCR', 'Luzon', 'Visayas', 'Mindanao', 'CAR'].map(r => (<option key={r} value={r}>{r}</option>))}
                                                                     </select>
                                                                 </div>
                                                             </div>
                                                             <div className="space-y-1">
                                                                 <label className="text-[9px] font-bold uppercase tracking-widest text-coral ml-1">Regional Narrative / Description</label>
-                                                                <textarea value={p.description} onChange={e => { const updated = [...presbyteries]; updated[idx].description = e.target.value; setPresbyteries(updated); }} rows={2} className="w-full bg-[hsl(var(--admin-bg-alt))] p-4 rounded-xl text-sm border-0 shadow-sm resize-none font-medium" />
+                                                                <textarea value={p.description} onChange={e => { const updated = [...presbyteries]; updated[idx].description = e.target.value; setPresbyteries(updated); }} rows={2} className="w-full bg-[hsl(var(--admin-bg-alt))] p-4 rounded-xl text-sm border border-[hsl(var(--admin-text))]/20 shadow-sm resize-none font-medium" />
                                                             </div>
                                                             <div className="space-y-1">
                                                                 <label className="text-[9px] font-bold uppercase tracking-widest text-coral ml-1">Official Website URL</label>
-                                                                <input type="text" placeholder="https://..." value={p.website || ''} onChange={e => { const updated = [...presbyteries]; updated[idx] = { ...updated[idx], website: e.target.value }; setPresbyteries(updated); }} className="w-full bg-[hsl(var(--admin-bg-alt))] p-3 rounded-xl text-[10px] font-bold border-0 shadow-sm" />
+                                                                <input type="text" placeholder="https://..." value={p.website || ''} onChange={e => { const updated = [...presbyteries]; updated[idx] = { ...updated[idx], website: e.target.value }; setPresbyteries(updated); }} className="w-full bg-[hsl(var(--admin-bg-alt))] p-3 rounded-xl text-[10px] font-bold border border-[hsl(var(--admin-text))]/20 shadow-sm" />
                                                             </div>
                                                             <div className="space-y-3">
                                                                 <div className="flex justify-between items-center mb-1">
@@ -1032,7 +1032,7 @@ export default function AdminContent() {
                                                                                             }
                                                                                             setPresbyteries(updated);
                                                                                         }}
-                                                                                        className="w-full bg-[hsl(var(--admin-bg))] p-2.5 rounded-xl text-[11px] font-bold border-0"
+                                                                                        className="w-full bg-[hsl(var(--admin-bg))] p-2.5 rounded-xl text-[11px] font-bold border border-[hsl(var(--admin-text))]/20"
                                                                                     />
                                                                                     <input
                                                                                         type="text"
@@ -1047,7 +1047,7 @@ export default function AdminContent() {
                                                                                             }
                                                                                             setPresbyteries(updated);
                                                                                         }}
-                                                                                        className="w-full bg-[hsl(var(--admin-bg))] p-2.5 rounded-xl text-[10px] border-0 text-coral/60"
+                                                                                        className="w-full bg-[hsl(var(--admin-bg))] p-2.5 rounded-xl text-[10px] border border-[hsl(var(--admin-text))]/20 text-coral/60"
                                                                                     />
                                                                                 </div>
                                                                                 <button onClick={() => { const updated = [...presbyteries]; updated[idx].officers.splice(oIdx, 1); setPresbyteries(updated); }} className="text-xs opacity-20 hover:opacity-100 hover:text-red-500 transition-all shrink-0">✕</button>
@@ -1082,7 +1082,7 @@ export default function AdminContent() {
                                                         value={donations[field.key] || ''}
                                                         onChange={(e) => setDonations({ ...donations, [field.key]: e.target.value })}
                                                         placeholder={field.placeholder}
-                                                        className="w-full bg-[hsl(var(--admin-bg-alt))] border-0 rounded-2xl p-5 text-sm font-medium focus:ring-2 focus:ring-coral/20 outline-none transition-all"
+                                                        className="w-full bg-[hsl(var(--admin-bg-alt))] border border-[hsl(var(--admin-text))]/20 rounded-2xl p-5 text-sm font-medium focus:ring-2 focus:ring-coral/20 outline-none transition-all"
                                                     />
                                                 </div>
                                             ))}
@@ -1094,7 +1094,7 @@ export default function AdminContent() {
                                                 <input
                                                     value={donations.scriptureRef || ''}
                                                     onChange={(e) => setDonations({ ...donations, scriptureRef: e.target.value })}
-                                                    className="w-full bg-[hsl(var(--admin-bg-alt))] border-0 rounded-2xl p-5 text-sm font-medium focus:ring-2 focus:ring-coral/20 outline-none transition-all"
+                                                    className="w-full bg-[hsl(var(--admin-bg-alt))] border border-[hsl(var(--admin-text))]/20 rounded-2xl p-5 text-sm font-medium focus:ring-2 focus:ring-coral/20 outline-none transition-all"
                                                 />
                                             </div>
                                         </div>
@@ -1204,7 +1204,7 @@ export default function AdminContent() {
                                                     onChange={(e) => setAnnouncement({ ...announcement, title: e.target.value })}
                                                     placeholder="e.g. Special Sunday Service"
                                                     maxLength={80}
-                                                    className="w-full bg-[hsl(var(--admin-bg-alt))] border-0 rounded-2xl p-5 text-base font-semibold focus:ring-2 focus:ring-accent/20 outline-none transition-all"
+                                                    className="w-full bg-[hsl(var(--admin-bg-alt))] border border-[hsl(var(--admin-text))]/20 rounded-2xl p-5 text-base font-semibold focus:ring-2 focus:ring-accent/20 outline-none transition-all"
                                                 />
                                                 <div className="mt-2 text-right text-[9px] text-[hsl(var(--admin-text-dim))]">
                                                     {(announcement.title || '').length} / 80
@@ -1219,7 +1219,7 @@ export default function AdminContent() {
                                                     placeholder="Write the full announcement message here. You can use multiple lines."
                                                     rows={5}
                                                     maxLength={500}
-                                                    className="w-full bg-[hsl(var(--admin-bg-alt))] border-0 rounded-2xl p-5 text-sm font-medium focus:ring-2 focus:ring-accent/20 outline-none transition-all resize-none"
+                                                    className="w-full bg-[hsl(var(--admin-bg-alt))] border border-[hsl(var(--admin-text))]/20 rounded-2xl p-5 text-sm font-medium focus:ring-2 focus:ring-accent/20 outline-none transition-all resize-none"
                                                 />
                                                 <div className="mt-2 text-right text-[9px] text-[hsl(var(--admin-text-dim))]">
                                                     {(announcement.message || '').length} / 500
@@ -1308,7 +1308,7 @@ export default function AdminContent() {
                                                         onChange={(e) => setAnnouncement({ ...announcement, buttonText: e.target.value })}
                                                         placeholder="e.g. Learn More"
                                                         maxLength={30}
-                                                        className="w-full bg-[hsl(var(--admin-bg-alt))] border-0 rounded-2xl p-5 text-sm font-medium focus:ring-2 focus:ring-accent/20 outline-none transition-all"
+                                                        className="w-full bg-[hsl(var(--admin-bg-alt))] border border-[hsl(var(--admin-text))]/20 rounded-2xl p-5 text-sm font-medium focus:ring-2 focus:ring-accent/20 outline-none transition-all"
                                                     />
                                                 </div>
                                                 <div>
@@ -1317,7 +1317,7 @@ export default function AdminContent() {
                                                         value={announcement.buttonLink || ''}
                                                         onChange={(e) => setAnnouncement({ ...announcement, buttonLink: e.target.value })}
                                                         placeholder="e.g. /churches or https://..."
-                                                        className="w-full bg-[hsl(var(--admin-bg-alt))] border-0 rounded-2xl p-5 text-sm font-medium focus:ring-2 focus:ring-accent/20 outline-none transition-all"
+                                                        className="w-full bg-[hsl(var(--admin-bg-alt))] border border-[hsl(var(--admin-text))]/20 rounded-2xl p-5 text-sm font-medium focus:ring-2 focus:ring-accent/20 outline-none transition-all"
                                                     />
                                                 </div>
                                             </div>

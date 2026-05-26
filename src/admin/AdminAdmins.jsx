@@ -137,7 +137,7 @@ export default function AdminAdmins() {
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             placeholder="email@example.com"
-                            className="flex-1 h-14 px-6 bg-[hsl(var(--admin-text))]/5 border border-transparent rounded-2xl text-sm font-bold outline-none focus:border-accent/40 transition-all placeholder:text-[hsl(var(--admin-text-dim))]/30"
+                            className="flex-1 h-14 px-6 bg-[hsl(var(--admin-text))]/5 border border-[hsl(var(--admin-text))]/20 rounded-2xl text-sm font-bold outline-none focus:border-accent/40 transition-all placeholder:text-[hsl(var(--admin-text-dim))]/30"
                         />
                         <div className="flex items-center gap-1 px-2 bg-[hsl(var(--admin-text))]/5 rounded-2xl border border-[hsl(var(--admin-border))]">
                             {ROLES.map((r) => (
