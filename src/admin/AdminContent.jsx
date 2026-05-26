@@ -1012,9 +1012,23 @@ export default function AdminContent() {
                                                                     </select>
                                                                 </div>
                                                             </div>
+                                                            <div className="grid grid-cols-3 gap-3">
+                                                                <div className="space-y-1">
+                                                                    <label className="text-[9px] font-bold uppercase tracking-widest text-coral ml-1">Seat</label>
+                                                                    <input type="text" placeholder="Laoag City" value={p.seat || ''} onChange={e => { const updated = [...presbyteries]; updated[idx] = { ...updated[idx], seat: e.target.value }; setPresbyteries(updated); }} className="w-full bg-[hsl(var(--admin-bg-alt))] p-3 rounded-xl text-[11px] font-bold border border-[hsl(var(--admin-text))]/20 shadow-sm" />
+                                                                </div>
+                                                                <div className="space-y-1">
+                                                                    <label className="text-[9px] font-bold uppercase tracking-widest text-coral ml-1">Congregations</label>
+                                                                    <input type="text" placeholder="24" value={p.congregations || ''} onChange={e => { const updated = [...presbyteries]; updated[idx] = { ...updated[idx], congregations: e.target.value }; setPresbyteries(updated); }} className="w-full bg-[hsl(var(--admin-bg-alt))] p-3 rounded-xl text-[11px] font-bold border border-[hsl(var(--admin-text))]/20 shadow-sm" />
+                                                                </div>
+                                                                <div className="space-y-1">
+                                                                    <label className="text-[9px] font-bold uppercase tracking-widest text-coral ml-1">Founded</label>
+                                                                    <input type="text" placeholder="MCMXII" value={p.founded || ''} onChange={e => { const updated = [...presbyteries]; updated[idx] = { ...updated[idx], founded: e.target.value }; setPresbyteries(updated); }} className="w-full bg-[hsl(var(--admin-bg-alt))] p-3 rounded-xl text-[11px] font-bold border border-[hsl(var(--admin-text))]/20 shadow-sm" />
+                                                                </div>
+                                                            </div>
                                                             <div className="space-y-1">
                                                                 <label className="text-[9px] font-bold uppercase tracking-widest text-coral ml-1">Regional Narrative / Description</label>
-                                                                <textarea value={p.description} onChange={e => { const updated = [...presbyteries]; updated[idx].description = e.target.value; setPresbyteries(updated); }} rows={2} className="w-full bg-[hsl(var(--admin-bg-alt))] p-4 rounded-xl text-sm border border-[hsl(var(--admin-text))]/20 shadow-sm resize-none font-medium" />
+                                                                <textarea value={p.description} onChange={e => { const updated = [...presbyteries]; updated[idx] = { ...updated[idx], description: e.target.value }; setPresbyteries(updated); }} rows={2} className="w-full bg-[hsl(var(--admin-bg-alt))] p-4 rounded-xl text-sm border border-[hsl(var(--admin-text))]/20 shadow-sm resize-none font-medium" />
                                                             </div>
                                                             <div className="space-y-1">
                                                                 <label className="text-[9px] font-bold uppercase tracking-widest text-coral ml-1">Official Website URL</label>

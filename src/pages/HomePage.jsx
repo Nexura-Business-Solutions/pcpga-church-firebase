@@ -220,13 +220,14 @@ export default function HomePage() {
   useEffect(() => {
     let active = true;
     (async () => {
-      const keys = ['hero', 'site-identity', 'mission-vision', 'core-principles', 'invitation-stats', 'announcement', 'standing-committees'];
-      const [hero, identity, mv, msg, stats, ann, committees, sermons] = await Promise.all([
+      const keys = ['hero', 'site-identity', 'mission-vision', 'core-principles', 'invitation-stats', 'announcement', 'standing-committees', 'presbyteries'];
+      const [hero, identity, mv, msg, stats, ann, committees, pres, sermons] = await Promise.all([
         ...keys.map((k) => getSettings(k)), getSermons(),
       ]);
       if (active) setCms({
         hero: hero || {}, identity: identity || {}, mv: mv || {}, msg: msg || {},
         stats: stats || {}, ann: ann || {}, committees: Array.isArray(committees) ? committees : [],
+        presbyteries: Array.isArray(pres) ? pres : [],
         sermons: Array.isArray(sermons) ? sermons : [],
       });
     })();
@@ -244,6 +245,10 @@ export default function HomePage() {
   // Real sermons from the Sermon Archive (falls back to sample copy when empty).
   const sermons = cms.sermons || [];
   const featured = sermons[0] || null;
+  // Presbyteries: editable copy from settings, but only when it has the 6 the
+  // region map expects (fixed REGIONS indices) — otherwise keep the hardcoded set.
+  const presbyteries = (cms.presbyteries && cms.presbyteries.length >= PRESBYTERIES.length)
+    ? cms.presbyteries : PRESBYTERIES;
 
   // body class management
   useEffect(() => {
@@ -934,8 +939,9 @@ export default function HomePage() {
                   </div>
                   <div className="presbyteries__grid">
                     {region.indices.map((idx, j) => {
-                      const p = PRESBYTERIES[idx];
-                      const [first, ...rest] = p.name.split(' ');
+                      const p = presbyteries[idx];
+                      if (!p) return null;
+                      const [first, ...rest] = (p.name || '').split(' ');
                       return (
                         <button
                           key={p.name}
@@ -1203,7 +1209,7 @@ export default function HomePage() {
         <div className="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
           <button className="modal__close" aria-label="Close" type="button" onClick={closeModal}>×</button>
           {modal && modal.kind === 'committee' && <CommitteeModal data={committees[modal.i]} />}
-          {modal && modal.kind === 'presbytery' && <PresbyteryModal data={PRESBYTERIES[modal.i]} />}
+          {modal && modal.kind === 'presbytery' && <PresbyteryModal data={presbyteries[modal.i]} />}
         </div>
       </div>
 
