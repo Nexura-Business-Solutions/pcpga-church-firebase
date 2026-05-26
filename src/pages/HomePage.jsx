@@ -169,9 +169,17 @@ const NAV_LINKS = [
   { href: '#message', label: 'About', roman: 'i.' },
   { href: '#sermons', label: 'Sermons', roman: 'ii.' },
   { href: '/churches', label: 'Churches', roman: 'iii.' },
-  { href: '#resources', label: 'Library', roman: 'iv.' },
+  { href: '/library', label: 'Library', roman: 'iv.' },
   { href: '#donate', label: 'Give', roman: 'v.' },
 ];
+
+// Turn a YouTube watch / youtu.be / embed URL into an embeddable URL so sermons
+// play inside the site rather than redirecting away.
+function toEmbedUrl(url) {
+  if (!url) return null;
+  const m = String(url).match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([\w-]{6,})/);
+  return m ? `https://www.youtube.com/embed/${m[1]}` : null;
+}
 
 function Divider({ width = 180 }) {
   return (
@@ -211,6 +219,7 @@ export default function HomePage() {
   const [modal, setModal] = useState(null);
   const [activeAmount, setActiveAmount] = useState(1);
   const [activeSermon, setActiveSermon] = useState(0);
+  const [playing, setPlaying] = useState(false);
   const scrollFillRef = useRef(null);
   const countRefs = useRef([]);
 
@@ -244,7 +253,8 @@ export default function HomePage() {
   }));
   // Real sermons from the Sermon Archive (falls back to sample copy when empty).
   const sermons = cms.sermons || [];
-  const featured = sermons[0] || null;
+  const featured = sermons[activeSermon] || sermons[0] || null;
+  const featuredEmbed = toEmbedUrl(featured?.videoUrl);
   // Presbyteries: editable copy from settings, but only when it has the 6 the
   // region map expects (fixed REGIONS indices) — otherwise keep the hardcoded set.
   const presbyteries = (cms.presbyteries && cms.presbyteries.length >= PRESBYTERIES.length)
@@ -720,23 +730,36 @@ export default function HomePage() {
 
           <div className="sermon__grid">
             <div className="sermon__media reveal">
-              <div className="illuminated">
-                <div className="illuminated__book">{featured?.series || 'The Epistle to the Romans'}</div>
-                <div className="illuminated__chapter">{featured?.scripture ? featured.scripture.replace(/[^0-9].*$/, '') || '✦' : 'VIII'}</div>
-                <div className="illuminated__ornament" aria-hidden="true">✦ · ✦</div>
-              </div>
-              <button
-                className="sermon__play"
-                aria-label="Play sermon"
-                type="button"
-                onClick={() => { if (featured?.videoUrl) window.open(featured.videoUrl, '_blank', 'noopener'); }}
-              >
-                <svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
-              </button>
-              <div className="sermon__caption">
-                <span>{featured?.duration ? featured.duration : 'No. 412 · 32 min'}</span>
-                <span className="scripture">{featured?.scripture || '“There is therefore now no condemnation…”'}</span>
-              </div>
+              {playing && featuredEmbed ? (
+                <div className="sermon__player">
+                  <iframe
+                    src={`${featuredEmbed}?autoplay=1&rel=0`}
+                    title={featured?.title || 'Sermon'}
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  />
+                </div>
+              ) : (
+                <>
+                  <div className="illuminated">
+                    <div className="illuminated__book">{featured?.series || 'The Epistle to the Romans'}</div>
+                    <div className="illuminated__chapter">{featured?.scripture ? featured.scripture.replace(/[^0-9].*$/, '') || '✦' : 'VIII'}</div>
+                    <div className="illuminated__ornament" aria-hidden="true">✦ · ✦</div>
+                  </div>
+                  <button
+                    className="sermon__play"
+                    aria-label="Play sermon"
+                    type="button"
+                    onClick={() => { if (featuredEmbed) setPlaying(true); else if (featured?.videoUrl) window.open(featured.videoUrl, '_blank', 'noopener'); }}
+                  >
+                    <svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
+                  </button>
+                  <div className="sermon__caption">
+                    <span>{featured?.duration ? featured.duration : 'No. 412 · 32 min'}</span>
+                    <span className="scripture">{featured?.scripture || '“There is therefore now no condemnation…”'}</span>
+                  </div>
+                </>
+              )}
             </div>
 
             <div className="sermon__text reveal">
@@ -768,7 +791,7 @@ export default function HomePage() {
                     key={row.n + i}
                     type="button"
                     className={`hymnal-row${i === activeSermon ? ' is-active' : ''}`}
-                    onClick={() => setActiveSermon(i)}
+                    onClick={() => { setActiveSermon(i); setPlaying(false); }}
                   >
                     <span className="hymnal-row__num">{row.n}</span>
                     <span className="hymnal-row__title">
