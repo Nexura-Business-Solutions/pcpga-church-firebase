@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import PhilippinesMap from '../components/PhilippinesMap.jsx';
 import AnnouncementModal from '../components/AnnouncementModal.jsx';
-import { getSettings } from '../lib/store.js';
+import { getSettings, getSermons } from '../lib/store.js';
 import '../styles/landing-v3.css';
 
 const COMMITTEES = [
@@ -221,10 +221,13 @@ export default function HomePage() {
     let active = true;
     (async () => {
       const keys = ['hero', 'site-identity', 'mission-vision', 'core-principles', 'invitation-stats', 'announcement', 'standing-committees'];
-      const [hero, identity, mv, msg, stats, ann, committees] = await Promise.all(keys.map((k) => getSettings(k)));
+      const [hero, identity, mv, msg, stats, ann, committees, sermons] = await Promise.all([
+        ...keys.map((k) => getSettings(k)), getSermons(),
+      ]);
       if (active) setCms({
         hero: hero || {}, identity: identity || {}, mv: mv || {}, msg: msg || {},
         stats: stats || {}, ann: ann || {}, committees: Array.isArray(committees) ? committees : [],
+        sermons: Array.isArray(sermons) ? sermons : [],
       });
     })();
     return () => { active = false; };
@@ -238,6 +241,9 @@ export default function HomePage() {
     duties: c.duties || c.details || [],
     officers: c.officers || [],
   }));
+  // Real sermons from the Sermon Archive (falls back to sample copy when empty).
+  const sermons = cms.sermons || [];
+  const featured = sermons[0] || null;
 
   // body class management
   useEffect(() => {
@@ -710,27 +716,32 @@ export default function HomePage() {
           <div className="sermon__grid">
             <div className="sermon__media reveal">
               <div className="illuminated">
-                <div className="illuminated__book">The Epistle to the Romans</div>
-                <div className="illuminated__chapter">VIII</div>
+                <div className="illuminated__book">{featured?.series || 'The Epistle to the Romans'}</div>
+                <div className="illuminated__chapter">{featured?.scripture ? featured.scripture.replace(/[^0-9].*$/, '') || '✦' : 'VIII'}</div>
                 <div className="illuminated__ornament" aria-hidden="true">✦ · ✦</div>
               </div>
-              <button className="sermon__play" aria-label="Play sermon" type="button">
+              <button
+                className="sermon__play"
+                aria-label="Play sermon"
+                type="button"
+                onClick={() => { if (featured?.videoUrl) window.open(featured.videoUrl, '_blank', 'noopener'); }}
+              >
                 <svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
               </button>
               <div className="sermon__caption">
-                <span>No. 412 · 32 min</span>
-                <span className="scripture">“There is therefore now no condemnation…”</span>
+                <span>{featured?.duration ? featured.duration : 'No. 412 · 32 min'}</span>
+                <span className="scripture">{featured?.scripture || '“There is therefore now no condemnation…”'}</span>
               </div>
             </div>
 
             <div className="sermon__text reveal">
               <div className="sermon__series">
-                <span>Series</span><span className="dot">·</span><span>Romans · The Gospel of Grace</span>
+                <span>Series</span><span className="dot">·</span><span>{featured?.series || 'Romans · The Gospel of Grace'}</span>
               </div>
-              <h3 className="display display--md">No Condemnation<br /><em>for those in Christ.</em></h3>
-              <p className="sermon__ref">Romans 8:1–11 · Rev. Jose Aguilar · 32 min</p>
+              <h3 className="display display--md">{featured?.title || <>No Condemnation<br /><em>for those in Christ.</em></>}</h3>
+              <p className="sermon__ref">{featured ? [featured.scripture, featured.speaker, featured.duration].filter(Boolean).join(' · ') : 'Romans 8:1–11 · Rev. Jose Aguilar · 32 min'}</p>
               <p className="sermon__blurb">
-                What does it mean that the Spirit gives life where the law could only condemn? An exposition on the great hinge of the eighth chapter — and what it sets free in the ordinary Christian’s ordinary week.
+                {featured?.description || 'What does it mean that the Spirit gives life where the law could only condemn? An exposition on the great hinge of the eighth chapter — and what it sets free in the ordinary Christian’s ordinary week.'}
               </p>
 
               <div className="hymnal-index">
@@ -739,21 +750,24 @@ export default function HomePage() {
                   <span>Sermon</span>
                   <span>Reference</span>
                 </div>
-                {[
-                  { n: '412', title: 'No Condemnation', em: 'for Those in Christ', ref: 'Rom. viii. 1' },
-                  { n: '411', title: 'The Spirit of', em: 'Adoption', ref: 'Rom. viii. 14' },
-                  { n: '410', title: 'The Sufferings of', em: 'This Present Time', ref: 'Rom. viii. 18' },
-                  { n: '409', title: 'More than', em: 'Conquerors', ref: 'Rom. viii. 37' },
-                ].map((row, i) => (
+                {(sermons.length
+                  ? sermons.slice(0, 5).map((s, i) => ({ n: String(sermons.length - i).padStart(3, '0'), title: s.title || 'Untitled', em: '', ref: s.scripture || s.speaker || '' }))
+                  : [
+                    { n: '412', title: 'No Condemnation', em: 'for Those in Christ', ref: 'Rom. viii. 1' },
+                    { n: '411', title: 'The Spirit of', em: 'Adoption', ref: 'Rom. viii. 14' },
+                    { n: '410', title: 'The Sufferings of', em: 'This Present Time', ref: 'Rom. viii. 18' },
+                    { n: '409', title: 'More than', em: 'Conquerors', ref: 'Rom. viii. 37' },
+                  ]
+                ).map((row, i) => (
                   <button
-                    key={row.n}
+                    key={row.n + i}
                     type="button"
                     className={`hymnal-row${i === activeSermon ? ' is-active' : ''}`}
                     onClick={() => setActiveSermon(i)}
                   >
                     <span className="hymnal-row__num">{row.n}</span>
                     <span className="hymnal-row__title">
-                      {row.title} <em>{row.em}</em>
+                      {row.title} {row.em && <em>{row.em}</em>}
                       <span className="hymnal-row__leader" />
                     </span>
                     <span className="hymnal-row__ref">{row.ref}</span>
@@ -761,7 +775,7 @@ export default function HomePage() {
                 ))}
               </div>
 
-              <a href="#" className="btn btn--link" style={{ marginTop: '0.75rem' }}>Sermon archive →</a>
+              <Link to="/library" className="btn btn--link" style={{ marginTop: '0.75rem' }}>Sermon archive →</Link>
             </div>
           </div>
         </div>

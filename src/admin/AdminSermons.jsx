@@ -11,6 +11,8 @@ const emptySermon = {
     speaker: '',
     date: '',
     duration: '',
+    scripture: '',
+    series: '',
     videoUrl: '',
     description: '',
     audioUrl: '',
@@ -199,6 +201,8 @@ export default function AdminSermons() {
 
                                     {[
                                         { key: 'speaker', label: 'Primary Speaker', placeholder: 'Rev. Name' },
+                                        { key: 'scripture', label: 'Scripture Reference', placeholder: 'Romans 8:1–11' },
+                                        { key: 'series', label: 'Series', placeholder: 'Romans · The Gospel of Grace' },
                                         { key: 'date', label: 'Recording Date', type: 'date' },
                                         { key: 'duration', label: 'Time Duration', placeholder: 'e.g. 45 min' },
                                         { key: 'videoUrl', label: 'YouTube Video URL', placeholder: 'https://youtube.com/watch?v=...' },
