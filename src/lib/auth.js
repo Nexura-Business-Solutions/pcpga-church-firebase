@@ -23,6 +23,7 @@ export function sendReset(email) {
 export function useAuth() {
   const [user, setUser] = useState(null);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [role, setRole] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -30,14 +31,28 @@ export function useAuth() {
       setUser(u);
       if (!u) {
         setIsAdmin(false);
+        setRole(null);
         setLoading(false);
         return;
       }
-      const snap = await getDoc(doc(db, 'admins', u.uid));
-      setIsAdmin(snap.exists());
-      setLoading(false);
+      try {
+        // Admins are keyed by lowercased email so they can be managed from the
+        // console (add by email — no uid lookup needed).
+        const email = (u.email || '').trim().toLowerCase();
+        const snap = await getDoc(doc(db, 'admins', email));
+        setIsAdmin(snap.exists());
+        setRole(snap.exists() ? (snap.data().role || 'admin') : null);
+      } catch (err) {
+        // A denied/failed read must not leave the app stuck on "Loading…".
+        // Treat any failure as "not an admin" and let routing redirect cleanly.
+        console.error('admin check failed:', err);
+        setIsAdmin(false);
+        setRole(null);
+      } finally {
+        setLoading(false);
+      }
     });
   }, []);
 
-  return { user, isAdmin, loading };
+  return { user, isAdmin, role, isOwner: role === 'owner', loading };
 }

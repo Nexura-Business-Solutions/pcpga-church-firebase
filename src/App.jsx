@@ -17,6 +17,7 @@ const AdminChurches = lazy(() => import('./admin/AdminChurches.jsx'));
 const AdminDonations = lazy(() => import('./admin/AdminDonations.jsx'));
 const AdminDonors = lazy(() => import('./admin/AdminDonors.jsx'));
 const AdminContent = lazy(() => import('./admin/AdminContent.jsx'));
+const AdminAdmins = lazy(() => import('./admin/AdminAdmins.jsx'));
 
 function AdminFallback() {
   return (
@@ -26,9 +27,9 @@ function AdminFallback() {
   );
 }
 
-function adminRoute(Component) {
+function adminRoute(Component, { ownerOnly = false } = {}) {
   return (
-    <AdminRoute>
+    <AdminRoute ownerOnly={ownerOnly}>
       <Suspense fallback={<AdminFallback />}>
         <Component />
       </Suspense>
@@ -54,6 +55,7 @@ export default function App() {
       <Route path="/admin/donations" element={adminRoute(AdminDonations)} />
       <Route path="/admin/donations/donors" element={adminRoute(AdminDonors)} />
       <Route path="/admin/content" element={adminRoute(AdminContent)} />
+      <Route path="/admin/admins" element={adminRoute(AdminAdmins, { ownerOnly: true })} />
 
       <Route path="*" element={<NotFoundPage />} />
     </Routes>

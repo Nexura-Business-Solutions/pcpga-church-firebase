@@ -1,8 +1,8 @@
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../lib/auth.js';
 
-export default function AdminRoute({ children }) {
-  const { user, isAdmin, loading } = useAuth();
+export default function AdminRoute({ children, ownerOnly = false }) {
+  const { user, isAdmin, isOwner, loading } = useAuth();
   const location = useLocation();
 
   if (loading) {
@@ -10,6 +10,9 @@ export default function AdminRoute({ children }) {
   }
   if (!user || !isAdmin) {
     return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+  if (ownerOnly && !isOwner) {
+    return <Navigate to="/admin" replace />;
   }
   return children;
 }

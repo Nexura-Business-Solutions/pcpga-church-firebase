@@ -72,3 +72,24 @@ export const getSetting = async (key) => {
 export const setSetting = async (key, value) => {
   await setDoc(doc(db, 'settings', key), { value }, { merge: true });
 };
+
+// ---------- Admins (doc id = lowercased email) ----------
+const normEmail = (email) => (email || '').trim().toLowerCase();
+
+export const listAdmins = async () => {
+  // No orderBy: admins docs are keyed by email and may predate createdAt.
+  const snap = await getDocs(collection(db, 'admins'));
+  return snap.docs.map((d) => ({ email: d.id, ...d.data() }));
+};
+export const setAdmin = async (email, role, addedBy) => {
+  const key = normEmail(email);
+  await setDoc(
+    doc(db, 'admins', key),
+    { role, addedBy: addedBy || null, updatedAt: serverTimestamp() },
+    { merge: true },
+  );
+  return key;
+};
+export const removeAdmin = async (email) => {
+  await deleteDoc(doc(db, 'admins', normEmail(email)));
+};

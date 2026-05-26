@@ -12,6 +12,7 @@ import {
     Moon,
     Globe,
     LogOut,
+    ShieldCheck,
 } from 'lucide-react';
 import { logout, useAuth } from '../../lib/auth.js';
 import { initStore } from '../../lib/store.js';
@@ -27,7 +28,7 @@ const navItems = [
 ];
 
 export default function AdminLayout({ children }) {
-    const { user, isAdmin, loading } = useAuth();
+    const { user, isAdmin, isOwner, loading } = useAuth();
     const navigate = useNavigate();
     const location = useLocation();
     const pathname = location.pathname;
@@ -105,7 +106,7 @@ export default function AdminLayout({ children }) {
 
                 {/* Navigation */}
                 <nav className="flex-1 px-4 py-6 space-y-1.5 overflow-y-auto custom-scrollbar">
-                    {navItems.map((item) => {
+                    {(isOwner ? [...navItems, { label: 'Admins', href: '/admin/admins', icon: ShieldCheck }] : navItems).map((item) => {
                         const isActive = pathname === item.href;
                         return (
                             <Link
