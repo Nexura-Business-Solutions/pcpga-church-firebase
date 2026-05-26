@@ -324,13 +324,16 @@ em.font-display,
 }
 .nav__burger span { display: block; width: 22px; height: 1.5px; background: var(--ink); transition: all 0.3s; }
 
-/* When hero is full-bleed dark, show the pre-scroll nav in paper on dark */
-.nav:not(.nav--scrolled) .nav__name,
-.nav:not(.nav--scrolled) .nav__link { color: rgba(245,240,230,0.9); }
-.nav:not(.nav--scrolled) .nav__sub { color: rgba(245,240,230,0.6); }
-.nav:not(.nav--scrolled) .nav__link:hover { color: #fff; }
-.nav:not(.nav--scrolled) .nav__burger span { background: var(--paper); }
-.nav:not(.nav--scrolled) .nav__link--active::after { background: #cca54f; }
+/* When hero is full-bleed dark, show the pre-scroll nav in paper on dark.
+   Scoped to non-landing pages: the lp-v3 landing has an always-cream nav and
+   never gets `.nav--scrolled`, so these light colors would make its nav text
+   and burger invisible (white on cream). */
+body:not(.lp-v3) .nav:not(.nav--scrolled) .nav__name,
+body:not(.lp-v3) .nav:not(.nav--scrolled) .nav__link { color: rgba(245,240,230,0.9); }
+body:not(.lp-v3) .nav:not(.nav--scrolled) .nav__sub { color: rgba(245,240,230,0.6); }
+body:not(.lp-v3) .nav:not(.nav--scrolled) .nav__link:hover { color: #fff; }
+body:not(.lp-v3) .nav:not(.nav--scrolled) .nav__burger span { background: var(--paper); }
+body:not(.lp-v3) .nav:not(.nav--scrolled) .nav__link--active::after { background: #cca54f; }
 
 @media (max-width: 880px) {
   .nav__links, .nav__actions { display: none; }
