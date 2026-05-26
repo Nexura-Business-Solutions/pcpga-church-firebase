@@ -243,8 +243,8 @@ body.lp-v3 .nav {
   position: sticky;
   top: 0;
   z-index: 100;
-  background: rgba(251,244,220,0.92);
-  backdrop-filter: blur(12px);
+  background: rgba(251,244,220,0.985);
+  backdrop-filter: blur(14px);
   border-bottom: 1px solid var(--line-soft);
 }
 body.lp-v3 .nav__inner {

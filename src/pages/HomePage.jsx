@@ -972,14 +972,14 @@ export default function HomePage() {
                 <h4>{b.title}<br /><em>{b.em}</em></h4>
                 <span className="book-card__meta">{b.meta}</span>
                 <p>{b.body}</p>
-                <a href="#" className="book-card__cta">
+                <Link to="/library" className="book-card__cta">
                   {b.cta}
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
                     <polyline points="7 10 12 15 17 10" />
                     <line x1="12" y1="15" x2="12" y2="3" />
                   </svg>
-                </a>
+                </Link>
               </article>
             ))}
           </div>
@@ -1134,9 +1134,9 @@ export default function HomePage() {
               <div>
                 <h5>Resources</h5>
                 <ul>
-                  <li><a href="#resources">Westminster Standards</a></li>
-                  <li><a href="#resources">Book of Order</a></li>
-                  <li><a href="/library">Digital Library</a></li>
+                  <li><Link to="/library">Westminster Standards</Link></li>
+                  <li><Link to="/library">Book of Order</Link></li>
+                  <li><Link to="/library">Digital Library</Link></li>
                   <li><a href="/admin">Admin Panel</a></li>
                 </ul>
               </div>
