@@ -1,48 +1,1213 @@
-import StoreInit from '../components/StoreInit.jsx';
-import Navbar from '../components/Navbar.jsx';
-import Hero from '../components/Hero.jsx';
-import StatsStrip from '../components/StatsStrip.jsx';
-import MessageSection from '../components/MessageSection.jsx';
-import SermonHighlight from '../components/SermonHighlight.jsx';
-import MissionVision from '../components/MissionVision.jsx';
-import Committees from '../components/Committees.jsx';
-import Presbyteries from '../components/Presbyteries.jsx';
-import Resources from '../components/Resources.jsx';
-import Donation from '../components/Donation.jsx';
-import Invitation from '../components/Invitation.jsx';
-import Footer from '../components/Footer.jsx';
-import AnnouncementModal from '../components/AnnouncementModal.jsx';
-import ChatbotWidget from '../components/ChatbotWidget.jsx';
-import SectionDivider from '../components/SectionDivider.jsx';
+import { useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
+import PhilippinesMap from '../components/PhilippinesMap.jsx';
+import '../styles/landing-v3.css';
+
+const COMMITTEES = [
+  {
+    name: 'Executive Committee',
+    sub: 'Acts for the General Assembly between sessions.',
+    description: 'Coordinates general execution of matters entrusted by the body, prepares GA meetings, and represents the denomination before sister bodies.',
+    duties: [
+      'To execute all matters entrusted by the General Assembly body.',
+      'To prepare all matters for the next General Assembly meeting.',
+      'To represent the denomination in ecumenical relations.',
+    ],
+    officers: [
+      { name: 'Rev. Dr. Eduardo T. Reyes', role: 'Moderator' },
+      { name: 'Rev. Mateo Aguilar', role: 'Stated Clerk' },
+      { name: 'Eld. Joel Santos', role: 'Treasurer' },
+    ],
+  },
+  {
+    name: 'Mission Committee',
+    sub: 'Home and foreign mission of the church.',
+    description: 'Leads programs for home and foreign missions, monitors ongoing mission works, raises funds for mission, and recruits & deploys missionaries.',
+    duties: [
+      'To make programs for home and foreign mission.',
+      'To monitor ongoing mission works in the field.',
+      'To raise funds for mission and missionary support.',
+    ],
+    officers: [
+      { name: 'Rev. Hosea Ligan', role: 'Chair' },
+      { name: 'Rev. Antonio Cruz', role: 'Field Coordinator' },
+    ],
+  },
+  {
+    name: 'Theological Education',
+    sub: 'Training the next generation of pastors.',
+    description: 'Sets standards for theological training institutions, recommends curricula, and manages scholarship programs for ministerial candidates.',
+    duties: [
+      'To set standards for theological institutions.',
+      'To recommend curriculum for ministerial training.',
+      'To set up and administer scholarship programs.',
+    ],
+  },
+  {
+    name: 'Christian Education',
+    sub: 'Curricula for Sunday Schools and discipleship.',
+    description: 'Develops curricula for Sunday Schools, formulates policies for CE, and organizes educational seminars across congregations.',
+    duties: [
+      'To formulate policies for Christian Education.',
+      'To develop curriculum for Sunday School.',
+      'To organize seminars and workshops.',
+    ],
+  },
+  {
+    name: 'Diaconal & Welfare',
+    sub: 'Disaster relief, widows, and orphans.',
+    description: 'Manages disaster relief, raises funds for welfare projects, and supports the families of deceased ministers.',
+    duties: [
+      'To formulate policies for relief operations.',
+      'To raise funds for relief works.',
+      'To help the families of deceased Ministers.',
+    ],
+  },
+  {
+    name: 'Church Auxiliaries',
+    sub: 'Youth, men’s, and women’s fellowships.',
+    description: 'Coordinates fellowships for Youth, Men, and Women organizations, and manages national church camps.',
+    duties: [
+      'To supervise Youth, Men, and Women’s organizations.',
+      'To co-ordinate national church camps and conferences.',
+    ],
+  },
+  {
+    name: 'Publication Committee',
+    sub: 'Books, minutes, and the website.',
+    description: 'Oversees official Assembly publications, manages GA materials, and maintains the church website.',
+    duties: [
+      'To oversee and publish General Assembly materials.',
+      'To manage and maintain the official website.',
+    ],
+  },
+  {
+    name: 'Finance Committee',
+    sub: 'Budgets and the stewardship of giving.',
+    description: 'Formulates annual budgets, monitors church income and expenditures, and recommends financial policies for the assembly’s approval.',
+    duties: [
+      'To formulate the annual denominational budget.',
+      'To monitor income and expenditures.',
+      'To recommend financial policies.',
+    ],
+  },
+  {
+    name: 'Judicial Court',
+    sub: 'Appellate jurisdiction over the church.',
+    description: 'Handles all judicial matters and appeals within the denomination and reports its proceedings to the General Assembly.',
+    duties: [
+      'To handle all judicial matters arising in the church.',
+      'To prepare a report to the next General Assembly meeting.',
+    ],
+  },
+];
+
+const PRESBYTERIES = [
+  {
+    name: 'Ilocos Norte', region: 'Luzon', seat: 'Laoag City', congregations: 24, founded: 'MCMXII',
+    description: 'Constituted from the original Northern Luzon mission posts, the presbytery has served the Ilocano coast for over a century.',
+    officers: [
+      { name: 'Rev. Bayani Pascual', role: 'Moderator' },
+      { name: 'Eld. Mariano Galang', role: 'Clerk' },
+    ],
+  },
+  {
+    name: 'Cordillera', region: 'Luzon', seat: 'Baguio City', congregations: 31, founded: 'MCMXXVIII',
+    description: 'The mountain churches of Benguet, Ifugao, and Mountain Province — our largest presbytery by number of congregations.',
+    officers: [{ name: 'Rev. Pedro Bayan', role: 'Moderator' }],
+  },
+  {
+    name: 'Central Luzon', region: 'Luzon', seat: 'San Fernando, Pampanga', congregations: 18, founded: 'MCMLVIII',
+    description: 'Covering Pampanga, Bulacan, Tarlac, and Nueva Ecija — the agricultural heartland of the church.',
+  },
+  {
+    name: 'Metro Manila', region: 'NCR', seat: 'Ermita, Manila', congregations: 22, founded: 'MDCCCXCVIII',
+    description: 'The mother presbytery. Ermita Chapel, the original PCP gathering place, still meets every Lord’s Day at 9 and 11 AM.',
+    officers: [
+      { name: 'Rev. Dr. Eduardo T. Reyes', role: 'Moderator' },
+      { name: 'Rev. Jose Aguilar', role: 'Preaching Elder' },
+      { name: 'Eld. Joel Santos', role: 'Treasurer' },
+    ],
+  },
+  {
+    name: 'Cebu & Bohol', region: 'Visayas', seat: 'Cebu City', congregations: 19, founded: 'MCMLXXII',
+    description: 'The Visayan presbytery, gathering Cebuano and Boholano congregations across the two islands.',
+  },
+  {
+    name: 'Northern Mindanao', region: 'Mindanao', seat: 'Cagayan de Oro', congregations: 30, founded: 'MCMLXXXV',
+    description: 'The youngest of the six, growing fastest — from Misamis Oriental down to Bukidnon and Lanao.',
+  },
+];
+
+const STATS = [
+  { roman: 'I.', target: 128, label: 'Years of Ministry', note: 'since 1898' },
+  { roman: 'II.', target: 144, label: 'Congregations', note: 'across the archipelago' },
+  { roman: 'III.', target: 42, suffix: 'K', label: 'Communicant Members', note: 'in good standing' },
+  { roman: 'IV.', target: 6, label: 'Presbyteries', note: 'Luzon · NCR · Visayas · Mindanao' },
+];
+
+const REGIONS = [
+  {
+    num: 'I.', title: 'Luzon', emTitle: '& Cordillera', count: '3 Presbyteries',
+    indices: [0, 1, 2],
+    romans: ['i.', 'ii.', 'iii.'],
+  },
+  {
+    num: 'II.', title: 'Metro', emTitle: 'Manila', count: '1 Presbytery',
+    indices: [3], romans: ['iv.'],
+  },
+  {
+    num: 'III.', title: 'Visayas', emTitle: '& Mindanao', count: '2 Presbyteries',
+    indices: [4, 5], romans: ['v.', 'vi.'],
+  },
+];
+
+const NAV_LINKS = [
+  { href: '#message', label: 'About', roman: 'i.' },
+  { href: '#sermons', label: 'Sermons', roman: 'ii.' },
+  { href: '/churches', label: 'Churches', roman: 'iii.' },
+  { href: '#resources', label: 'Library', roman: 'iv.' },
+  { href: '#donate', label: 'Give', roman: 'v.' },
+];
+
+function Divider({ width = 180 }) {
+  return (
+    <div className="divider" aria-hidden="true">
+      <svg width={width} height="20" viewBox="0 0 180 20" fill="none" stroke="currentColor" strokeWidth="1">
+        <path d="M0 10 L60 10 M75 10 Q80 5 85 10 Q90 15 95 10 L120 10" />
+        <circle cx="70" cy="10" r="1.5" fill="currentColor" />
+      </svg>
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor" aria-hidden="true">
+        <path d="M7 0l1.6 5.4L14 7l-5.4 1.6L7 14l-1.6-5.4L0 7l5.4-1.6L7 0z" />
+      </svg>
+      <svg width={width} height="20" viewBox="0 0 180 20" fill="none" stroke="currentColor" strokeWidth="1">
+        <path d="M180 10 L120 10 M105 10 Q100 5 95 10 Q90 15 85 10 L60 10" />
+        <circle cx="110" cy="10" r="1.5" fill="currentColor" />
+      </svg>
+    </div>
+  );
+}
+
+function StatItem({ stat, refSetter }) {
+  return (
+    <div className="stats__item reveal">
+      <div className="stats__roman">{stat.roman}</div>
+      <div className="stats__value">
+        <span ref={refSetter} data-count="" data-target={stat.target}>{stat.target}</span>
+        {stat.suffix && <em>{stat.suffix}</em>}
+      </div>
+      <div className="stats__label">{stat.label}</div>
+      <div className="stats__note">{stat.note}</div>
+    </div>
+  );
+}
 
 export default function HomePage() {
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [lang, setLang] = useState('en');
+  const [modal, setModal] = useState(null);
+  const [activeAmount, setActiveAmount] = useState(1);
+  const [activeSermon, setActiveSermon] = useState(0);
+  const scrollFillRef = useRef(null);
+  const countRefs = useRef([]);
+
+  // body class management
+  useEffect(() => {
+    document.body.classList.add('lp-v3');
+    return () => {
+      document.body.classList.remove('lp-v3', 'mobile-open', 'modal-open', 'lang-tl');
+    };
+  }, []);
+
+  useEffect(() => {
+    document.body.classList.toggle('mobile-open', mobileOpen);
+  }, [mobileOpen]);
+
+  useEffect(() => {
+    document.body.classList.toggle('modal-open', modal !== null);
+  }, [modal]);
+
+  useEffect(() => {
+    document.body.classList.toggle('lang-tl', lang === 'tl');
+  }, [lang]);
+
+  // Reveal-on-scroll
+  useEffect(() => {
+    const els = document.querySelectorAll('.reveal');
+    if (!('IntersectionObserver' in window)) {
+      els.forEach((e) => e.classList.add('is-in'));
+      return undefined;
+    }
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const idx = entry.target.parentElement
+            ? Array.prototype.indexOf.call(entry.target.parentElement.children, entry.target)
+            : 0;
+          entry.target.style.transitionDelay = Math.min(idx * 70, 420) + 'ms';
+          entry.target.classList.add('is-in');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+    els.forEach((el) => io.observe(el));
+    return () => io.disconnect();
+  }, []);
+
+  // Scroll progress bar
+  useEffect(() => {
+    const fill = scrollFillRef.current;
+    if (!fill) return undefined;
+    let ticking = false;
+    function update() {
+      const h = document.documentElement;
+      const max = h.scrollHeight - h.clientHeight;
+      const pct = max > 0 ? (window.scrollY / max) * 100 : 0;
+      fill.style.width = pct + '%';
+      ticking = false;
+    }
+    function onScroll() {
+      if (!ticking) {
+        requestAnimationFrame(update);
+        ticking = true;
+      }
+    }
+    window.addEventListener('scroll', onScroll, { passive: true });
+    update();
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  // Count-up
+  useEffect(() => {
+    const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const nodes = countRefs.current.filter(Boolean);
+    if (!nodes.length) return undefined;
+    if (reduced) {
+      nodes.forEach((n) => { n.textContent = n.getAttribute('data-target'); });
+      return undefined;
+    }
+    function countUp(el) {
+      const target = parseFloat(el.getAttribute('data-target')) || 0;
+      const duration = 1700;
+      const start = performance.now();
+      function frame(now) {
+        const t = Math.min((now - start) / duration, 1);
+        const eased = 1 - Math.pow(1 - t, 3);
+        el.textContent = Math.round(target * eased);
+        if (t < 1) requestAnimationFrame(frame);
+      }
+      requestAnimationFrame(frame);
+    }
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (e.isIntersecting) {
+          countUp(e.target);
+          io.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.5 });
+    nodes.forEach((n) => io.observe(n));
+    return () => io.disconnect();
+  }, []);
+
+  // Parallax
+  useEffect(() => {
+    const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduced) return undefined;
+    const els = Array.from(document.querySelectorAll('[data-parallax]'));
+    if (!els.length) return undefined;
+    let vh = window.innerHeight;
+    let ticking = false;
+    function onResize() { vh = window.innerHeight; }
+    function update() {
+      els.forEach((el) => {
+        const parent = el.parentElement;
+        const rect = parent.getBoundingClientRect();
+        if (rect.bottom < -200 || rect.top > vh + 200) return;
+        const speed = parseFloat(el.getAttribute('data-parallax')) || 0.15;
+        const centerOffset = rect.top + rect.height / 2 - vh / 2;
+        let translate = centerOffset * -speed;
+        if (translate > 120) translate = 120;
+        if (translate < -120) translate = -120;
+        el.style.transform = `translate3d(0,${translate.toFixed(1)}px,0)`;
+      });
+      ticking = false;
+    }
+    function onScroll() {
+      if (!ticking) { requestAnimationFrame(update); ticking = true; }
+    }
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onResize);
+    update();
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onResize);
+    };
+  }, []);
+
+  // Sequential map pin reveal
+  useEffect(() => {
+    const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const map = document.querySelector('.ph-map');
+    if (!map) return undefined;
+    const pins = map.querySelectorAll('.map-pin');
+    if (!pins.length) return undefined;
+    if (reduced) {
+      pins.forEach((p) => p.classList.add('is-in'));
+      return undefined;
+    }
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (e.isIntersecting) {
+          pins.forEach((p, i) => {
+            setTimeout(() => p.classList.add('is-in'), 240 + i * 240);
+          });
+          io.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.35 });
+    io.observe(map);
+    return () => io.disconnect();
+  }, []);
+
+  // Nav active state
+  useEffect(() => {
+    const links = document.querySelectorAll('.nav__link[href^="#"]');
+    const map = {};
+    links.forEach((a) => {
+      const href = a.getAttribute('href');
+      if (href && href.charAt(0) === '#') map[href.slice(1)] = a;
+    });
+    const sections = Object.keys(map).map((id) => document.getElementById(id)).filter(Boolean);
+    if (!sections.length) return undefined;
+    function onScroll() {
+      const pos = window.scrollY + 140;
+      let active = sections[0];
+      sections.forEach((s) => { if (s.offsetTop <= pos) active = s; });
+      Object.values(map).forEach((a) => a.classList.remove('is-active'));
+      if (map[active.id]) map[active.id].classList.add('is-active');
+    }
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  // ESC closes mobile menu + modal
+  useEffect(() => {
+    function onKey(e) {
+      if (e.key === 'Escape') {
+        setMobileOpen(false);
+        setModal(null);
+      }
+    }
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
+
+  function openCommittee(i) { setModal({ kind: 'committee', i }); }
+  function openPresbytery(i) { setModal({ kind: 'presbytery', i }); }
+  function closeModal() { setModal(null); }
+
   return (
     <>
       <Helmet>
-        <title>Presbyterian Church of the Philippines | Welcome Home</title>
-        <meta name="description" content="Rooted in the Gospel, Reformed in tradition. Discover a community of faith, hope, and love at the Presbyterian Church of the Philippines." />
+        <title>Presbyterian Church of the Philippines · Sacred Heritage</title>
+        <meta name="description" content="A communion of Reformed congregations gathered around Scripture, Sacrament, and the historic Presbyterian faith — keeping the old paths across the islands since 1898." />
       </Helmet>
-      <AnnouncementModal />
-      <main id="main-content">
-        <StoreInit />
-        <Navbar />
-        <Hero />
-        <StatsStrip />
-        <MessageSection />
-        <SectionDivider />
-        <SermonHighlight />
-        <MissionVision />
-        <SectionDivider />
-        <Committees />
-        <Presbyteries />
-        <SectionDivider />
-        <Resources />
-        <Donation />
-        <Invitation />
-        <Footer />
-      </main>
-      <ChatbotWidget />
+
+      <div className="scroll-bar" aria-hidden="true">
+        <div className="scroll-bar__fill" ref={scrollFillRef} />
+      </div>
+
+      {/* MASTHEAD */}
+      <div className="masthead">
+        <div className="masthead__inner">
+          <span className="masthead__latin">Verbum Domini manet in aeternum</span>
+          <div className="masthead__meta">
+            <span>Vol. CXXVIII · No. 12</span>
+            <span>Manila · A.D. MMXXVI</span>
+            <span>Lord’s Day xliii</span>
+            <span className="lang-toggle">
+              <button className={lang === 'en' ? 'is-active' : ''} onClick={() => setLang('en')} type="button">EN</button>
+              <span className="sep">·</span>
+              <button className={lang === 'tl' ? 'is-active' : ''} onClick={() => setLang('tl')} type="button">TL</button>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* NAV */}
+      <header className="nav">
+        <div className="nav__inner">
+          <a href="#" className="nav__brand">
+            <img src="/pcpga_logo.png" alt="" className="nav__logo" />
+            <div className="nav__brand-text">
+              <span className="nav__name">Presbyterian Church</span>
+              <span className="nav__sub">of the Philippines</span>
+            </div>
+          </a>
+          <nav className="nav__links">
+            {NAV_LINKS.map((l) => (
+              <a key={l.href} href={l.href} className="nav__link">{l.label}</a>
+            ))}
+            <div className="nav__actions">
+              <Link to="/churches" className="btn btn--primary btn--small">Find a Church</Link>
+            </div>
+          </nav>
+          <button
+            className="nav__burger"
+            aria-label="Toggle menu"
+            type="button"
+            onClick={() => setMobileOpen((v) => !v)}
+          >
+            <span /><span /><span />
+          </button>
+        </div>
+      </header>
+
+      {/* Mobile menu overlay */}
+      <div className="mobile-menu" aria-hidden={!mobileOpen}>
+        {NAV_LINKS.map((l) => (
+          <a
+            key={l.href}
+            href={l.href}
+            className="mobile-menu__link"
+            onClick={() => setMobileOpen(false)}
+          >
+            {l.label} <em>{l.roman}</em>
+          </a>
+        ))}
+        <span className="mobile-menu__divider" />
+        <Link to="/churches" className="btn btn--primary" onClick={() => setMobileOpen(false)}>
+          Find a Church
+        </Link>
+      </div>
+
+      {/* HERO */}
+      <section className="hero" id="hero" aria-label="Welcome">
+        <div className="hero__bg" data-parallax="0.15">
+          <img src="/pcp-hero.jpg" alt="" />
+        </div>
+        <div className="hero__frame" aria-hidden="true">
+          <span className="hero__frame-corner hero__frame-corner--tl" />
+          <span className="hero__frame-corner hero__frame-corner--tr" />
+          <span className="hero__frame-corner hero__frame-corner--bl" />
+          <span className="hero__frame-corner hero__frame-corner--br" />
+        </div>
+
+        <div className="hero__inner">
+          <div className="hero__copy reveal">
+            <div className="hero__edition">
+              <span className="brass">✦</span>
+              <span>A Communion of Reformed Churches</span>
+              <span className="sep">·</span>
+              <span>Est. MDCCCXCVIII</span>
+              <span className="sep">·</span>
+              <span className="brass">128 Years in the Islands</span>
+            </div>
+
+            <h1 className="hero__title">
+              <span data-en="">Welcome <em>home.</em></span>
+              <span data-tl="">Maligayang <em>pagdating.</em></span>
+            </h1>
+
+            <p className="hero__lede">
+              A communion of Reformed congregations gathered around Scripture, Sacrament, and the historic Presbyterian faith — keeping the old paths across the islands since the dying years of the 19th century.
+            </p>
+
+            <div className="hero__actions">
+              <Link to="/churches" className="btn btn--primary">Find a Church</Link>
+              <a href="#sermons" className="btn btn--ghost-light">Watch the Sermon</a>
+            </div>
+
+            <p className="hero__times">Sunday Worship · 9:00 &amp; 11:00 AM · Metro Manila</p>
+          </div>
+
+          <div className="wax-seal reveal reveal--scale" aria-hidden="true">
+            <div className="wax-seal__inner">
+              <span className="wax-seal__diamond">✦</span>
+              <span>General<br />Assembly</span>
+              <span className="wax-seal__year">MDCCCXCVIII</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="hero__scroll" aria-hidden="true">
+          <span>Scroll</span>
+          <span className="hero__scroll-line" />
+        </div>
+      </section>
+
+      {/* STATS */}
+      <section className="stats" aria-label="At a glance">
+        <div className="stats__grid">
+          {STATS.map((s, i) => (
+            <StatItem
+              key={s.label}
+              stat={s}
+              refSetter={(el) => { countRefs.current[i] = el; }}
+            />
+          ))}
+        </div>
+      </section>
+
+      {/* EVENTS */}
+      <section className="events" aria-label="Upcoming events">
+        <div className="events__inner">
+          <div className="events__head">
+            <h3 className="events__title">Upcoming &amp; <em>in session.</em></h3>
+            <span className="events__feed">
+              <span className="live-dot" aria-hidden="true" />
+              <span>Denominational Feed</span>
+            </span>
+          </div>
+          <div className="events__grid">
+            <button className="event-card reveal" type="button">
+              <div className="event-card__date">
+                <span className="month">Oct</span>
+                <span className="day">14</span>
+                <span className="yr">MMXXVI</span>
+              </div>
+              <div className="event-card__body">
+                <span className="event-card__tag">General Assembly</span>
+                <h4>The 32nd <em>General Assembly</em> convenes.</h4>
+                <p>Four days of deliberation, worship, and the seating of newly ordained ministers.</p>
+                <span className="event-card__meta">14–17 Oct · Ermita Chapel, Manila</span>
+              </div>
+            </button>
+            <button className="event-card reveal" type="button">
+              <div className="event-card__date">
+                <span className="month">Sep</span>
+                <span className="day">07</span>
+                <span className="yr">MMXXVI</span>
+              </div>
+              <div className="event-card__body">
+                <span className="event-card__tag">Church Plant</span>
+                <h4>New <em>Bacolod</em> chapel opens.</h4>
+                <p>Our 145th congregation begins weekly worship in the Visayas under Rev. Antonio Cruz.</p>
+                <span className="event-card__meta">Sundays · 9:00 AM · Bacolod City</span>
+              </div>
+            </button>
+            <button className="event-card reveal" type="button">
+              <div className="event-card__date">
+                <span className="month">Aug</span>
+                <span className="day">22</span>
+                <span className="yr">MMXXVI</span>
+              </div>
+              <div className="event-card__body">
+                <span className="event-card__tag">Mission Update</span>
+                <h4>From the field · <em>Camiguin</em>.</h4>
+                <p>A short letter from our mission station on the small northern island — baptisms and small-group launches.</p>
+                <span className="event-card__meta">Read the dispatch →</span>
+              </div>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <Divider />
+
+      {/* MODERATOR'S LETTER */}
+      <section className="editorial" id="message" aria-label="A word of welcome">
+        <div className="editorial__grid">
+          <aside className="editorial__meta reveal">
+            <span className="kicker">A Word of Welcome</span>
+            <span className="bylabel">From the Moderator</span>
+          </aside>
+          <div className="editorial__body reveal">
+            <h2 className="editorial__title">
+              We are a church built on the <em>old foundation</em> — Christ, the Scriptures, and the fellowship of the saints.
+            </h2>
+            <p className="editorial__para has-drop-cap">
+              For over a century, the Gospel has travelled through these islands — from the seaside chapels of the Ilocos coast to the mountain parishes of the Cordillera, and into the neighborhoods of Metro Manila. Our congregations are ordinary and small; the God we worship is not. We gather weekly around the preached Word and the Lord’s Table, believing that grace still reaches the ordinary sinner through ordinary means.
+            </p>
+            <blockquote className="pull-quote">
+              Grace still reaches the ordinary sinner through ordinary means — the preached Word, the Sacraments, the prayers of the saints.
+            </blockquote>
+            <p className="editorial__para">
+              Whether you are new to the faith, returning after many years away, or simply visiting for a season — you will find a seat here, a Bible opened, and a community that believes the Gospel is good news for you today.
+            </p>
+            <div className="signature">
+              <em>Rev. Dr. Eduardo T. Reyes</em>
+              <span>Moderator · 32nd General Assembly</span>
+            </div>
+          </div>
+          <aside className="marginalia reveal">
+            <div className="margin-note">
+              <span className="label">Note</span>
+              The first PCP congregation gathered for worship in Ermita, Manila, on Easter Sunday, 1898 — twenty souls at table.
+            </div>
+            <div className="margin-note">
+              <span className="label">Cf.</span>
+              “Stand ye in the ways, and see, and ask for the old paths, where is the good way, and walk therein…”
+              <span className="scripture">Jeremiah 6 : 16</span>
+            </div>
+            <div className="margin-note">
+              <span className="label">In Session</span>
+              The 32nd General Assembly convenes at Ermita Chapel from 14–17 October.
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      {/* SERMON */}
+      <section className="sermon" id="sermons" aria-label="Latest sermons">
+        <div className="sermon__inner">
+          <div className="section-head section-head--split">
+            <div className="reveal">
+              <span className="kicker">Messages from the Pulpit</span>
+              <h2 className="display display--lg">Latest<br /><em>sermons.</em></h2>
+            </div>
+            <p className="lede reveal">
+              Weekly exposition of the Word, archived here for reflection, family devotion, and ongoing discipleship.
+            </p>
+          </div>
+
+          <div className="sermon__grid">
+            <div className="sermon__media reveal">
+              <div className="illuminated">
+                <div className="illuminated__book">The Epistle to the Romans</div>
+                <div className="illuminated__chapter">VIII</div>
+                <div className="illuminated__ornament" aria-hidden="true">✦ · ✦</div>
+              </div>
+              <button className="sermon__play" aria-label="Play sermon" type="button">
+                <svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
+              </button>
+              <div className="sermon__caption">
+                <span>No. 412 · 32 min</span>
+                <span className="scripture">“There is therefore now no condemnation…”</span>
+              </div>
+            </div>
+
+            <div className="sermon__text reveal">
+              <div className="sermon__series">
+                <span>Series</span><span className="dot">·</span><span>Romans · The Gospel of Grace</span>
+              </div>
+              <h3 className="display display--md">No Condemnation<br /><em>for those in Christ.</em></h3>
+              <p className="sermon__ref">Romans 8:1–11 · Rev. Jose Aguilar · 32 min</p>
+              <p className="sermon__blurb">
+                What does it mean that the Spirit gives life where the law could only condemn? An exposition on the great hinge of the eighth chapter — and what it sets free in the ordinary Christian’s ordinary week.
+              </p>
+
+              <div className="hymnal-index">
+                <div className="hymnal-index__head">
+                  <span>No.</span>
+                  <span>Sermon</span>
+                  <span>Reference</span>
+                </div>
+                {[
+                  { n: '412', title: 'No Condemnation', em: 'for Those in Christ', ref: 'Rom. viii. 1' },
+                  { n: '411', title: 'The Spirit of', em: 'Adoption', ref: 'Rom. viii. 14' },
+                  { n: '410', title: 'The Sufferings of', em: 'This Present Time', ref: 'Rom. viii. 18' },
+                  { n: '409', title: 'More than', em: 'Conquerors', ref: 'Rom. viii. 37' },
+                ].map((row, i) => (
+                  <button
+                    key={row.n}
+                    type="button"
+                    className={`hymnal-row${i === activeSermon ? ' is-active' : ''}`}
+                    onClick={() => setActiveSermon(i)}
+                  >
+                    <span className="hymnal-row__num">{row.n}</span>
+                    <span className="hymnal-row__title">
+                      {row.title} <em>{row.em}</em>
+                      <span className="hymnal-row__leader" />
+                    </span>
+                    <span className="hymnal-row__ref">{row.ref}</span>
+                  </button>
+                ))}
+              </div>
+
+              <a href="#" className="btn btn--link" style={{ marginTop: '0.75rem' }}>Sermon archive →</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <Divider width={160} />
+
+      {/* SUNDAYS AT PCP */}
+      <section className="sundays" aria-label="Sundays at PCP">
+        <div className="sundays__bg" data-parallax="0.10">
+          <div className="img-placeholder" />
+        </div>
+        <div className="sundays__frame" aria-hidden="true" />
+        <div className="sundays__inner reveal">
+          <span className="kicker kicker--on-dark" style={{ color: 'var(--brass-bright)' }}>A Lord’s Day at PCP</span>
+          <h2 className="sundays__title">Worship as the saints have, <em>for centuries.</em></h2>
+          <p className="sundays__lede">
+            Our Sunday services follow the simple, scripted pattern of historic Reformed worship — the same five movements you would have found in a Geneva chapel in 1559, or a Cordillera barrio in 1928.
+          </p>
+          <div className="order-of-worship">
+            {[
+              { r: 'I.', n: 'Call to Worship', s: 'Psalm · Invocation' },
+              { r: 'II.', n: 'Confession', s: 'Sin · Pardon' },
+              { r: 'III.', n: 'The Word', s: 'Reading · Sermon' },
+              { r: 'IV.', n: 'The Table', s: 'Monthly · Communion' },
+              { r: 'V.', n: 'Benediction', s: 'Sending · Doxology' },
+            ].map((step) => (
+              <div key={step.r} className="order-of-worship__step">
+                <span className="roman">{step.r}</span>
+                <span className="name">{step.n}</span>
+                <span className="sub">{step.s}</span>
+              </div>
+            ))}
+          </div>
+          <p
+            className="sundays__lede"
+            style={{ maxWidth: '44ch', fontStyle: 'italic', color: 'rgba(251,244,220,0.65)', fontSize: '1rem' }}
+          >
+            Walang ceremonya na masyadong elaborate. The Word, the Table, and the people gathered — that is enough.
+          </p>
+        </div>
+      </section>
+
+      {/* MOTTO + MISSION */}
+      <section className="mv" id="mission" aria-label="Mission &amp; Vision">
+        <div className="mv__inner">
+          <div className="mv__motto reveal">
+            <span className="kicker kicker--brass">The Denominational Motto</span>
+            <p className="mv__motto-text">
+              “To glorify God <em>and to enjoy Him forever.</em>”
+            </p>
+            <div className="sdg-seal reveal reveal--scale">
+              <span className="sdg-seal__diamond">✦</span>
+              <span className="sdg-seal__words">Soli Deo<br />Gloria</span>
+              <span className="sdg-seal__cite">A · D · MDCXLVII</span>
+            </div>
+            <p className="mv__motto-cite">Westminster Shorter Catechism · Question I.</p>
+          </div>
+
+          <div className="mv__pillars">
+            <div className="mv__pillars-intro reveal">
+              <span className="kicker">Our Calling</span>
+              <h2 className="display display--lg">Five tasks,<br /><em>one Lord.</em></h2>
+              <p className="lede">
+                As a Reformed and Presbyterian denomination under the authority of Scripture and the Lordship of Jesus Christ, we are called to:
+              </p>
+              <p className="mv__pillars-tag">Established in grace · moving in faith.</p>
+            </div>
+
+            <ol className="pillars-list">
+              {[
+                { n: 'I.', h: 'Go,', em: 'make disciples.', p: 'Nurture believers to maturity through Word, Sacrament and prayer.' },
+                { n: 'II.', h: 'Advance', em: 'the mission.', p: 'Proclaim the gospel of grace locally and globally, in mercy and justice.' },
+                { n: 'III.', h: 'Grow', em: 'the church.', p: 'Plant, strengthen, and revitalize confessional Presbyterian congregations.' },
+                { n: 'IV.', h: 'Develop', em: 'leaders.', p: 'Train faithful pastors, elders and deacons for worship, service and witness.' },
+                { n: 'V.', h: 'Uphold', em: 'the Reformed faith.', p: 'Preserve the confessional heritage and promote unity among Reformed bodies.' },
+              ].map((p) => (
+                <li key={p.n} className="reveal">
+                  <span className="num">{p.n}</span>
+                  <div>
+                    <h4>{p.h} <em>{p.em}</em></h4>
+                    <p>{p.p}</p>
+                  </div>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </div>
+      </section>
+
+      {/* COMMITTEES */}
+      <section className="committees" id="committees" aria-label="Standing committees">
+        <div className="committees__inner">
+          <div className="section-head reveal">
+            <span className="kicker">Governance</span>
+            <h2 className="display display--lg">Standing<br /><em>committees.</em></h2>
+            <p className="lede">
+              Nine committees carry out the ministries and administrative work of the General Assembly between sessions. Select a committee to view its standing rules and officers.
+            </p>
+          </div>
+          <ul className="committees__list">
+            {COMMITTEES.map((c, i) => {
+              const romans = ['I.', 'II.', 'III.', 'IV.', 'V.', 'VI.', 'VII.', 'VIII.', 'IX.'];
+              return (
+                <li key={c.name}>
+                  <button className="committees__card reveal" type="button" onClick={() => openCommittee(i)}>
+                    <span className="committees__num">{romans[i]}</span>
+                    <h4>{c.name}</h4>
+                    <p>{c.description.length > 140 ? c.description.slice(0, 140) + '…' : c.description}</p>
+                    <span className="committees__cta">View rules →</span>
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      </section>
+
+      {/* PRESBYTERIES + MAP */}
+      <section className="presbyteries" id="presbyteries" aria-label="Presbyteries">
+        <div className="presbyteries__inner">
+          <div className="section-head section-head--split">
+            <div className="reveal">
+              <span className="kicker">Across the Archipelago</span>
+              <h2 className="display display--lg">Six presbyteries.<br /><em>One communion.</em></h2>
+            </div>
+            <p className="lede reveal">
+              From the Cordilleras to Mindanao, our congregations gather weekly to hear the Word preached and the Sacraments rightly administered.
+            </p>
+          </div>
+
+          <div className="presbyteries__layout">
+            <aside className="ph-map reveal">
+              <div className="ph-map__label">— Map of the Communion —</div>
+              <PhilippinesMap />
+              <div className="ph-map__legend">
+                <span className="pin" />
+                <span>Seat of Presbytery · mga kongregasyon</span>
+              </div>
+            </aside>
+
+            <div className="presbyteries__col">
+              {REGIONS.map((region) => (
+                <div key={region.num} className="presbyteries__region reveal">
+                  <div className="presbyteries__region-head">
+                    <span className="num">{region.num}</span>
+                    <h3>{region.title} <em>{region.emTitle}</em></h3>
+                    <span className="count">{region.count}</span>
+                  </div>
+                  <div className="presbyteries__grid">
+                    {region.indices.map((idx, j) => {
+                      const p = PRESBYTERIES[idx];
+                      const [first, ...rest] = p.name.split(' ');
+                      return (
+                        <button
+                          key={p.name}
+                          type="button"
+                          className="presbyteries__card"
+                          onClick={() => openPresbytery(idx)}
+                        >
+                          <span className="presbyteries__num">{region.romans[j]}</span>
+                          <div className="presbyteries__body">
+                            <h4>{first} {rest.length > 0 && <em>{rest.join(' ')}</em>}</h4>
+                            <span className="presbyteries__seat">Seat · {p.seat}</span>
+                            <span className="presbyteries__count">
+                              {p.congregations} congregations
+                            </span>
+                          </div>
+                          <span className="presbyteries__arrow">→</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* RESOURCES */}
+      <section className="dark-section" id="resources" aria-label="Official governance documents">
+        <div className="dark-section__frame" aria-hidden="true" />
+        <div className="resources__inner">
+          <div className="section-head reveal">
+            <span className="kicker kicker--on-dark" style={{ color: 'var(--brass-bright)' }}>Official Governance · The Library</span>
+            <h2 className="display display--lg on-dark">Vision &amp;<br /><em>constitutions.</em></h2>
+            <p className="lede lede--on-dark">
+              Foundational documents that define our heritage, discipline and direction.
+            </p>
+          </div>
+          <div className="resources__grid">
+            {[
+              { cat: 'Constitution', ed: 'Ed. iv · MMXV', title: 'The Book of', em: 'Church Order', meta: 'Government · Discipline · Worship', body: 'The constitution of the Presbyterian Church of the Philippines as amended and approved at the 20th General Assembly, 4 November 2015.', cta: 'Download PDF' },
+              { cat: 'Standards', ed: 'A.D. MDCXLVII', title: 'Westminster', em: 'Standards.', meta: 'Confession · Larger & Shorter Catechisms', body: 'The doctrinal standards of the Presbyterian Church — the Confession of Faith and the two Catechisms drafted at Westminster Abbey, 1647.', cta: 'Download PDF' },
+              { cat: 'Vision', ed: 'MMXXVI – MMXXX', title: 'Strategic', em: 'Directions.', meta: 'Five-Year Plan of the General Assembly', body: 'Plans adopted by the General Assembly for the next five years of ministry, mission, education and church planting.', cta: 'Open in Library' },
+            ].map((b) => (
+              <article key={b.cat} className="book-card reveal reveal--book">
+                <div className="book-card__head">
+                  <span className="book-card__cat">{b.cat}</span>
+                  <span className="book-card__edition">{b.ed}</span>
+                </div>
+                <h4>{b.title}<br /><em>{b.em}</em></h4>
+                <span className="book-card__meta">{b.meta}</span>
+                <p>{b.body}</p>
+                <a href="#" className="book-card__cta">
+                  {b.cta}
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                    <polyline points="7 10 12 15 17 10" />
+                    <line x1="12" y1="15" x2="12" y2="3" />
+                  </svg>
+                </a>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* GIVE */}
+      <section className="dark-section" id="donate" aria-label="Give">
+        <div className="dark-section__frame" aria-hidden="true" />
+        <div className="give__inner">
+          <div className="give__copy reveal">
+            <span className="kicker kicker--on-dark" style={{ color: 'var(--brass-bright)' }}>Stewardship</span>
+            <h2 className="display display--lg on-dark">
+              Give as you have<br /><em>purposed in your heart.</em>
+            </h2>
+            <p className="give__cite">— II Corinthians ix : 7</p>
+            <p className="give__scripture">
+              Every man according as he purposeth in his heart, so let him give; not grudgingly, or of necessity: for God loveth a cheerful giver.
+            </p>
+            <p className="lede lede--on-dark">
+              Your gifts sustain the preaching of the Word, the training of pastors, the planting of congregations, and the mercy ministries of the Church across the islands.
+            </p>
+          </div>
+
+          <div className="covenant-card reveal reveal--scale">
+            <span className="covenant-card__corner covenant-card__corner--tl" />
+            <span className="covenant-card__corner covenant-card__corner--tr" />
+            <span className="covenant-card__corner covenant-card__corner--bl" />
+            <span className="covenant-card__corner covenant-card__corner--br" />
+            <div className="covenant-card__head">
+              <div className="covenant-card__kicker">— A Card of Stewardship —</div>
+              <div className="covenant-card__title">For the work of the Gospel</div>
+            </div>
+            <div>
+              <label className="give-form__label">Your name (optional)</label>
+              <input className="give-form__input" type="text" placeholder="Anonymous" />
+            </div>
+            <div>
+              <label className="give-form__label">Choose an amount</label>
+              <div className="give-form__amounts">
+                {['₱500', '₱1,000', '₱2,500', '₱5,000'].map((amt, i) => (
+                  <button
+                    key={amt}
+                    type="button"
+                    className={`give-form__chip${i === activeAmount ? ' is-active' : ''}`}
+                    onClick={() => setActiveAmount(i)}
+                  >
+                    {amt}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <button
+              type="button"
+              className="btn btn--primary"
+              style={{ width: '100%', justifyContent: 'center', padding: '1.1rem' }}
+            >
+              Donate Now
+            </button>
+            <div className="give-form__qrs">
+              <div>
+                <div className="give-form__qr">GCASH</div>
+                <span className="give-form__qr-label">GCash</span>
+              </div>
+              <div>
+                <div className="give-form__qr">MAYA</div>
+                <span className="give-form__qr-label">Maya</span>
+              </div>
+              <div
+                style={{
+                  flex: 1,
+                  paddingLeft: '0.5rem',
+                  fontFamily: 'var(--font-serif)',
+                  fontStyle: 'italic',
+                  color: 'rgba(251,244,220,0.65)',
+                  fontSize: '0.92rem',
+                  lineHeight: 1.5,
+                }}
+              >
+                Direct GCash &amp; Maya. Questions? Write to{' '}
+                <a
+                  href="mailto:info@pcphilippines.org"
+                  style={{ color: 'var(--brass-bright)', borderBottom: '1px solid currentColor' }}
+                >
+                  info@pcphilippines.org
+                </a>.
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* INVITATION */}
+      <section className="invitation" id="visit" aria-label="You are invited">
+        <div className="invitation__bg" data-parallax="0.18">
+          <img src="/pcp-hero.jpg" alt="" />
+        </div>
+        <div className="invitation__frame" aria-hidden="true" />
+        <div className="invitation__inner reveal">
+          <span className="kicker kicker--on-dark" style={{ color: 'var(--brass-bright)' }}>You’re Invited</span>
+          <h2 className="invitation__title">You belong <em>here.</em></h2>
+          <p className="invitation__lede">
+            No matter where you are on your journey, there is a seat at our table. Come worship with us this Lord’s Day.
+          </p>
+          <div className="invitation__actions">
+            <a href="#presbyteries" className="btn btn--primary">Find a Church Near You</a>
+            <a href="#donate" className="btn btn--ghost-light">Partner with Us</a>
+          </div>
+          <div className="invitation__strip">
+            <div><span className="label">Sundays</span><span className="value">9:00 &amp; 11:00 AM</span></div>
+            <div><span className="label">Wednesdays</span><span className="value">7:00 PM</span></div>
+            <div><span className="label">Location</span><span className="value">Metro Manila</span></div>
+          </div>
+        </div>
+      </section>
+
+      {/* FOOTER */}
+      <footer className="foot" role="contentinfo">
+        <div className="foot__inner">
+          <div className="foot__benediction">
+            <span className="foot__benediction-kicker">Benediction</span>
+            <p className="foot__benediction-text">
+              “Now unto Him that is able to keep you from falling, and to present you faultless before the presence of His glory with exceeding joy…”
+            </p>
+            <span className="foot__benediction-cite">Jude · 24</span>
+          </div>
+
+          <div className="foot__top">
+            <div>
+              <div className="foot__brand">
+                <img src="/pcpga_logo.png" alt="" className="foot__logo" />
+                <div>
+                  <div className="foot__name">Presbyterian Church of the Philippines</div>
+                  <div className="foot__sub">General Assembly · Est. MDCCCXCVIII</div>
+                </div>
+              </div>
+              <p className="foot__desc">
+                Serving the Philippines since 1898 — proclaiming the Gospel, equipping believers, and planting confessional Presbyterian congregations across the nation.
+              </p>
+            </div>
+
+            <div className="foot__cols">
+              <div>
+                <h5>Ministry</h5>
+                <ul>
+                  <li><a href="#message">About</a></li>
+                  <li><a href="#sermons">Sermons</a></li>
+                  <li><a href="#presbyteries">Find a Church</a></li>
+                  <li><a href="#donate">Give Online</a></li>
+                </ul>
+              </div>
+              <div>
+                <h5>Resources</h5>
+                <ul>
+                  <li><a href="#resources">Westminster Standards</a></li>
+                  <li><a href="#resources">Book of Order</a></li>
+                  <li><a href="/library">Digital Library</a></li>
+                  <li><a href="/admin">Admin Panel</a></li>
+                </ul>
+              </div>
+              <div>
+                <h5>Contact</h5>
+                <ul>
+                  <li>1200 Taft Avenue, Ermita, Manila 1000</li>
+                  <li>info@pcphilippines.org</li>
+                  <li>+63 2 8524 0000</li>
+                  <li className="social">
+                    <a href="#">Facebook</a>
+                    <a href="#">YouTube</a>
+                    <a href="#">Instagram</a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div className="foot__solas">
+            {[
+              ['Sola Scriptura', 'Scripture Alone'],
+              ['Sola Gratia', 'Grace Alone'],
+              ['Sola Fide', 'Faith Alone'],
+              ['Solus Christus', 'Christ Alone'],
+              ['Soli Deo Gloria', 'To God Alone Be Glory'],
+            ].map(([name, tr]) => (
+              <div key={name} className="sola">
+                <span className="sola__name">{name}</span>
+                <span className="sola__tr">{tr}</span>
+              </div>
+            ))}
+          </div>
+
+          <div className="foot__bottom">
+            <span>© MMXXVI · Presbyterian Church of the Philippines</span>
+            <em>To the glory of God alone.</em>
+          </div>
+        </div>
+      </footer>
+
+      {/* MODAL */}
+      <div
+        className="modal-backdrop"
+        aria-hidden={modal === null}
+        onClick={(e) => { if (e.target === e.currentTarget) closeModal(); }}
+      >
+        <div className="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+          <button className="modal__close" aria-label="Close" type="button" onClick={closeModal}>×</button>
+          {modal && modal.kind === 'committee' && <CommitteeModal data={COMMITTEES[modal.i]} />}
+          {modal && modal.kind === 'presbytery' && <PresbyteryModal data={PRESBYTERIES[modal.i]} />}
+        </div>
+      </div>
+    </>
+  );
+}
+
+function OfficerList({ officers }) {
+  if (!officers || !officers.length) return null;
+  return (
+    <div className="modal__officers">
+      {officers.map((o) => (
+        <div key={o.name} className="modal__officer">
+          <div className="modal__officer-photo">{(o.name || '·').trim().charAt(0)}</div>
+          <div className="modal__officer-name">{o.name}</div>
+          {o.role && <div className="modal__officer-role">{o.role}</div>}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function CommitteeModal({ data }) {
+  return (
+    <>
+      <div className="modal__eyebrow">Standing Rules &amp; Duties</div>
+      <h3 className="modal__title" id="modal-title">{data.name}</h3>
+      <div className="modal__sub">{data.sub}</div>
+      <div className="modal__body">
+        <p>{data.description}</p>
+        {data.duties && data.duties.length > 0 && (
+          <>
+            <div className="modal__section-title">Standing Duties</div>
+            <ul className="modal__list">
+              {data.duties.map((d) => <li key={d}>{d}</li>)}
+            </ul>
+          </>
+        )}
+        {data.officers && data.officers.length > 0 && (
+          <>
+            <div className="modal__section-title">Commissioned Officers</div>
+            <OfficerList officers={data.officers} />
+          </>
+        )}
+      </div>
+    </>
+  );
+}
+
+function PresbyteryModal({ data }) {
+  return (
+    <>
+      <div className="modal__eyebrow">Presbytery · {data.region}</div>
+      <h3 className="modal__title" id="modal-title">{data.name}</h3>
+      <div className="modal__sub">{data.seat ? `Seat · ${data.seat}` : ''}</div>
+      <div className="modal__body">
+        <p>{data.description}</p>
+        <div className="modal__section-title">At a Glance</div>
+        <ul className="modal__list">
+          {data.seat && <li>Seat — {data.seat}</li>}
+          {data.founded && <li>Founded — A.D. {data.founded}</li>}
+          {data.congregations && <li>{data.congregations} congregations across the region</li>}
+        </ul>
+        {data.officers && data.officers.length > 0 && (
+          <>
+            <div className="modal__section-title">Commissioned Elders</div>
+            <OfficerList officers={data.officers} />
+          </>
+        )}
+      </div>
     </>
   );
 }

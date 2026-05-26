@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
@@ -16,6 +16,8 @@ export default function ChurchesPage() {
     const [regionFilter, setRegionFilter] = useState('');
     const [selected, setSelected] = useState(null);
     const [viewMode, setViewMode] = useState('list'); // 'list' or 'map'
+    const [footerNear, setFooterNear] = useState(false);
+    const footerSentinelRef = useRef(null);
 
     useEffect(() => {
         const fetchChurches = async () => {
@@ -24,6 +26,24 @@ export default function ChurchesPage() {
             setLoading(false);
         };
         fetchChurches();
+    }, []);
+
+    useEffect(() => {
+        const onScroll = () => {
+            const el = footerSentinelRef.current;
+            if (!el) return;
+            // Hide pill when the start-of-footer marker is within ~120px above the viewport bottom
+            const rect = el.getBoundingClientRect();
+            const buffer = 120;
+            setFooterNear(rect.top <= window.innerHeight + buffer);
+        };
+        onScroll();
+        window.addEventListener('scroll', onScroll, { passive: true });
+        window.addEventListener('resize', onScroll);
+        return () => {
+            window.removeEventListener('scroll', onScroll);
+            window.removeEventListener('resize', onScroll);
+        };
     }, []);
 
     const filtered = (churches || []).filter((c) => {
@@ -53,7 +73,7 @@ export default function ChurchesPage() {
                         </Link>
                         <Link
                             to="/"
-                            className="text-[11px] font-bold tracking-widest uppercase text-church-gray hover:text-accent transition-colors flex items-center gap-2 bg-black/[0.03] px-5 py-2.5 rounded-xl"
+                            className="text-[11px] font-bold tracking-widest uppercase text-church-gray hover:text-accent transition-colors flex items-center gap-2 bg-black/[0.03] px-5 min-h-[44px] rounded-xl"
                         >
                             ← Back to Home
                         </Link>
@@ -83,10 +103,10 @@ export default function ChurchesPage() {
                             </div>
 
                             {/* Region Chips */}
-                            <div className="flex flex-wrap gap-1.5 lg:gap-2 overflow-x-auto pb-1 no-scrollbar">
+                            <div className="flex flex-wrap gap-2 overflow-x-auto pb-1 no-scrollbar">
                                 <button
                                     onClick={() => setRegionFilter('')}
-                                    className={`px-3 py-1.5 lg:px-4 lg:py-2 rounded-lg lg:rounded-xl text-[9px] lg:text-[10px] font-bold tracking-wider uppercase transition-all whitespace-nowrap ${regionFilter === '' ? 'bg-accent text-white shadow-lg shadow-accent/20' : 'bg-black/[0.03] text-church-gray hover:bg-black/[0.06]'
+                                    className={`px-4 min-h-[44px] lg:min-h-0 lg:py-2 rounded-xl text-[10px] lg:text-[10px] font-bold tracking-wider uppercase transition-all whitespace-nowrap ${regionFilter === '' ? 'bg-accent text-white shadow-lg shadow-accent/20' : 'bg-black/[0.03] text-church-gray hover:bg-black/[0.06]'
                                         }`}
                                 >
                                     All Regions
@@ -95,7 +115,7 @@ export default function ChurchesPage() {
                                     <button
                                         key={r}
                                         onClick={() => setRegionFilter(r)}
-                                        className={`px-3 py-1.5 lg:px-4 lg:py-2 rounded-lg lg:rounded-xl text-[9px] lg:text-[10px] font-bold tracking-wider uppercase transition-all whitespace-nowrap ${regionFilter === r ? 'bg-accent text-white shadow-lg shadow-accent/20' : 'bg-black/[0.03] text-church-gray hover:bg-black/[0.06]'
+                                        className={`px-4 min-h-[44px] lg:min-h-0 lg:py-2 rounded-xl text-[10px] lg:text-[10px] font-bold tracking-wider uppercase transition-all whitespace-nowrap ${regionFilter === r ? 'bg-accent text-white shadow-lg shadow-accent/20' : 'bg-black/[0.03] text-church-gray hover:bg-black/[0.06]'
                                             }`}
                                     >
                                         {r}
@@ -273,18 +293,21 @@ export default function ChurchesPage() {
                     </main>
 
                     {/* Mobile View Toggle Switch (Glassmorphic Segmented Control) */}
-                    <div className="lg:hidden fixed bottom-10 left-1/2 -translate-x-1/2 z-[80] w-auto">
+                    <div
+                        aria-hidden={footerNear}
+                        className={`lg:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-[80] w-auto transition-all duration-300 ${footerNear ? 'opacity-0 translate-y-24 pointer-events-none' : 'opacity-100 translate-y-0'}`}
+                    >
                         <div className="flex p-1.5 bg-black/40 backdrop-blur-2xl rounded-full border border-white/10 shadow-2xl">
                             <button
                                 onClick={() => setViewMode('list')}
-                                className={`flex items-center gap-2 px-6 py-2.5 rounded-full text-[10px] font-bold tracking-widest uppercase transition-all duration-300 ${viewMode === 'list' ? 'bg-white text-church-dark shadow-lg' : 'text-white/60 hover:text-white'}`}
+                                className={`flex items-center gap-2 px-6 min-h-[44px] rounded-full text-[10px] font-bold tracking-widest uppercase transition-all duration-300 ${viewMode === 'list' ? 'bg-white text-church-dark shadow-lg' : 'text-white/60 hover:text-white'}`}
                             >
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="8" y1="6" x2="21" y2="6" /><line x1="8" y1="12" x2="21" y2="12" /><line x1="8" y1="18" x2="21" y2="18" /><line x1="3" y1="6" x2="3.01" y2="6" /><line x1="3" y1="12" x2="3.01" y2="12" /><line x1="3" y1="18" x2="3.01" y2="18" /></svg>
                                 List
                             </button>
                             <button
                                 onClick={() => setViewMode('map')}
-                                className={`flex items-center gap-2 px-6 py-2.5 rounded-full text-[10px] font-bold tracking-widest uppercase transition-all duration-300 ${viewMode === 'map' ? 'bg-white text-church-dark shadow-lg' : 'text-white/60 hover:text-white'}`}
+                                className={`flex items-center gap-2 px-6 min-h-[44px] rounded-full text-[10px] font-bold tracking-widest uppercase transition-all duration-300 ${viewMode === 'map' ? 'bg-white text-church-dark shadow-lg' : 'text-white/60 hover:text-white'}`}
                             >
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" /></svg>
                                 Map
@@ -293,6 +316,7 @@ export default function ChurchesPage() {
                     </div>
                 </div>
             </div>
+            <div ref={footerSentinelRef} aria-hidden="true" className="lg:hidden h-px" />
             <Footer />
             <ChatbotWidget />
         </>

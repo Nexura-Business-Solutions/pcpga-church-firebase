@@ -113,7 +113,7 @@ export default function LibraryPage() {
                                     <button
                                         key={cat}
                                         onClick={() => setCategoryFilter(cat)}
-                                        className="px-5 py-3 rounded-xl text-[10px] font-bold tracking-widest uppercase transition-all whitespace-nowrap"
+                                        className="px-5 min-h-[44px] rounded-xl text-[10px] font-bold tracking-widest uppercase transition-all whitespace-nowrap"
                                         style={
                                             active
                                                 ? { background: 'var(--oxblood)', color: 'var(--paper)', border: '1px solid var(--oxblood)' }

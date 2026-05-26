@@ -8,8 +8,18 @@ const PRESETS = [500, 1000, 2500, 5000];
 
 const createInvoice = httpsCallable(functions, 'createInvoice');
 
+const DEFAULT_CONTENT = {
+    heading: 'Give as you have purposed in your heart',
+    scriptureRef: '2 Corinthians 9:7',
+    subtitle:
+        'Your gifts sustain the preaching of the Word, the training of pastors, the planting of congregations, and the mercy ministries of the Church.',
+    gcashQR: '',
+    mayaQR: '',
+    contactEmail: '',
+};
+
 export default function Donation() {
-    const [content, setContent] = useState(null);
+    const [content, setContent] = useState(DEFAULT_CONTENT);
     const [open, setOpen] = useState(false);
     const [amount, setAmount] = useState(1000);
     const [isCustom, setIsCustom] = useState(false);
@@ -20,7 +30,7 @@ export default function Donation() {
     useEffect(() => {
         (async () => {
             const data = await getDonationContent();
-            if (data) setContent(data);
+            if (data) setContent({ ...DEFAULT_CONTENT, ...data });
         })();
     }, []);
 
@@ -58,14 +68,6 @@ export default function Donation() {
             setGenerating(false);
         }
     };
-
-    if (!content) {
-        return (
-            <section id="donate" className="give" aria-label="Give">
-                <div className="give__inner"><p style={{ color: 'rgba(245,240,230,0.7)' }}>Loading…</p></div>
-            </section>
-        );
-    }
 
     const { primary, secondary } = splitGiveHeading(content.heading);
 
