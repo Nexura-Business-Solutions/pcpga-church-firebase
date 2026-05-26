@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import PhilippinesMap from '../components/PhilippinesMap.jsx';
+import AnnouncementModal from '../components/AnnouncementModal.jsx';
 import { getSettings } from '../lib/store.js';
 import '../styles/landing-v3.css';
 
@@ -1189,6 +1190,9 @@ export default function HomePage() {
           {modal && modal.kind === 'presbytery' && <PresbyteryModal data={PRESBYTERIES[modal.i]} />}
         </div>
       </div>
+
+      {/* Announcement popup — shows once per visitor when active (Site Content → Announcement) */}
+      <AnnouncementModal />
     </>
   );
 }
