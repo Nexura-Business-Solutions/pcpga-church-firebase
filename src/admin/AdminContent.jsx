@@ -357,12 +357,15 @@ export default function AdminContent() {
 
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                                             {[
-                                                { key: 'heading', label: 'Main Headline', placeholder: 'Welcome Home.' },
-                                                { key: 'subtitle', label: 'Supportive Narrative', placeholder: 'Where faith meets community.' },
-                                                { key: 'ctaText', label: 'Action Label', placeholder: 'Join Us Sunday' },
-                                                { key: 'serviceTimes', label: 'Schedule Banner', placeholder: 'Sundays · 9:00 AM' },
+                                                { key: 'editionText', label: 'Edition Line', placeholder: 'A Communion of Reformed Churches' },
+                                                { key: 'heading', label: 'Headline (English)', placeholder: 'Welcome home.' },
+                                                { key: 'headingTl', label: 'Headline (Tagalog)', placeholder: 'Maligayang pagdating.' },
+                                                { key: 'lede', label: 'Intro Paragraph', placeholder: 'A communion of Reformed congregations…' },
+                                                { key: 'ctaPrimary', label: 'Primary Button', placeholder: 'Find a Church' },
+                                                { key: 'ctaSecondary', label: 'Secondary Button', placeholder: 'Watch the Sermon' },
+                                                { key: 'times', label: 'Service Times Banner', placeholder: 'Sunday Worship · 9:00 & 11:00 AM · Metro Manila' },
                                             ].map((field) => (
-                                                <div key={field.key} className={field.key === 'heading' || field.key === 'subtitle' ? 'md:col-span-2' : ''}>
+                                                <div key={field.key} className={field.key === 'lede' || field.key === 'editionText' || field.key === 'times' ? 'md:col-span-2' : ''}>
                                                     <label className="block text-coral text-[10px] tracking-[0.25em] uppercase mb-4 font-bold">{field.label}</label>
                                                     <input
                                                         value={hero[field.key] || ''}

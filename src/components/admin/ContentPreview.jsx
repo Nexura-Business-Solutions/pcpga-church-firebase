@@ -43,11 +43,12 @@ function Hero({ hero }) {
                     : { background: 'linear-gradient(135deg, #3a2417, #6b3f22)' }}>
                 <div className="absolute inset-0" style={{ background: 'rgba(20,12,8,0.55)' }} />
                 <div className="relative" style={{ color: '#fbf4dc' }}>
-                    {hero?.serviceTimes && <p className="text-[10px] uppercase tracking-[0.35em] mb-4 opacity-80">{hero.serviceTimes}</p>}
-                    <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">{fallback(hero?.heading, 'Welcome Home.')}</h1>
-                    <p className="text-base opacity-90 max-w-md mx-auto mb-7">{fallback(hero?.subtitle, 'Where faith meets community.')}</p>
+                    {(hero?.editionText) && <p className="text-[9px] uppercase tracking-[0.3em] mb-3 opacity-70">{hero.editionText}</p>}
+                    <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">{fallback(hero?.heading, 'Welcome home.')}</h1>
+                    <p className="text-base opacity-90 max-w-md mx-auto mb-7">{fallback(hero?.lede, 'A communion of Reformed congregations gathered around Scripture and the historic Presbyterian faith.')}</p>
                     <span className="inline-block px-7 py-3 rounded-full text-[11px] font-bold uppercase tracking-[0.2em]"
-                        style={{ background: '#c9a24a', color: '#2b1a12' }}>{fallback(hero?.ctaText, 'Join Us Sunday')}</span>
+                        style={{ background: '#c9a24a', color: '#2b1a12' }}>{fallback(hero?.ctaPrimary, 'Find a Church')}</span>
+                    {hero?.times && <p className="text-[10px] uppercase tracking-[0.3em] mt-5 opacity-70">{hero.times}</p>}
                 </div>
             </div>
         </Frame>

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import PhilippinesMap from '../components/PhilippinesMap.jsx';
+import { getSettings } from '../lib/store.js';
 import '../styles/landing-v3.css';
 
 const COMMITTEES = [
@@ -211,6 +212,20 @@ export default function HomePage() {
   const [activeSermon, setActiveSermon] = useState(0);
   const scrollFillRef = useRef(null);
   const countRefs = useRef([]);
+
+  // CMS content — loaded from Firestore settings; every field falls back to the
+  // hardcoded copy below so the page is identical until something is edited.
+  const [cms, setCms] = useState({});
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      const keys = ['hero', 'site-identity', 'mission-vision', 'core-principles', 'invitation-stats', 'announcement'];
+      const [hero, identity, mv, msg, stats, ann] = await Promise.all(keys.map((k) => getSettings(k)));
+      if (active) setCms({ hero: hero || {}, identity: identity || {}, mv: mv || {}, msg: msg || {}, stats: stats || {}, ann: ann || {} });
+    })();
+    return () => { active = false; };
+  }, []);
+  const hero = cms.hero || {};
 
   // body class management
   useEffect(() => {
@@ -499,7 +514,7 @@ export default function HomePage() {
           <div className="hero__copy reveal">
             <div className="hero__edition">
               <span className="brass">✦</span>
-              <span>A Communion of Reformed Churches</span>
+              <span>{hero.editionText || 'A Communion of Reformed Churches'}</span>
               <span className="sep">·</span>
               <span>Est. MDCCCXCVIII</span>
               <span className="sep">·</span>
@@ -507,20 +522,20 @@ export default function HomePage() {
             </div>
 
             <h1 className="hero__title">
-              <span data-en="">Welcome <em>home.</em></span>
-              <span data-tl="">Maligayang <em>pagdating.</em></span>
+              <span data-en="">{hero.heading || <>Welcome <em>home.</em></>}</span>
+              <span data-tl="">{hero.headingTl || <>Maligayang <em>pagdating.</em></>}</span>
             </h1>
 
             <p className="hero__lede">
-              A communion of Reformed congregations gathered around Scripture, Sacrament, and the historic Presbyterian faith — keeping the old paths across the islands since the dying years of the 19th century.
+              {hero.lede || 'A communion of Reformed congregations gathered around Scripture, Sacrament, and the historic Presbyterian faith — keeping the old paths across the islands since the dying years of the 19th century.'}
             </p>
 
             <div className="hero__actions">
-              <Link to="/churches" className="btn btn--primary">Find a Church</Link>
-              <a href="#sermons" className="btn btn--ghost-light">Watch the Sermon</a>
+              <Link to="/churches" className="btn btn--primary">{hero.ctaPrimary || 'Find a Church'}</Link>
+              <a href="#sermons" className="btn btn--ghost-light">{hero.ctaSecondary || 'Watch the Sermon'}</a>
             </div>
 
-            <p className="hero__times">Sunday Worship · 9:00 &amp; 11:00 AM · Metro Manila</p>
+            <p className="hero__times">{hero.times || 'Sunday Worship · 9:00 & 11:00 AM · Metro Manila'}</p>
           </div>
 
           <div className="wax-seal reveal reveal--scale" aria-hidden="true">
