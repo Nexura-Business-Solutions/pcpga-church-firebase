@@ -162,7 +162,7 @@ export default function AdminLayout({ children }) {
             {/* Main Content */}
             <div className="flex-1 min-h-screen flex flex-col">
                 {/* Header */}
-                <header className="sticky top-0 z-30 bg-[hsl(var(--admin-bg))]/80 backdrop-blur-xl border-b border-[hsl(var(--admin-border))] px-8 h-20 flex items-center justify-between transition-colors duration-500">
+                <header className="sticky top-0 z-30 bg-[hsl(var(--admin-bg))]/80 backdrop-blur-xl border-b border-[hsl(var(--admin-border))] px-4 sm:px-8 h-20 flex items-center justify-between transition-colors duration-500">
                     <div className="flex items-center gap-4">
                         <button
                             onClick={() => setSidebarOpen(true)}
@@ -192,7 +192,7 @@ export default function AdminLayout({ children }) {
                     <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-accent/20 to-transparent" />
                 </header>
 
-                <main className="flex-1 p-8 lg:p-12 overflow-x-hidden">
+                <main className="flex-1 p-4 sm:p-8 lg:p-12 overflow-x-hidden">
                     <AnimatePresence mode="wait">
                         <motion.div
                             key={pathname}

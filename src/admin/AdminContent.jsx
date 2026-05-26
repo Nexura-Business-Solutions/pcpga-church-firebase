@@ -244,7 +244,7 @@ export default function AdminContent() {
 
     if (loading) return (
         <AdminLayout>
-            <div className="min-h-screen bg-[hsl(var(--admin-bg))] p-8 lg:p-12 pb-32">
+            <div className="min-h-screen bg-[hsl(var(--admin-bg))] p-4 sm:p-8 lg:p-12 pb-32">
                 <div className="max-w-7xl mx-auto">
                     <AdminHeaderSkeleton />
                     <div className="flex gap-2 mb-12 inline-flex">
@@ -258,10 +258,10 @@ export default function AdminContent() {
 
     return (
         <AdminLayout>
-            <div className="min-h-screen bg-[hsl(var(--admin-bg))] p-8 lg:p-12 pb-32">
+            <div className="min-h-screen bg-[hsl(var(--admin-bg))] p-4 sm:p-8 lg:p-12 pb-32">
                 <div className="max-w-7xl mx-auto">
                     {/* Header */}
-                    <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-16">
+                    <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8 md:mb-16">
                         <div>
                             <div className="flex items-center gap-3 mb-4">
                                 <Globe className="w-5 h-5 text-coral" />
@@ -289,7 +289,7 @@ export default function AdminContent() {
                     </div>
 
                     {/* Tabs */}
-                    <div id="tour-tabs" className="flex flex-wrap gap-2 p-2 bg-[hsl(var(--admin-bg-alt))] rounded-3xl border border-[hsl(var(--admin-border))] mb-12 self-start inline-flex">
+                    <div id="tour-tabs" className="flex flex-wrap gap-2 p-2 bg-[hsl(var(--admin-bg-alt))] rounded-3xl border border-[hsl(var(--admin-border))] mb-8 md:mb-12 self-start inline-flex">
                         {TABS.map(tab => (
                             <button
                                 key={tab.id}
@@ -314,7 +314,7 @@ export default function AdminContent() {
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0, y: -10 }}
                                 transition={{ duration: 0.3 }}
-                                className="bg-[hsl(var(--admin-surface))] rounded-[2.5rem] border border-[hsl(var(--admin-border))] p-8 md:p-12 shadow-sm min-h-[600px]"
+                                className="bg-[hsl(var(--admin-surface))] rounded-[2.5rem] border border-[hsl(var(--admin-border))] p-5 sm:p-8 md:p-12 shadow-sm min-h-[600px]"
                             >
                                 {/* HERO TAB */}
                                 {activeTab === 'hero' && (
@@ -480,7 +480,7 @@ export default function AdminContent() {
                                             />
                                         )}
                                         {(Array.isArray(mission.missionPoints) ? mission.missionPoints : []).map((point, i) => (
-                                            <div key={i} className="p-8 bg-[hsl(var(--admin-bg-alt))] rounded-3xl space-y-6 relative overflow-hidden group border border-[hsl(var(--admin-border))]">
+                                            <div key={i} className="p-5 sm:p-8 bg-[hsl(var(--admin-bg-alt))] rounded-3xl space-y-6 relative overflow-hidden group border border-[hsl(var(--admin-border))]">
                                                 <div className="flex items-center gap-4">
                                                     <IconPicker
                                                         value={point.icon}
@@ -539,7 +539,7 @@ export default function AdminContent() {
                                             />
                                         )}
                                         {(Array.isArray(mission.commitments) ? mission.commitments : []).map((item, i) => (
-                                            <div key={i} className="p-8 bg-[hsl(17_47%_13%)] rounded-3xl space-y-6 relative overflow-hidden group border border-white/5">
+                                            <div key={i} className="p-5 sm:p-8 bg-[hsl(17_47%_13%)] rounded-3xl space-y-6 relative overflow-hidden group border border-white/5">
                                                 <div className="flex items-center gap-4">
                                                     <IconPicker
                                                         value={item.icon}
@@ -804,7 +804,7 @@ export default function AdminContent() {
                                                 />
                                             )}
                                             {(Array.isArray(committees) ? committees : []).map((com, i) => (
-                                                <div key={i} className="p-8 bg-[hsl(var(--admin-bg-alt))] rounded-3xl border border-[hsl(var(--admin-border))] space-y-6 relative group">
+                                                <div key={i} className="p-5 sm:p-8 bg-[hsl(var(--admin-bg-alt))] rounded-3xl border border-[hsl(var(--admin-border))] space-y-6 relative group">
                                                     <button onClick={() => removeItem(committees, setCommittees, i)} className="absolute top-8 right-8 px-4 py-2 bg-red-50 text-red-500 rounded-xl text-[9px] font-bold uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">Delete Committee</button>
                                                     <div className="flex items-center gap-4">
                                                         <IconPicker
@@ -987,7 +987,7 @@ export default function AdminContent() {
                                                 />
                                             )}
                                             {(Array.isArray(presbyteries) ? presbyteries : []).map((p, idx) => (
-                                                <div key={p.id || idx} className="p-8 bg-[hsl(var(--admin-bg-alt))] rounded-3xl border border-[hsl(var(--admin-border))] space-y-6 relative group">
+                                                <div key={p.id || idx} className="p-5 sm:p-8 bg-[hsl(var(--admin-bg-alt))] rounded-3xl border border-[hsl(var(--admin-border))] space-y-6 relative group">
                                                     <button
                                                         onClick={() => {
                                                             if (window.confirm('Delete this record?')) {
@@ -1473,13 +1473,13 @@ export default function AdminContent() {
                         </div>
 
                         {/* Feedback & Save Bar */}
-                        <div className="fixed bottom-0 left-0 right-0 p-8 flex flex-col items-center pointer-events-none z-[100]">
+                        <div className="fixed bottom-0 left-0 right-0 p-4 sm:p-8 flex flex-col items-center pointer-events-none z-[100]">
                             <div className="w-full max-w-7xl mx-auto flex justify-center">
                                 <button
                                     id="tour-save"
                                     onClick={handleSave}
                                     disabled={saving}
-                                    className={`h-18 px-24 rounded-2xl text-[11px] font-bold uppercase tracking-[0.3em] shadow-2xl transition-all duration-500 pointer-events-auto hover:scale-105 active:scale-95 ${saving
+                                    className={`h-16 sm:h-18 w-full sm:w-auto px-8 sm:px-24 rounded-2xl text-[11px] font-bold uppercase tracking-[0.3em] shadow-2xl transition-all duration-500 pointer-events-auto hover:scale-105 active:scale-95 ${saving
                                         ? 'bg-[hsl(var(--admin-border))] text-[hsl(var(--admin-text-dim))]'
                                         : 'bg-coral text-white hover:shadow-coral/30'
                                         }`}
