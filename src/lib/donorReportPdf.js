@@ -140,14 +140,75 @@ export function generateDonorReportPdf(opts = {}) {
     pdf.save(`PCPGA_Donor_Report_${stamp}.pdf`);
 }
 
-// Open the report in a new tab as a real PDF — works as a print preview on
-// both desktop and phone (the device's PDF viewer can then print or share).
+// Open a preview window with its own Print + Download buttons and the report
+// embedded below. A bare PDF tab hides the print control on many phones, so we
+// supply the toolbar ourselves. Built with safe DOM APIs (no innerHTML) and
+// listeners attached from the opener (no inline script).
+const PREVIEW_CSS = `
+* { box-sizing: border-box; }
+body { margin: 0; font-family: ui-sans-serif, system-ui, -apple-system, sans-serif; background: #525659; }
+.bar { position: sticky; top: 0; z-index: 2; display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: #17110d; color: #faf6ef; }
+.bar .t { flex: 1; font-size: 14px; font-weight: 700; letter-spacing: .02em; }
+.bar button { font: inherit; font-size: 13px; font-weight: 700; padding: 10px 18px; border: 0; border-radius: 12px; cursor: pointer; }
+.bar .print { background: #1f7a6b; color: #fff; }
+.bar .dl { background: #faf6ef; color: #17110d; }
+.bar button:active { transform: scale(.96); }
+iframe { display: block; width: 100%; height: calc(100vh - 56px); border: 0; background: #525659; }
+@media print { .bar { display: none !important; } iframe { height: 100vh; } }`;
+
 export function previewDonorReportPdf(opts = {}) {
     const pdf = buildDonorReportPdf(opts);
     const url = pdf.output('bloburl');
-    const win = window.open(url, '_blank');
+    const stamp = new Date().toISOString().slice(0, 10);
+    const fname = `PCPGA_Donor_Report_${stamp}.pdf`;
+
+    const win = window.open('', '_blank');
     if (!win) {
-        // Popup blocked — fall back to navigating the current tab.
+        // Popup blocked — fall back to opening the raw PDF.
         window.location.assign(url);
+        return;
     }
+
+    const doc = win.document;
+    doc.title = 'Donor Giving Report — Preview';
+
+    const style = doc.createElement('style');
+    style.textContent = PREVIEW_CSS;
+    doc.head.appendChild(style);
+
+    const bar = doc.createElement('div');
+    bar.className = 'bar';
+    const title = doc.createElement('span');
+    title.className = 't';
+    title.textContent = 'Donor Giving Report';
+    const printBtn = doc.createElement('button');
+    printBtn.className = 'print';
+    printBtn.textContent = '🖨️ Print';
+    const dlBtn = doc.createElement('button');
+    dlBtn.className = 'dl';
+    dlBtn.textContent = '⬇ Download';
+    bar.append(title, printBtn, dlBtn);
+
+    const frame = doc.createElement('iframe');
+    frame.setAttribute('title', 'Donor Giving Report');
+    frame.src = url;
+
+    doc.body.append(bar, frame);
+
+    printBtn.addEventListener('click', () => {
+        try {
+            frame.contentWindow.focus();
+            frame.contentWindow.print();
+        } catch (e) {
+            try { win.print(); } catch (_) { /* nothing else we can do */ }
+        }
+    });
+    dlBtn.addEventListener('click', () => {
+        const a = doc.createElement('a');
+        a.href = url;
+        a.download = fname;
+        doc.body.appendChild(a);
+        a.click();
+        a.remove();
+    });
 }
