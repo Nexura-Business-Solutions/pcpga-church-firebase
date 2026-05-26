@@ -61,7 +61,7 @@ export default function AdminDonors() {
     return (
         <AdminLayout>
             <div className="max-w-6xl mx-auto selection:bg-teal/10">
-                <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-16 px-2">
+                <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8 md:mb-16 px-2">
                     <div>
                         <h1 className="text-4xl font-bold text-[hsl(var(--admin-text))] tracking-tighter font-display mb-3">Donor Database</h1>
                         <p className="text-[hsl(var(--admin-text-dim))] text-[11px] font-bold tracking-[0.3em] uppercase">Historical Stewardship Records</p>
@@ -82,7 +82,7 @@ export default function AdminDonors() {
                 </div>
 
                 <div className="bg-[hsl(var(--admin-surface))] rounded-[2.5rem] border border-[hsl(var(--admin-border))] shadow-2xl overflow-hidden relative">
-                    <div className="p-8 border-b border-[hsl(var(--admin-border))] flex flex-col md:flex-row md:items-center justify-between gap-6">
+                    <div className="p-5 sm:p-8 border-b border-[hsl(var(--admin-border))] flex flex-col md:flex-row md:items-center justify-between gap-6">
                         <div className="relative flex-1 max-w-md">
                             <span className="absolute left-6 top-1/2 -translate-y-1/2 text-[hsl(var(--admin-text-dim))]/30">
                                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
@@ -119,7 +119,42 @@ export default function AdminDonors() {
                         </div>
                     </div>
 
-                    <div className="overflow-x-auto custom-scrollbar">
+                    {/* Mobile: stacked cards (a 5-column table is unreadable on phones) */}
+                    <div className="md:hidden">
+                        {loading ? (
+                            [...Array(4)].map((_, i) => (
+                                <div key={i} className="p-5 border-b border-[hsl(var(--admin-border))] animate-pulse"><div className="h-4 bg-[hsl(var(--admin-text))]/5 rounded-lg w-2/3" /></div>
+                            ))
+                        ) : filteredDonors.length > 0 ? (
+                            filteredDonors.map((d) => {
+                                const name = d.name || d.donor_name || d.donorName || 'Anonymous';
+                                const email = d.email || d.donor_email || d.donorEmail;
+                                const count = Number(d.donationCount || d.donation_count || d.count || 0);
+                                const total = Number(d.totalDonated || d.total_donated || d.total || 0);
+                                const lastAt = d.lastDonationAt || d.last_donation_at || d.lastGiftAt || d.updatedAt || d.createdAt;
+                                return (
+                                    <div key={d.id} className="p-5 border-b border-[hsl(var(--admin-border))]">
+                                        <div className="flex items-center gap-3 mb-3">
+                                            <div className={`w-10 h-10 shrink-0 rounded-xl flex items-center justify-center font-bold text-[10px] ${name === 'Anonymous' ? 'bg-zinc-500/10 text-zinc-500 border border-zinc-500/20' : 'bg-teal/10 text-teal border border-teal/20'}`}>{name?.[0]?.toUpperCase() || '?'}</div>
+                                            <div className="min-w-0">
+                                                <p className="text-sm font-bold text-[hsl(var(--admin-text))] tracking-tight truncate">{name}</p>
+                                                <p className="text-[11px] text-[hsl(var(--admin-text-dim))] font-bold truncate">{email || '—'}</p>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center justify-between">
+                                            <span className="px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-widest border bg-[hsl(var(--admin-text))]/5 border-[hsl(var(--admin-border))] text-[hsl(var(--admin-text-dim))]">{count} gifts</span>
+                                            <span className="text-sm font-bold text-teal font-display">₱{total.toLocaleString()}</span>
+                                        </div>
+                                        <p className="text-[10px] font-bold text-[hsl(var(--admin-text-dim))] opacity-40 tracking-widest uppercase mt-2">Last gift · {toDateLabel(lastAt)}</p>
+                                    </div>
+                                );
+                            })
+                        ) : (
+                            <div className="py-24 text-center text-xs font-bold uppercase tracking-[0.4em] opacity-20">No donor records found</div>
+                        )}
+                    </div>
+
+                    <div className="overflow-x-auto custom-scrollbar hidden md:block">
                         <table className="w-full text-left border-collapse">
                             <thead>
                                 <tr className="border-b border-[hsl(var(--admin-border))] bg-[hsl(var(--admin-text))]/2">

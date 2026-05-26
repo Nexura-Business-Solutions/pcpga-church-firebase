@@ -115,7 +115,7 @@ export default function AdminAdmins() {
         <AdminLayout>
             <div className="max-w-5xl mx-auto">
                 {/* Header */}
-                <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-12 px-2">
+                <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8 md:mb-12 px-2">
                     <div>
                         <h1 className="text-4xl font-bold text-[hsl(var(--admin-text))] tracking-tighter font-display mb-3 flex items-center gap-3">
                             <ShieldCheck className="w-8 h-8 text-accent" /> Access Control
@@ -163,7 +163,61 @@ export default function AdminAdmins() {
 
                 {/* List */}
                 <div className="bg-[hsl(var(--admin-surface))] rounded-[2.5rem] border border-[hsl(var(--admin-border))] shadow-2xl overflow-hidden">
-                    <div className="overflow-x-auto custom-scrollbar">
+                    {/* Mobile: stacked cards (the 4-column table is unreadable on phones) */}
+                    <div className="md:hidden">
+                        {loading ? (
+                            [...Array(3)].map((_, i) => (
+                                <div key={i} className="p-5 border-b border-[hsl(var(--admin-border))] animate-pulse"><div className="h-4 bg-[hsl(var(--admin-text))]/5 rounded-lg w-2/3" /></div>
+                            ))
+                        ) : admins.length > 0 ? (
+                            admins.map((a) => {
+                                const isOwnerRow = a.role === 'owner';
+                                const isSelf = a.email === me;
+                                const locked = isOwnerRow || isSelf;
+                                return (
+                                    <div key={a.email} className="p-5 border-b border-[hsl(var(--admin-border))]">
+                                        <div className="flex items-center gap-3 mb-3">
+                                            <div className={`w-10 h-10 shrink-0 rounded-xl flex items-center justify-center font-bold text-[11px] border ${roleBadge(a.role)}`}>
+                                                {isOwnerRow ? <Crown className="w-4 h-4" /> : (a.email[0] || '?').toUpperCase()}
+                                            </div>
+                                            <p className="text-sm font-bold text-[hsl(var(--admin-text))] tracking-tight truncate min-w-0">
+                                                {a.email}{isSelf && <span className="ml-2 text-[9px] text-[hsl(var(--admin-text-dim))]/40 uppercase tracking-widest">(you)</span>}
+                                            </p>
+                                        </div>
+                                        <div className="flex items-center justify-between gap-3">
+                                            {locked ? (
+                                                <span className={`px-4 py-1.5 rounded-full text-[9px] font-bold uppercase tracking-widest border ${roleBadge(a.role)}`}>{a.role}</span>
+                                            ) : (
+                                                <select
+                                                    value={a.role}
+                                                    onChange={(e) => handleRoleChange(a.email, e.target.value)}
+                                                    className="bg-[hsl(var(--admin-text))]/5 border border-[hsl(var(--admin-border))] rounded-xl px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-[hsl(var(--admin-text))] outline-none focus:border-accent/40"
+                                                >
+                                                    {ROLES.map((r) => <option key={r.id} value={r.id}>{r.label}</option>)}
+                                                </select>
+                                            )}
+                                            <button
+                                                onClick={() => handleRemove(a.email)}
+                                                disabled={locked}
+                                                title={isOwnerRow ? 'Cannot remove the owner' : isSelf ? 'Cannot remove yourself' : 'Remove'}
+                                                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest text-coral/60 hover:text-coral hover:bg-coral/5 transition-all disabled:opacity-20 disabled:hover:bg-transparent disabled:cursor-not-allowed"
+                                            >
+                                                <Trash2 className="w-3.5 h-3.5" /> Remove
+                                            </button>
+                                        </div>
+                                        <p className="text-[10px] font-bold text-[hsl(var(--admin-text-dim))] opacity-40 tracking-widest uppercase mt-3">Added {toDateLabel(a.updatedAt)}{a.addedBy && ` · by ${a.addedBy}`}</p>
+                                    </div>
+                                );
+                            })
+                        ) : (
+                            <div className="py-24 text-center flex flex-col items-center gap-4 opacity-20">
+                                <ShieldCheck className="w-12 h-12" />
+                                <p className="text-xs font-bold uppercase tracking-[0.4em]">No admins yet</p>
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="overflow-x-auto custom-scrollbar hidden md:block">
                         <table className="w-full text-left border-collapse">
                             <thead>
                                 <tr className="border-b border-[hsl(var(--admin-border))] bg-[hsl(var(--admin-text))]/2">
