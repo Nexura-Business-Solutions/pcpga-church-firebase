@@ -2604,3 +2604,42 @@ body.lp-v3 .hero__bg::after {
     radial-gradient(ellipse at 18% 75%, rgba(139,31,36,0.18), transparent 55%),
     linear-gradient(180deg, rgba(26,14,8,0.30) 0%, rgba(26,14,8,0.52) 55%, rgba(26,14,8,0.85) 100%);
 }
+
+/* ============================================================
+   Mobile polish — professional pass (2026). Desktop unaffected.
+   Bigger/readable type, more breathing room, simpler sections,
+   and a nav that compacts on scroll.
+   ============================================================ */
+@media (max-width: 700px) {
+  /* 1) Bigger, more readable body copy (>=16px, comfortable leading) */
+  body.lp-v3 .event-card__body p,
+  body.lp-v3 .book-card p,
+  body.lp-v3 .sermon p,
+  body.lp-v3 .presbyteries p,
+  body.lp-v3 .resources p { font-size: 1rem; line-height: 1.62; }
+  body.lp-v3 .lede { font-size: 1.08rem; line-height: 1.6; }
+
+  /* 2) More breathing room between + within sections */
+  body.lp-v3 { --gap-y: clamp(3.75rem, 12vw, 5.25rem); }
+  body.lp-v3 .section-head { margin-bottom: 2rem; }
+
+  /* 3) Simpler, cleaner sections — drop heavy ornament on phones */
+  body.lp-v3 .wax-seal,
+  body.lp-v3 .hero__frame,
+  body.lp-v3 .sdg-seal,
+  body.lp-v3 .marginalia { display: none; }
+  /* Let the hero copy use the full width once the seal is gone */
+  body.lp-v3 .hero__inner { grid-template-columns: 1fr; }
+}
+
+/* 4) Smoother nav: compact once the page is scrolled (mobile) */
+@media (max-width: 900px) {
+  body.lp-v3 .nav { transition: padding 240ms ease, box-shadow 240ms ease; }
+  body.lp-v3.nav-compact .nav {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    box-shadow: 0 6px 24px -12px rgba(26,14,8,0.35);
+  }
+  body.lp-v3.nav-compact .nav__logo { height: 30px; transition: height 240ms ease; }
+  body.lp-v3 .nav__logo { transition: height 240ms ease; }
+}

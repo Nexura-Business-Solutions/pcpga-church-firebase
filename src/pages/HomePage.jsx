@@ -243,7 +243,7 @@ export default function HomePage() {
   useEffect(() => {
     document.body.classList.add('lp-v3');
     return () => {
-      document.body.classList.remove('lp-v3', 'mobile-open', 'modal-open', 'lang-tl');
+      document.body.classList.remove('lp-v3', 'mobile-open', 'modal-open', 'lang-tl', 'nav-compact');
     };
   }, []);
 
@@ -292,6 +292,8 @@ export default function HomePage() {
       const max = h.scrollHeight - h.clientHeight;
       const pct = max > 0 ? (window.scrollY / max) * 100 : 0;
       fill.style.width = pct + '%';
+      // Compact the nav once scrolled past the masthead (mobile smoothing).
+      document.body.classList.toggle('nav-compact', window.scrollY > 60);
       ticking = false;
     }
     function onScroll() {
