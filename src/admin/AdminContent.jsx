@@ -9,6 +9,7 @@ import { AdminSkeleton, AdminHeaderSkeleton, AdminCardSkeleton } from '../compon
 import AdminEmptyState from '../components/admin/AdminEmptyState.jsx';
 import AdminLayout from '../components/admin/AdminLayout.jsx';
 import ContentPreview from '../components/admin/ContentPreview.jsx';
+import IconPicker from '../components/admin/IconPicker.jsx';
 import {
     Home,
     Palette,
@@ -28,6 +29,7 @@ import {
     Bell,
     ImagePlus,
     Film,
+    Trash2,
     X
 } from 'lucide-react';
 
@@ -54,7 +56,7 @@ export default function AdminContent() {
     const tourSteps = [
         { selector: '#tour-tabs', title: 'Content Categories', message: 'Switch between different sections like Identity, Mission, and Governance using these tabs.' },
         { selector: '#tour-fields-header', title: 'Live Editing', message: 'You can edit the text fields directly. Changes will be saved once you click the button at the bottom.' },
-        { selector: '#tour-dynamic', title: 'Dynamic Lists', message: 'Use the "+ Add" and "🗑️" buttons to manage lists like Mission Points or Committee Duties.' },
+        { selector: '#tour-dynamic', title: 'Dynamic Lists', message: 'Use the "+ Add" and delete buttons to manage lists like Mission Points or Committee Duties.' },
         { selector: '#tour-save', title: 'Save Everything', message: 'CRITICAL: Always click here to push your changes to the live website. It may take 60 seconds to update.' }
     ];
 
@@ -477,15 +479,13 @@ export default function AdminContent() {
                                         {(Array.isArray(mission.missionPoints) ? mission.missionPoints : []).map((point, i) => (
                                             <div key={i} className="p-8 bg-[hsl(var(--admin-bg-alt))] rounded-3xl space-y-6 relative overflow-hidden group border border-[hsl(var(--admin-border))]">
                                                 <div className="flex items-center gap-4">
-                                                    <input
-                                                        type="text"
+                                                    <IconPicker
                                                         value={point.icon}
-                                                        onChange={e => {
+                                                        onChange={(name) => {
                                                             const p = [...mission.missionPoints];
-                                                            p[i].icon = e.target.value;
+                                                            p[i].icon = name;
                                                             setMission({ ...mission, missionPoints: p });
                                                         }}
-                                                        className="w-16 h-16 bg-[hsl(var(--admin-bg-alt))] border border-[hsl(var(--admin-text))]/20 rounded-2xl text-2xl flex items-center justify-center text-center focus:ring-2 focus:ring-coral/20"
                                                     />
                                                     <input
                                                         type="text"
@@ -497,7 +497,7 @@ export default function AdminContent() {
                                                         }}
                                                         className="flex-1 bg-[hsl(var(--admin-bg-alt))] border border-[hsl(var(--admin-text))]/20 rounded-2xl p-4 text-sm font-bold focus:ring-2 focus:ring-coral/20"
                                                     />
-                                                    <button onClick={() => removeItem(mission.missionPoints, (l) => setMission({ ...mission, missionPoints: l }), i)} className="p-3 text-red-500 hover:bg-red-50 rounded-xl transition-colors">🗑️</button>
+                                                    <button onClick={() => removeItem(mission.missionPoints, (l) => setMission({ ...mission, missionPoints: l }), i)} className="p-3 text-red-500 hover:bg-red-50 rounded-xl transition-colors"><Trash2 className="w-4 h-4" /></button>
                                                 </div>
                                                 <textarea
                                                     rows={2}
@@ -538,15 +538,13 @@ export default function AdminContent() {
                                         {(Array.isArray(mission.commitments) ? mission.commitments : []).map((item, i) => (
                                             <div key={i} className="p-8 bg-[hsl(17_47%_13%)] rounded-3xl space-y-6 relative overflow-hidden group border border-white/5">
                                                 <div className="flex items-center gap-4">
-                                                    <input
-                                                        type="text"
+                                                    <IconPicker
                                                         value={item.icon}
-                                                        onChange={e => {
+                                                        onChange={(name) => {
                                                             const c = [...mission.commitments];
-                                                            c[i].icon = e.target.value;
+                                                            c[i].icon = name;
                                                             setMission({ ...mission, commitments: c });
                                                         }}
-                                                        className="w-16 h-16 bg-white/5 border border-white/15 rounded-2xl text-2xl flex items-center justify-center text-center focus:ring-2 focus:ring-coral/40 text-white"
                                                     />
                                                     <input
                                                         type="text"
@@ -558,7 +556,7 @@ export default function AdminContent() {
                                                         }}
                                                         className="flex-1 bg-white/5 border border-white/15 rounded-2xl p-4 text-sm font-bold focus:ring-2 focus:ring-coral/40 text-white"
                                                     />
-                                                    <button onClick={() => removeItem(mission.commitments, (l) => setMission({ ...mission, commitments: l }), i)} className="p-3 text-red-400 hover:bg-white/5 rounded-xl transition-colors">🗑️</button>
+                                                    <button onClick={() => removeItem(mission.commitments, (l) => setMission({ ...mission, commitments: l }), i)} className="p-3 text-red-400 hover:bg-white/5 rounded-xl transition-colors"><Trash2 className="w-4 h-4" /></button>
                                                 </div>
                                                 <textarea
                                                     rows={2}
@@ -617,7 +615,7 @@ export default function AdminContent() {
                                                         <button
                                                             onClick={() => removeItem(principles.paragraphs || [''], (l) => setPrinciples({ ...principles, paragraphs: l }), i)}
                                                             className="mt-3 p-3 text-red-500 hover:bg-red-50 rounded-xl transition-colors"
-                                                        >🗑️</button>
+                                                        ><Trash2 className="w-4 h-4" /></button>
                                                     </div>
                                                 ))}
                                                 <button
@@ -795,15 +793,13 @@ export default function AdminContent() {
                                                 <div key={i} className="p-8 bg-[hsl(var(--admin-bg-alt))] rounded-3xl border border-[hsl(var(--admin-border))] space-y-6 relative group">
                                                     <button onClick={() => removeItem(committees, setCommittees, i)} className="absolute top-8 right-8 px-4 py-2 bg-red-50 text-red-500 rounded-xl text-[9px] font-bold uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">Delete Committee</button>
                                                     <div className="flex items-center gap-4">
-                                                        <input
-                                                            type="text"
+                                                        <IconPicker
                                                             value={com.icon}
-                                                            onChange={e => {
+                                                            onChange={(name) => {
                                                                 const newComs = [...committees];
-                                                                newComs[i].icon = e.target.value;
+                                                                newComs[i].icon = name;
                                                                 setCommittees(newComs);
                                                             }}
-                                                            className="w-14 h-14 bg-[hsl(var(--admin-bg-alt))] rounded-2xl text-center text-2xl border border-[hsl(var(--admin-text))]/20 shadow-sm"
                                                         />
                                                         <input
                                                             type="text"
@@ -938,7 +934,7 @@ export default function AdminContent() {
                                         </div>
                                         {committees?.length > 0 && (
                                             <button
-                                                onClick={() => setCommittees([...committees, { icon: '🏛️', name: 'New Committee', description: '', details: ['', ''], officers: [], photo: '' }])}
+                                                onClick={() => setCommittees([...committees, { icon: 'Landmark', name: 'New Committee', description: '', details: ['', ''], officers: [], photo: '' }])}
                                                 className="w-full h-16 rounded-2xl border-2 border-dashed border-[hsl(var(--admin-border))] text-[10px] font-bold uppercase tracking-widest text-coral hover:bg-coral/5 hover:border-coral/20 transition-all"
                                             >
                                                 + Add New Standing Committee
@@ -1110,7 +1106,7 @@ export default function AdminContent() {
                                                         {donations[qr.key] ? (
                                                             <img src={donations[qr.key]} alt={qr.label} className="w-full h-full object-contain" />
                                                         ) : (
-                                                            <span className="text-[20px] opacity-20">📸</span>
+                                                            <ImagePlus className="w-7 h-7 opacity-20" />
                                                         )}
                                                         <div className="absolute inset-0 bg-black/40 backdrop-blur-sm flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                                                             <label className="cursor-pointer px-4 py-2 bg-white text-coral text-[9px] font-bold uppercase rounded-xl">
