@@ -8,8 +8,8 @@ const DEFAULT = {
         "For over a century, the Gospel has travelled through these islands — from the seaside chapels of the Ilocos coast to the mountain parishes of the Cordillera, and into the neighborhoods of Metro Manila. Our congregations are ordinary and small; the God we worship is not. We gather weekly around the preached Word and the Lord's Table, believing that grace still reaches the ordinary sinner through ordinary means.",
         "Whether you are new to the faith, returning after many years away, or simply visiting for a season — you will find a seat here, a Bible opened, and a community that believes the Gospel is good news for you today.",
     ],
-    signer: 'Rev. Dr. Eduardo T. Reyes',
-    role: 'Moderator, General Assembly',
+    signer: 'Office of the Moderator',
+    role: 'General Assembly of the Presbyterian Church of the Philippines',
 };
 
 export default function MessageSection() {

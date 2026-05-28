@@ -43,11 +43,7 @@ const COMMITTEES = [
       'To prepare all matters for the next General Assembly meeting.',
       'To represent the denomination in ecumenical relations.',
     ],
-    officers: [
-      { name: 'Rev. Dr. Eduardo T. Reyes', role: 'Moderator' },
-      { name: 'Rev. Mateo Aguilar', role: 'Stated Clerk' },
-      { name: 'Eld. Joel Santos', role: 'Treasurer' },
-    ],
+    officers: [],
   },
   {
     name: 'Mission Committee',
@@ -58,10 +54,7 @@ const COMMITTEES = [
       'To monitor ongoing mission works in the field.',
       'To raise funds for mission and missionary support.',
     ],
-    officers: [
-      { name: 'Rev. Hosea Ligan', role: 'Chair' },
-      { name: 'Rev. Antonio Cruz', role: 'Field Coordinator' },
-    ],
+    officers: [],
   },
   {
     name: 'Theological Education',
@@ -631,46 +624,8 @@ export default function HomePage() {
               <span>Denominational Feed</span>
             </span>
           </div>
-          <div className="events__grid">
-            <button className="event-card reveal" type="button">
-              <div className="event-card__date">
-                <span className="month">Oct</span>
-                <span className="day">14</span>
-                <span className="yr">MMXXVI</span>
-              </div>
-              <div className="event-card__body">
-                <span className="event-card__tag">General Assembly</span>
-                <h4>The 32nd <em>General Assembly</em> convenes.</h4>
-                <p>Four days of deliberation, worship, and the seating of newly ordained ministers.</p>
-                <span className="event-card__meta">14–17 Oct · Ermita Chapel, Manila</span>
-              </div>
-            </button>
-            <button className="event-card reveal" type="button">
-              <div className="event-card__date">
-                <span className="month">Sep</span>
-                <span className="day">07</span>
-                <span className="yr">MMXXVI</span>
-              </div>
-              <div className="event-card__body">
-                <span className="event-card__tag">Church Plant</span>
-                <h4>New <em>Bacolod</em> chapel opens.</h4>
-                <p>Our 145th congregation begins weekly worship in the Visayas under Rev. Antonio Cruz.</p>
-                <span className="event-card__meta">Sundays · 9:00 AM · Bacolod City</span>
-              </div>
-            </button>
-            <button className="event-card reveal" type="button">
-              <div className="event-card__date">
-                <span className="month">Aug</span>
-                <span className="day">22</span>
-                <span className="yr">MMXXVI</span>
-              </div>
-              <div className="event-card__body">
-                <span className="event-card__tag">Mission Update</span>
-                <h4>From the field · <em>Camiguin</em>.</h4>
-                <p>A short letter from our mission station on the small northern island — baptisms and small-group launches.</p>
-                <span className="event-card__meta">Read the dispatch →</span>
-              </div>
-            </button>
+          <div className="events__empty reveal">
+            <p>Upcoming events &amp; dispatches will be posted here as the General Assembly and the presbyteries convene.</p>
           </div>
         </div>
       </section>
@@ -698,8 +653,8 @@ export default function HomePage() {
               {cms.msg?.paragraphs?.[1] || 'Whether you are new to the faith, returning after many years away, or simply visiting for a season — you will find a seat here, a Bible opened, and a community that believes the Gospel is good news for you today.'}
             </p>
             <div className="signature">
-              <em>{cms.msg?.signer || 'Rev. Dr. Eduardo T. Reyes'}</em>
-              <span>{cms.msg?.role || 'Moderator · 32nd General Assembly'}</span>
+              <em>{cms.msg?.signer || 'Office of the Moderator'}</em>
+              <span>{cms.msg?.role || 'General Assembly of the Presbyterian Church of the Philippines'}</span>
             </div>
           </div>
           <aside className="marginalia reveal">
@@ -714,7 +669,7 @@ export default function HomePage() {
             </div>
             <div className="margin-note">
               <span className="label">In Session</span>
-              The 32nd General Assembly convenes at Ermita Chapel from 14–17 October.
+              The General Assembly convenes annually on the third Tuesday of October, by appointment of the previous stated meeting.
             </div>
           </aside>
         </div>
@@ -760,8 +715,8 @@ export default function HomePage() {
                     <svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
                   </button>
                   <div className="sermon__caption">
-                    <span>{featured?.duration ? featured.duration : 'No. 412 · 32 min'}</span>
-                    <span className="scripture">{featured?.scripture || '“There is therefore now no condemnation…”'}</span>
+                    <span>{featured?.duration || ''}</span>
+                    <span className="scripture">{featured?.scripture || ''}</span>
                   </div>
                 </>
               )}
@@ -771,8 +726,8 @@ export default function HomePage() {
               <div className="sermon__series">
                 <span>Series</span><span className="dot">·</span><span>{featured?.series || 'Romans · The Gospel of Grace'}</span>
               </div>
-              <h3 className="display display--md">{featured?.title || <>No Condemnation<br /><em>for those in Christ.</em></>}</h3>
-              <p className="sermon__ref">{featured ? [featured.scripture, featured.speaker, featured.duration].filter(Boolean).join(' · ') : 'Romans 8:1–11 · Rev. Jose Aguilar · 32 min'}</p>
+              <h3 className="display display--md">{featured?.title || <>Sermons from the<br /><em>General Assembly.</em></>}</h3>
+              <p className="sermon__ref">{featured ? [featured.scripture, featured.speaker, featured.duration].filter(Boolean).join(' · ') : 'Sermons from the General Assembly will appear here.'}</p>
               <p className="sermon__blurb">
                 {featured?.description || 'What does it mean that the Spirit gives life where the law could only condemn? An exposition on the great hinge of the eighth chapter — and what it sets free in the ordinary Christian’s ordinary week.'}
               </p>
@@ -785,12 +740,7 @@ export default function HomePage() {
                 </div>
                 {(sermons.length
                   ? sermons.slice(0, 5).map((s, i) => ({ n: String(sermons.length - i).padStart(3, '0'), title: s.title || 'Untitled', em: '', ref: s.scripture || s.speaker || '' }))
-                  : [
-                    { n: '412', title: 'No Condemnation', em: 'for Those in Christ', ref: 'Rom. viii. 1' },
-                    { n: '411', title: 'The Spirit of', em: 'Adoption', ref: 'Rom. viii. 14' },
-                    { n: '410', title: 'The Sufferings of', em: 'This Present Time', ref: 'Rom. viii. 18' },
-                    { n: '409', title: 'More than', em: 'Conquerors', ref: 'Rom. viii. 37' },
-                  ]
+                  : []
                 ).map((row, i) => (
                   <button
                     key={row.n + i}
