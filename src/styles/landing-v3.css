@@ -2016,6 +2016,21 @@ body.lp-v3 .events__grid {
   grid-template-columns: repeat(3, 1fr);
   gap: 1.25rem;
 }
+body.lp-v3 .events__empty {
+  padding: 3rem 2rem;
+  background: var(--cream-card);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--brass);
+  text-align: center;
+}
+body.lp-v3 .events__empty p {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 1.05rem;
+  color: var(--ink-mute);
+  margin: 0;
+  line-height: 1.6;
+}
 body.lp-v3 .event-card {
   background: var(--cream-card);
   border: 1px solid var(--line);
