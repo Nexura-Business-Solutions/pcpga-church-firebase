@@ -4,7 +4,34 @@ import { Helmet } from 'react-helmet-async';
 import PhilippinesMap from '../components/PhilippinesMap.jsx';
 import AnnouncementModal from '../components/AnnouncementModal.jsx';
 import { getSettings, getSermons } from '../lib/store.js';
+import { defaultPresbyteries } from '../lib/seed-data.js';
 import '../styles/landing-v3.css';
+
+const REGION_ORDER = ['Luzon', 'NCR', 'Visayas', 'Mindanao', 'CAR'];
+const REGION_LABEL = {
+  Luzon: { title: 'Luzon', emTitle: '& Cordillera' },
+  NCR: { title: 'Metro', emTitle: 'Manila' },
+  Visayas: { title: 'Visayas', emTitle: '& the Islands' },
+  Mindanao: { title: 'Mindanao', emTitle: '& the South' },
+  CAR: { title: 'Cordillera', emTitle: 'Administrative Region' },
+};
+const REGION_ROMAN = ['I.', 'II.', 'III.', 'IV.', 'V.'];
+
+function toLowerRoman(num) {
+  const map = [['xc', 90], ['l', 50], ['xl', 40], ['x', 10], ['ix', 9], ['v', 5], ['iv', 4], ['i', 1]];
+  let n = num;
+  let out = '';
+  for (const [letter, value] of map) {
+    while (n >= value) { out += letter; n -= value; }
+  }
+  return out + '.';
+}
+
+function congregationCount(p) {
+  if (typeof p.congregations === 'number') return p.congregations;
+  if (Array.isArray(p.churches)) return p.churches.length;
+  return 0;
+}
 
 const COMMITTEES = [
   {
@@ -105,64 +132,11 @@ const COMMITTEES = [
   },
 ];
 
-const PRESBYTERIES = [
-  {
-    name: 'Ilocos Norte', region: 'Luzon', seat: 'Laoag City', congregations: 24, founded: 'MCMXII',
-    description: 'Constituted from the original Northern Luzon mission posts, the presbytery has served the Ilocano coast for over a century.',
-    officers: [
-      { name: 'Rev. Bayani Pascual', role: 'Moderator' },
-      { name: 'Eld. Mariano Galang', role: 'Clerk' },
-    ],
-  },
-  {
-    name: 'Cordillera', region: 'Luzon', seat: 'Baguio City', congregations: 31, founded: 'MCMXXVIII',
-    description: 'The mountain churches of Benguet, Ifugao, and Mountain Province — our largest presbytery by number of congregations.',
-    officers: [{ name: 'Rev. Pedro Bayan', role: 'Moderator' }],
-  },
-  {
-    name: 'Central Luzon', region: 'Luzon', seat: 'San Fernando, Pampanga', congregations: 18, founded: 'MCMLVIII',
-    description: 'Covering Pampanga, Bulacan, Tarlac, and Nueva Ecija — the agricultural heartland of the church.',
-  },
-  {
-    name: 'Metro Manila', region: 'NCR', seat: 'Ermita, Manila', congregations: 22, founded: 'MDCCCXCVIII',
-    description: 'The mother presbytery. Ermita Chapel, the original PCP gathering place, still meets every Lord’s Day at 9 and 11 AM.',
-    officers: [
-      { name: 'Rev. Dr. Eduardo T. Reyes', role: 'Moderator' },
-      { name: 'Rev. Jose Aguilar', role: 'Preaching Elder' },
-      { name: 'Eld. Joel Santos', role: 'Treasurer' },
-    ],
-  },
-  {
-    name: 'Cebu & Bohol', region: 'Visayas', seat: 'Cebu City', congregations: 19, founded: 'MCMLXXII',
-    description: 'The Visayan presbytery, gathering Cebuano and Boholano congregations across the two islands.',
-  },
-  {
-    name: 'Northern Mindanao', region: 'Mindanao', seat: 'Cagayan de Oro', congregations: 30, founded: 'MCMLXXXV',
-    description: 'The youngest of the six, growing fastest — from Misamis Oriental down to Bukidnon and Lanao.',
-  },
-];
-
 const STATS = [
   { roman: 'I.', target: 128, label: 'Years of Ministry', note: 'since 1898' },
   { roman: 'II.', target: 144, label: 'Congregations', note: 'across the archipelago' },
   { roman: 'III.', target: 42, suffix: 'K', label: 'Communicant Members', note: 'in good standing' },
-  { roman: 'IV.', target: 6, label: 'Presbyteries', note: 'Luzon · NCR · Visayas · Mindanao' },
-];
-
-const REGIONS = [
-  {
-    num: 'I.', title: 'Luzon', emTitle: '& Cordillera', count: '3 Presbyteries',
-    indices: [0, 1, 2],
-    romans: ['i.', 'ii.', 'iii.'],
-  },
-  {
-    num: 'II.', title: 'Metro', emTitle: 'Manila', count: '1 Presbytery',
-    indices: [3], romans: ['iv.'],
-  },
-  {
-    num: 'III.', title: 'Visayas', emTitle: '& Mindanao', count: '2 Presbyteries',
-    indices: [4, 5], romans: ['v.', 'vi.'],
-  },
+  { roman: 'IV.', target: defaultPresbyteries.length, label: 'Presbyteries', note: 'Luzon · NCR · Visayas · Mindanao' },
 ];
 
 const NAV_LINKS = [
@@ -255,10 +229,41 @@ export default function HomePage() {
   const sermons = cms.sermons || [];
   const featured = sermons[activeSermon] || sermons[0] || null;
   const featuredEmbed = toEmbedUrl(featured?.videoUrl);
-  // Presbyteries: editable copy from settings, but only when it has the 6 the
-  // region map expects (fixed REGIONS indices) — otherwise keep the hardcoded set.
-  const presbyteries = (cms.presbyteries && cms.presbyteries.length >= PRESBYTERIES.length)
-    ? cms.presbyteries : PRESBYTERIES;
+  // Presbyteries: editable copy from settings; fall back to the seeded defaults
+  // (defaultPresbyteries) so the page works even before any admin edits.
+  const presbyteries = (cms.presbyteries && cms.presbyteries.length > 0)
+    ? cms.presbyteries : defaultPresbyteries;
+
+  // Group by `region` (data-driven) so the section scales as more presbyteries
+  // are added without touching the layout code.
+  const presbyteriesByRegion = (() => {
+    const groups = {};
+    presbyteries.forEach((p, idx) => {
+      const region = p.region || 'Other';
+      (groups[region] = groups[region] || []).push({ ...p, _idx: idx });
+    });
+    const orderedRegions = Object.keys(groups).sort((a, b) => {
+      const ai = REGION_ORDER.indexOf(a);
+      const bi = REGION_ORDER.indexOf(b);
+      return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi);
+    });
+    let running = 0;
+    return orderedRegions.map((region, ri) => {
+      const items = groups[region].map((item) => {
+        running += 1;
+        return { ...item, _roman: toLowerRoman(running) };
+      });
+      const label = REGION_LABEL[region] || { title: region, emTitle: '' };
+      return {
+        region,
+        num: REGION_ROMAN[ri] || `${ri + 1}.`,
+        title: label.title,
+        emTitle: label.emTitle,
+        count: `${items.length} ${items.length === 1 ? 'Presbytery' : 'Presbyteries'}`,
+        items,
+      };
+    });
+  })();
 
   // body class management
   useEffect(() => {
@@ -935,7 +940,7 @@ export default function HomePage() {
           <div className="section-head section-head--split">
             <div className="reveal">
               <span className="kicker">Across the Archipelago</span>
-              <h2 className="display display--lg">Six presbyteries.<br /><em>One communion.</em></h2>
+              <h2 className="display display--lg">{presbyteries.length} presbyteries.<br /><em>One communion.</em></h2>
             </div>
             <p className="lede reveal">
               From the Cordilleras to Mindanao, our congregations gather weekly to hear the Word preached and the Sacraments rightly administered.
@@ -953,32 +958,33 @@ export default function HomePage() {
             </aside>
 
             <div className="presbyteries__col">
-              {REGIONS.map((region) => (
-                <div key={region.num} className="presbyteries__region reveal">
+              {presbyteriesByRegion.map((region) => (
+                <div key={region.region} className="presbyteries__region reveal">
                   <div className="presbyteries__region-head">
                     <span className="num">{region.num}</span>
-                    <h3>{region.title} <em>{region.emTitle}</em></h3>
+                    <h3>{region.title} {region.emTitle && <em>{region.emTitle}</em>}</h3>
                     <span className="count">{region.count}</span>
                   </div>
                   <div className="presbyteries__grid">
-                    {region.indices.map((idx, j) => {
-                      const p = presbyteries[idx];
-                      if (!p) return null;
+                    {region.items.map((p) => {
                       const [first, ...rest] = (p.name || '').split(' ');
+                      const count = congregationCount(p);
                       return (
                         <button
-                          key={p.name}
+                          key={`${p.id || p.name || 'p'}-${p._idx}`}
                           type="button"
                           className="presbyteries__card"
-                          onClick={() => openPresbytery(idx)}
+                          onClick={() => openPresbytery(p._idx)}
                         >
-                          <span className="presbyteries__num">{region.romans[j]}</span>
+                          <span className="presbyteries__num">{p._roman}</span>
                           <div className="presbyteries__body">
                             <h4>{first} {rest.length > 0 && <em>{rest.join(' ')}</em>}</h4>
-                            <span className="presbyteries__seat">Seat · {p.seat}</span>
-                            <span className="presbyteries__count">
-                              {p.congregations} congregations
-                            </span>
+                            {p.seat && <span className="presbyteries__seat">Seat · {p.seat}</span>}
+                            {count > 0 && (
+                              <span className="presbyteries__count">
+                                {count} {count === 1 ? 'congregation' : 'congregations'}
+                              </span>
+                            )}
                           </div>
                           <span className="presbyteries__arrow">→</span>
                         </button>
@@ -1285,23 +1291,56 @@ function CommitteeModal({ data }) {
 }
 
 function PresbyteryModal({ data }) {
+  const churchCount = Array.isArray(data.churches) ? data.churches.length : (data.congregations || 0);
   return (
     <>
       <div className="modal__eyebrow">Presbytery · {data.region}</div>
       <h3 className="modal__title" id="modal-title">{data.name}</h3>
       <div className="modal__sub">{data.seat ? `Seat · ${data.seat}` : ''}</div>
       <div className="modal__body">
-        <p>{data.description}</p>
-        <div className="modal__section-title">At a Glance</div>
-        <ul className="modal__list">
-          {data.seat && <li>Seat — {data.seat}</li>}
-          {data.founded && <li>Founded — A.D. {data.founded}</li>}
-          {data.congregations && <li>{data.congregations} congregations across the region</li>}
-        </ul>
+        {data.description && <p>{data.description}</p>}
+        {(data.seat || data.founded || churchCount > 0) && (
+          <>
+            <div className="modal__section-title">At a Glance</div>
+            <ul className="modal__list">
+              {data.seat && <li>Seat — {data.seat}</li>}
+              {data.founded && <li>Founded — A.D. {data.founded}</li>}
+              {churchCount > 0 && <li>{churchCount} {churchCount === 1 ? 'congregation' : 'congregations'} across the region</li>}
+            </ul>
+          </>
+        )}
         {data.officers && data.officers.length > 0 && (
           <>
-            <div className="modal__section-title">Commissioned Elders</div>
+            <div className="modal__section-title">Executive Committee</div>
             <OfficerList officers={data.officers} />
+          </>
+        )}
+        {Array.isArray(data.churches) && data.churches.length > 0 && (
+          <>
+            <div className="modal__section-title">Member Churches ({data.churches.length})</div>
+            <div className="modal__churches">
+              {data.churches.map((ch, idx) => (
+                <article key={ch.name || idx} className="modal__church">
+                  <h4 className="modal__church-name">{ch.name}</h4>
+                  {ch.address && <p className="modal__church-line"><strong>Address:</strong> {ch.address}</p>}
+                  {ch.minister && <p className="modal__church-line"><strong>Minister:</strong> {ch.minister}</p>}
+                  {ch.associatePastors?.length > 0 && (
+                    <p className="modal__church-line"><strong>Associate Pastors:</strong> {ch.associatePastors.join(', ')}</p>
+                  )}
+                  {ch.worshipTime && <p className="modal__church-line"><strong>Worship:</strong> {ch.worshipTime}</p>}
+                  {ch.contact && <p className="modal__church-line"><strong>Contact:</strong> {ch.contact}</p>}
+                  {ch.email && (
+                    <p className="modal__church-line">
+                      <strong>Email:</strong>{' '}
+                      <a href={`mailto:${ch.email}`}>{ch.email}</a>
+                    </p>
+                  )}
+                  {ch.elders?.length > 0 && (
+                    <p className="modal__church-line"><strong>Elders:</strong> {ch.elders.join(', ')}</p>
+                  )}
+                </article>
+              ))}
+            </div>
           </>
         )}
       </div>
