@@ -34,7 +34,7 @@ export default function Presbyteries() {
                 <div className="section-head section-head--split">
                     <div>
                         <span className="kicker">Across the Archipelago</span>
-                        <h2 className="display-h2">Six presbyteries.<br /><em>One communion.</em></h2>
+                        <h2 className="display-h2">{presbyteries.length || 'Many'} presbyteries.<br /><em>One communion.</em></h2>
                     </div>
                     <p className="section-head__lede">Loading…</p>
                 </div>
@@ -47,7 +47,7 @@ export default function Presbyteries() {
             <div className="section-head section-head--split">
                 <div>
                     <span className="kicker">Across the Archipelago</span>
-                    <h2 className="display-h2">Six presbyteries.<br /><em>One communion.</em></h2>
+                    <h2 className="display-h2">{presbyteries.length} presbyteries.<br /><em>One communion.</em></h2>
                 </div>
                 <p className="section-head__lede">
                     From the Cordilleras to Mindanao, our congregations gather weekly to hear the Word preached and the
@@ -86,7 +86,11 @@ export default function Presbyteries() {
                                     </p>
                                 )}
                                 <p className="presbyteries__count">
-                                    {item.congregations ? `${item.congregations} congregations` : `${item.officers?.length || 0} officers`}
+                                    {item.churches?.length
+                                        ? `${item.churches.length} ${item.churches.length === 1 ? 'church' : 'churches'}`
+                                        : item.congregations
+                                            ? `${item.congregations} congregations`
+                                            : `${item.officers?.length || 0} officers`}
                                 </p>
                                 <span className="presbyteries__arrow">→</span>
                             </motion.button>
@@ -135,10 +139,41 @@ export default function Presbyteries() {
                                             })}
                                         </div>
                                     </>
-                                ) : (
+                                ) : (!selected.churches?.length && (
                                     <p style={{ fontStyle: 'italic', color: 'var(--ink-mute)' }}>
                                         No commissioned elder listed for this period.
                                     </p>
+                                ))}
+
+                                {selected.churches?.length > 0 && (
+                                    <>
+                                        <div className="pcp-modal__section-title" style={{ marginTop: '2rem' }}>
+                                            Member Churches ({selected.churches.length})
+                                        </div>
+                                        <div className="pcp-modal__churches">
+                                            {selected.churches.map((ch, idx) => (
+                                                <article key={idx} className="pcp-modal__church">
+                                                    <h4 className="pcp-modal__church-name">{ch.name}</h4>
+                                                    {ch.address && <p className="pcp-modal__church-line"><strong>Address:</strong> {ch.address}</p>}
+                                                    {ch.minister && <p className="pcp-modal__church-line"><strong>Minister:</strong> {ch.minister}</p>}
+                                                    {ch.associatePastors?.length > 0 && (
+                                                        <p className="pcp-modal__church-line"><strong>Associate Pastors:</strong> {ch.associatePastors.join(', ')}</p>
+                                                    )}
+                                                    {ch.worshipTime && <p className="pcp-modal__church-line"><strong>Worship:</strong> {ch.worshipTime}</p>}
+                                                    {ch.contact && <p className="pcp-modal__church-line"><strong>Contact:</strong> {ch.contact}</p>}
+                                                    {ch.email && (
+                                                        <p className="pcp-modal__church-line">
+                                                            <strong>Email:</strong>{' '}
+                                                            <a href={`mailto:${encodeURIComponent(ch.email)}`}>{ch.email}</a>
+                                                        </p>
+                                                    )}
+                                                    {ch.elders?.length > 0 && (
+                                                        <p className="pcp-modal__church-line"><strong>Elders:</strong> {ch.elders.join(', ')}</p>
+                                                    )}
+                                                </article>
+                                            ))}
+                                        </div>
+                                    </>
                                 )}
 
                                 {selected.website && (
