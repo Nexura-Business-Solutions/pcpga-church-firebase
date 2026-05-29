@@ -82,7 +82,7 @@ function SeminaryDetail({ seminary, onBack }) {
             )}
             {(s.admissions?.whoMayApply?.length > 0 || s.admissions?.requirements?.length > 0) && (
                 <Section title="Admissions">
-                    {s.admissions.whoMayApply?.length > 0 && (
+                    {s.admissions?.whoMayApply?.length > 0 && (
                         <>
                             <p className="font-semibold text-church-dark/80 mb-2">Who may apply</p>
                             <ul className="list-disc list-inside text-church-dark/80 mb-4 space-y-0.5">
@@ -90,7 +90,7 @@ function SeminaryDetail({ seminary, onBack }) {
                             </ul>
                         </>
                     )}
-                    {s.admissions.requirements?.length > 0 && (
+                    {s.admissions?.requirements?.length > 0 && (
                         <>
                             <p className="font-semibold text-church-dark/80 mb-2">Requirements</p>
                             <ul className="list-disc list-inside text-church-dark/80 space-y-0.5">
@@ -143,19 +143,27 @@ function SeminaryDetail({ seminary, onBack }) {
 export default function SeminariesPage() {
     const [seminaries, setSeminaries] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(false);
     const [selected, setSelected] = useState(null);
 
     useEffect(() => {
         (async () => {
             const data = await getSettings('seminaries');
-            if (Array.isArray(data)) setSeminaries(data);
+            if (Array.isArray(data)) {
+                setSeminaries(data);
+            } else {
+                setError(true);
+            }
             setLoading(false);
         })();
     }, []);
 
     return (
         <>
-            <Helmet><title>Seminaries — Presbyterian Church of the Philippines</title></Helmet>
+            <Helmet>
+                <title>Seminaries — Presbyterian Church of the Philippines</title>
+                <meta name="description" content="Reformed, Christ-centered theological education at the seminaries of the Presbyterian Church of the Philippines." />
+            </Helmet>
             <Navbar />
             <div className="min-h-screen bg-[#f8f7ff] selection:bg-accent/10">
                 <main className="pt-28 pb-24 px-5 sm:px-8">
@@ -176,6 +184,8 @@ export default function SeminariesPage() {
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                             {[...Array(2)].map((_, i) => <Skeleton key={i} className="h-48 rounded-3xl" />)}
                                         </div>
+                                    ) : error ? (
+                                        <p className="text-center text-church-dark/50 py-24">We couldn&apos;t load the seminaries right now. Please try again later.</p>
                                     ) : seminaries.length === 0 ? (
                                         <p className="text-center text-church-dark/50 py-24">No seminaries listed yet.</p>
                                     ) : (
