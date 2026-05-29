@@ -4,6 +4,7 @@ import toast from 'react-hot-toast';
 import { getSettings, saveSettings } from '../lib/store.js';
 import { uploadFile } from '../lib/storage.js';
 import { defaultPresbyteries } from '../lib/seed-data.js';
+import { mergePresbyteries } from '../lib/directorySync.js';
 import GuidedTour from '../components/admin/GuidedTour.jsx';
 import { AdminSkeleton, AdminHeaderSkeleton, AdminCardSkeleton } from '../components/admin/AdminSkeleton.jsx';
 import AdminEmptyState from '../components/admin/AdminEmptyState.jsx';
@@ -134,6 +135,13 @@ export default function AdminContent() {
         } finally {
             setSaving(false);
         }
+    };
+
+    const handleSyncDirectory = () => {
+        if (!confirm('Sync the directory from the latest defaults? This adds/updates churches and officers without removing your existing entries or photos.')) return;
+        const merged = mergePresbyteries(presbyteries, defaultPresbyteries);
+        setPresbyteries(merged);
+        toast.success('Directory synced — review, then Save to publish ✦');
     };
 
     // Convert file to compressed base64 data URL (for officer photos)
@@ -976,6 +984,12 @@ export default function AdminContent() {
                                 {activeTab === 'presbyteries' && (
                                     <div className="space-y-12">
                                         <h3 className="text-[10px] font-bold uppercase tracking-widest text-coral border-b border-[hsl(var(--admin-border))] pb-4">Regional Governance</h3>
+                                        <div className="mb-6 flex justify-end">
+                                            <button type="button" onClick={handleSyncDirectory}
+                                                className="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-accent/10 text-accent text-[11px] font-bold uppercase tracking-widest border border-accent/20 hover:bg-accent hover:text-white transition-all">
+                                                Sync directory from latest
+                                            </button>
+                                        </div>
                                         <div className="grid grid-cols-1 gap-8">
                                             {(!presbyteries || presbyteries.length === 0) && (
                                                 <AdminEmptyState
