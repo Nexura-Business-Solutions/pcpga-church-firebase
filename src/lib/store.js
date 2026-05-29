@@ -190,15 +190,16 @@ export async function initStore() {
     if (!py || (Array.isArray(py) && py.length === 0) || (typeof py === 'object' && Object.keys(py).length === 0)) {
       await saveSettings('presbyteries', defaultPresbyteries);
     }
-    try {
-      const sem = await getSettings('seminaries');
-      if (!sem || (Array.isArray(sem) && sem.length === 0)) {
-        await saveSettings('seminaries', defaultSeminaries);
-      }
-    } catch (e) {
-      console.error('initStore seminaries error:', e);
-    }
   } catch (e) {
     console.error('initStore error:', e);
+  }
+
+  try {
+    const sem = await getSettings('seminaries');
+    if (!sem || (Array.isArray(sem) && sem.length === 0) || (typeof sem === 'object' && Object.keys(sem).length === 0)) {
+      await saveSettings('seminaries', defaultSeminaries);
+    }
+  } catch (e) {
+    console.error('initStore seminaries error:', e);
   }
 }
