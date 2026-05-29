@@ -4,6 +4,7 @@ import AdminRoute from './components/AdminRoute.jsx';
 import HomePage from './pages/HomePage.jsx';
 import LibraryPage from './pages/LibraryPage.jsx';
 import ChurchesPage from './pages/ChurchesPage.jsx';
+import SeminariesPage from './pages/SeminariesPage.jsx';
 import DonationPage from './pages/DonationPage.jsx';
 import DonationSuccessPage from './pages/DonationSuccessPage.jsx';
 import LoginPage from './pages/LoginPage.jsx';
@@ -18,6 +19,7 @@ const AdminDonations = lazy(() => import('./admin/AdminDonations.jsx'));
 const AdminDonors = lazy(() => import('./admin/AdminDonors.jsx'));
 const AdminContent = lazy(() => import('./admin/AdminContent.jsx'));
 const AdminAdmins = lazy(() => import('./admin/AdminAdmins.jsx'));
+const AdminSeminaries = lazy(() => import('./admin/AdminSeminaries.jsx'));
 
 function AdminFallback() {
   return (
@@ -43,6 +45,7 @@ export default function App() {
       <Route path="/" element={<HomePage />} />
       <Route path="/library" element={<LibraryPage />} />
       <Route path="/churches" element={<ChurchesPage />} />
+      <Route path="/seminaries" element={<SeminariesPage />} />
       <Route path="/donation" element={<DonationPage />} />
       <Route path="/donation/success" element={<DonationSuccessPage />} />
       <Route path="/login" element={<LoginPage />} />
@@ -52,6 +55,7 @@ export default function App() {
       <Route path="/admin/sermons" element={adminRoute(AdminSermons)} />
       <Route path="/admin/library" element={adminRoute(AdminLibrary)} />
       <Route path="/admin/churches" element={adminRoute(AdminChurches)} />
+      <Route path="/admin/seminaries" element={adminRoute(AdminSeminaries)} />
       <Route path="/admin/donations" element={adminRoute(AdminDonations)} />
       <Route path="/admin/donations/donors" element={adminRoute(AdminDonors)} />
       <Route path="/admin/content" element={adminRoute(AdminContent)} />

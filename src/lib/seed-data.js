@@ -220,3 +220,145 @@ export const defaultPresbyteries = [
         ],
     },
 ];
+
+// Seminaries / theological schools. Admin-managed via the `seminaries`
+// settings key; this is the seed/fallback (mirrors defaultPresbyteries).
+export const defaultSeminaries = [
+    {
+        id: 'ptscas',
+        name: 'PTS College and Advanced Studies',
+        shortName: 'PTSCAS',
+        tagline: 'The national ministerial training institution of GAPCP',
+        type: 'college',
+        about:
+            'PTS College and Advanced Studies (PTSCAS) is the national institution of the General Assembly of the Presbyterian Church of the Philippines (GAPCP). It serves as the main ministerial training school of the denomination, rooted in the Reformed tradition. PTSCAS offers quality Christian education from basic to advanced levels.',
+        location: '',
+        website: 'https://ptscas.edu.ph',
+        contact: '',
+        vision:
+            "To be a leading Reformed Christian institution that proclaims the Gospel, ministers to the church, society, and God's creation.",
+        mission: [
+            'Provide quality and holistic Christian education',
+            'Train men and women for church-building and societal transformation',
+            "Serve as a catalyst for the expansion of God's kingdom",
+        ],
+        statementOfFaith: [],
+        officers: [],
+        faculty: [],
+        programs: [
+            { name: 'K–12 Program', duration: '', units: '', description: 'Elementary, Junior High, and Senior High School', highlights: [] },
+            { name: "Bachelor's Degree Programs", duration: '', units: '', description: 'Theology, Christian Education, and related fields', highlights: [] },
+            { name: "Master's / Seminary Degrees", duration: '', units: '', description: 'Master of Divinity, Master of Arts in various ministries', highlights: [] },
+            { name: 'Doctoral Degree Programs', duration: '', units: '', description: 'Doctor of Ministry and Ph.D. programs', highlights: [] },
+        ],
+        admissions: { whoMayApply: [], requirements: [] },
+        schedule: { day: '', time: '', mode: '', load: '' },
+        photoUrl: '',
+    },
+    {
+        id: 'pbsi-bulacan',
+        name: 'Presbyterian Bible Seminary Inc. – Bulacan Annex',
+        shortName: 'PBSI – Bulacan Annex',
+        tagline: 'Reformed and Christ-centered theological education',
+        type: 'seminary',
+        about:
+            'Presbyterian Bible Seminary Inc. – Bulacan Annex is the officially recognized regional extension of Presbyterian Bible Seminary Inc. (PBSI), with its main campus located in Angeles City, Pampanga. As a duly registered non-stock, non-profit educational institution under SEC Registration No. 2024010129878-00, PBSI is committed to providing Reformed and Christ-centered theological education to individuals who are called to serve the Church and participate in the advancement of God’s kingdom. The seminary seeks to equip future pastors, missionaries, church leaders, and Christian workers through sound biblical instruction, spiritual formation, and practical ministry training. PBSI – Bulacan Annex welcomes students from all Christian denominations and is not exclusive to Presbyterian members.',
+        location:
+            'Jesus Shepherd of Our Soul (JSOOS), Blk. 1, Lot 14 & 15, Humel Heritage Homes, Longos, City of Malolos, Bulacan',
+        website: '',
+        contact: '',
+        vision:
+            "To be a leading Reformed Christian institution in Central Luzon and Bulacan that faithfully proclaims the Gospel and ministers to the Church, society, and God’s creation.",
+        mission: [
+            'Provide quality and holistic Christian educational services.',
+            'Train men and women for the edification of the Church and the transformation of society.',
+            "Serve as a catalyst for the expansion of God’s kingdom on earth.",
+        ],
+        statementOfFaith: [
+            { title: 'Sola Scriptura', subtitle: 'Scripture Alone' },
+            { title: 'Sola Fide', subtitle: 'Faith Alone' },
+            { title: 'Sola Gratia', subtitle: 'Grace Alone' },
+            { title: 'Solus Christus', subtitle: 'Christ Alone' },
+            { title: 'Soli Deo Gloria', subtitle: 'Glory to God Alone' },
+        ],
+        officers: [
+            { name: 'Rev. Joval Kinisamal', role: 'President (PBSI Main Campus)' },
+            { name: 'Rev. Jhune Josep', role: 'School Administrator' },
+            { name: 'Rev. Samuel Suyao', role: 'Dean of Academic & Student Affairs' },
+            { name: 'Ptra. Helen Talaoc', role: 'School Registrar' },
+            { name: 'Ptra. Zenaida Navea', role: 'Accounting & Finance' },
+            { name: 'Ptra. Lhorie Flores', role: 'School Secretary' },
+        ],
+        faculty: [
+            'Rev. Jose Pagdanganan',
+            'Rev. Agripino Kabiling',
+            'Rev. Arman Josep',
+            'Ptra. Lhorie Flores',
+            'Ptra. Zenaida Navea',
+        ],
+        programs: [
+            {
+                name: 'Bachelor of Theology (B.Th.)',
+                duration: 'Three (3) years',
+                units: '122 units',
+                description:
+                    'A comprehensive three-year degree program designed to prepare students for pastoral ministry, church leadership, missions, and Christian education. Graduation requires completion of all 122 required units.',
+                highlights: [
+                    'Trimester-based academic calendar',
+                    'Strong emphasis on biblical instruction and hands-on ministry',
+                    'Field Ministry training in actual church settings',
+                    'Minimum of 18 units per trimester',
+                ],
+            },
+            {
+                name: 'Bachelor of Christian Ministry (BCM)',
+                duration: '1 Year',
+                units: '60 units',
+                description:
+                    'Foundational theological and ministry training. Field Ministry subjects are primarily for reporting purposes; students submit prescribed ministry engagement forms weekly. Units may later be credited toward the B.Th. degree.',
+                highlights: [],
+            },
+            {
+                name: 'Diploma in Theological Studies (DTS)',
+                duration: '',
+                units: '24 units',
+                description:
+                    "For individuals who already possess a four-year bachelor’s degree and desire formal theological education. Subjects marked with an asterisk (*) are prerequisite courses. Units may later be credited toward the B.Th. degree.",
+                highlights: [],
+            },
+            {
+                name: 'Lay Leadership Training Program',
+                duration: '',
+                units: '18 units',
+                description:
+                    "Designed for church workers and lay leaders as an introductory theological training course; may later be credited toward a bachelor’s degree program.",
+                highlights: [],
+            },
+        ],
+        admissions: {
+            whoMayApply: [
+                'Aspiring pastors',
+                'Missionaries',
+                'Church workers',
+                'Christian educators',
+                'Committed laypeople desiring theological training',
+            ],
+            requirements: [
+                'Transcript of Records or Report Card',
+                'PSA Birth Certificate',
+                'Certificate of Good Moral Character',
+                'Church Recommendation',
+                'Two (2) pieces 2x2 ID pictures',
+                'Personal Testimony or Essay',
+                'Interview with School Leadership',
+            ],
+        },
+        schedule: {
+            day: 'Every Monday',
+            time: '8:00 AM – 5:00 PM',
+            mode: 'Primarily face-to-face, with blended or online options depending on instructor availability',
+            load: 'Six (6) subjects per trimester (18 units); 1 hour and 30 minutes per subject',
+        },
+        photoUrl: '',
+    },
+];
