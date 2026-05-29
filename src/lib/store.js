@@ -7,7 +7,7 @@ import {
   listChurches, createChurch, updateChurch as fsUpdateChurch, deleteChurch as fsDeleteChurch,
   getSetting, setSetting,
 } from './firestore.js';
-import { defaultPresbyteries } from './seed-data.js';
+import { defaultPresbyteries, defaultSeminaries } from './seed-data.js';
 
 // ---------- Churches ----------
 export async function getChurches() {
@@ -149,7 +149,7 @@ export async function saveDonationContent(content) {
 export async function getSettings(key) {
   try {
     const data = await getSetting(key);
-    const arrayKeys = ['standing-committees', 'presbyteries'];
+    const arrayKeys = ['standing-committees', 'presbyteries', 'seminaries'];
     if (arrayKeys.includes(key)) {
       if (!data || (typeof data === 'object' && !Array.isArray(data) && Object.keys(data).length === 0)) {
         return [];
@@ -173,6 +173,15 @@ export async function saveSettings(key, value) {
   }
 }
 
+// ---------- Seminaries ----------
+export async function getSeminaries() {
+  return await getSettings('seminaries');
+}
+
+export async function saveSeminaries(list) {
+  return await saveSettings('seminaries', list);
+}
+
 // ---------- initStore ----------
 // Source initStore prefetches presbyteries seed data; we keep the same behavior.
 export async function initStore() {
@@ -180,6 +189,14 @@ export async function initStore() {
     const py = await getSettings('presbyteries');
     if (!py || (Array.isArray(py) && py.length === 0) || (typeof py === 'object' && Object.keys(py).length === 0)) {
       await saveSettings('presbyteries', defaultPresbyteries);
+    }
+    try {
+      const sem = await getSettings('seminaries');
+      if (!sem || (Array.isArray(sem) && sem.length === 0)) {
+        await saveSettings('seminaries', defaultSeminaries);
+      }
+    } catch (e) {
+      console.error('initStore seminaries error:', e);
     }
   } catch (e) {
     console.error('initStore error:', e);
