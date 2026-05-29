@@ -38,6 +38,23 @@ function mergeChurches(liveChurches = [], defaultChurches = []) {
   return result;
 }
 
+function mergeOfficers(liveOfficers = [], defaultOfficers = []) {
+  if (!Array.isArray(defaultOfficers) || defaultOfficers.length === 0) {
+    return liveOfficers || [];
+  }
+  const livePhotoByName = new Map(
+    (liveOfficers || []).flatMap((o) => {
+      const k = normalizeName(o.name);
+      return k && o.photo ? [[k, o.photo]] : [];
+    })
+  );
+  return defaultOfficers.map((o) => {
+    if (o.photo) return { ...o };
+    const photo = livePhotoByName.get(normalizeName(o.name));
+    return photo ? { ...o, photo } : { ...o };
+  });
+}
+
 export function mergePresbyteries(live = [], defaults = []) {
   const result = live.map((p) => ({ ...p }));
   const indexByName = new Map(
@@ -49,9 +66,7 @@ export function mergePresbyteries(live = [], defaults = []) {
     if (indexByName.has(key)) {
       const i = indexByName.get(key);
       const livePres = result[i];
-      const officers = Array.isArray(dp.officers) && dp.officers.length > 0
-        ? dp.officers
-        : (livePres.officers || []);
+      const officers = mergeOfficers(livePres.officers, dp.officers);
       result[i] = {
         ...mergeChurch(livePres, dp),
         officers,

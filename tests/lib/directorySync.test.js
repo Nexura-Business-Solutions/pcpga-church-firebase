@@ -87,4 +87,19 @@ describe('mergePresbyteries', () => {
     const out = mergePresbyteries(live, defaults);
     expect(out).toHaveLength(2);
   });
+
+  it('preserves a live officer photo by name when defaults omit it', () => {
+    const live = [{ name: 'P', officers: [{ name: 'Rev. A', role: 'Moderator', photo: 'face.jpg' }], churches: [] }];
+    const defaults = [{ name: 'P', officers: [{ name: 'Rev. A', role: 'Moderator' }], churches: [] }];
+    const out = mergePresbyteries(live, defaults);
+    expect(out[0].officers[0].photo).toBe('face.jpg');
+    expect(out[0].officers[0].role).toBe('Moderator');
+  });
+
+  it('does not attach a photo to a default officer with a different name', () => {
+    const live = [{ name: 'P', officers: [{ name: 'Rev. A', photo: 'face.jpg' }], churches: [] }];
+    const defaults = [{ name: 'P', officers: [{ name: 'Rev. B', role: 'Moderator' }], churches: [] }];
+    const out = mergePresbyteries(live, defaults);
+    expect(out[0].officers.find((o) => o.name === 'Rev. B').photo).toBeUndefined();
+  });
 });

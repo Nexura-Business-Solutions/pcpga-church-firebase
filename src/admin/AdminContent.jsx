@@ -138,7 +138,7 @@ export default function AdminContent() {
     };
 
     const handleSyncDirectory = () => {
-        if (!confirm('Sync the directory from the latest defaults? This adds/updates churches and officers without removing your existing entries or photos.')) return;
+        if (!confirm('Sync the directory from the latest defaults? Officer rosters are refreshed from the latest directory (your uploaded officer photos are kept), and churches are added or updated without removing your existing entries.')) return;
         const merged = mergePresbyteries(presbyteries, defaultPresbyteries);
         setPresbyteries(merged);
         toast.success('Directory synced — review, then Save to publish ✦');
