@@ -6,6 +6,7 @@ const navLinks = [
     { name: 'About', href: '#message' },
     { name: 'Sermons', href: '#sermons' },
     { name: 'Churches', href: '/churches' },
+    { name: 'Seminaries', href: '/seminaries' },
     { name: 'Library', href: '/library' },
     { name: 'Give', href: '#donate' },
 ];
