@@ -175,6 +175,10 @@ export default function AdminSeminaries() {
     const handleSave = async () => {
         if (!form.name.trim()) { toast.error('Name is required'); return; }
         const id = form.id || slugify(form.name);
+        if (!editingId && seminaries.some((s) => s.id === id)) {
+            toast.error('A seminary with this name already exists');
+            return;
+        }
         const record = { ...form, id };
         const list = editingId
             ? seminaries.map((s) => (s.id === editingId ? record : s))
@@ -187,7 +191,7 @@ export default function AdminSeminaries() {
 
     const handleDelete = async (id) => {
         if (!confirm('Remove this seminary?')) return;
-        if (await persist(seminaries.filter((s) => s.id !== id))) toast.error('Seminary removed');
+        if (await persist(seminaries.filter((s) => s.id !== id))) toast.success('Seminary removed');
     };
 
     return (
