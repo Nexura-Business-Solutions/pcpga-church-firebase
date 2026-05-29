@@ -8,6 +8,7 @@ import {
     Diamond,
     Sparkles,
     ExternalLink,
+    GraduationCap,
 } from 'lucide-react';
 import { getChurches, getSermons } from '../lib/store.js';
 import AdminLayout from '../components/admin/AdminLayout.jsx';
@@ -141,6 +142,12 @@ export default function AdminDashboard() {
                                     <Sparkles className="w-3 h-3" /> Media
                                 </div>
                                 <p className="text-[hsl(var(--admin-text-dim))] text-[11px] leading-relaxed">Archive new spiritual messages</p>
+                            </Link>
+                            <Link to="/admin/seminaries" className="p-8 bg-[hsl(var(--admin-surface))] rounded-[2rem] border border-[hsl(var(--admin-border))] hover:border-accent/10 transition-all group shadow-sm hover:shadow-md">
+                                <div className="text-accent text-xs font-bold tracking-widest uppercase mb-3 opacity-60 group-hover:opacity-100 transition-opacity flex items-center gap-2">
+                                    <GraduationCap className="w-3 h-3" /> Seminaries
+                                </div>
+                                <p className="text-[hsl(var(--admin-text-dim))] text-[11px] leading-relaxed">Theological schools</p>
                             </Link>
                             <a href="/" target="_blank" rel="noreferrer" className="p-8 bg-[hsl(var(--admin-surface))] rounded-[2rem] border border-[hsl(var(--admin-border))] hover:border-coral/10 transition-all group shadow-sm hover:shadow-md">
                                 <div className="text-coral text-xs font-bold tracking-widest uppercase mb-3 opacity-60 group-hover:opacity-100 transition-opacity flex items-center gap-2">
