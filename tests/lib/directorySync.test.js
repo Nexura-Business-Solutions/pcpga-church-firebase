@@ -8,6 +8,10 @@ describe('normalizeName', () => {
   it('handles non-strings safely', () => {
     expect(normalizeName(undefined)).toBe('');
   });
+  it('returns empty string for null and numbers', () => {
+    expect(normalizeName(null)).toBe('');
+    expect(normalizeName(42)).toBe('');
+  });
 });
 
 describe('mergePresbyteries', () => {
@@ -67,5 +71,20 @@ describe('mergePresbyteries', () => {
     const defaults = [{ name: 'Other Presbytery', officers: [], churches: [] }];
     const out = mergePresbyteries(live, defaults);
     expect(out.map((p) => p.name).sort()).toEqual(['LiveOnly Presbytery', 'Other Presbytery']);
+  });
+
+  it('preserves a live-only presbytery field when defaults omit it', () => {
+    const live = [{ name: 'P', description: 'Admin edited', photoUrl: 'p.jpg', officers: [], churches: [] }];
+    const defaults = [{ name: 'P', officers: [], churches: [] }];
+    const out = mergePresbyteries(live, defaults);
+    expect(out[0].description).toBe('Admin edited');
+    expect(out[0].photoUrl).toBe('p.jpg');
+  });
+
+  it('does not collapse two unnamed presbyteries into one', () => {
+    const live = [{ officers: [], churches: [] }];
+    const defaults = [{ officers: [], churches: [] }];
+    const out = mergePresbyteries(live, defaults);
+    expect(out).toHaveLength(2);
   });
 });

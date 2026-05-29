@@ -21,9 +21,12 @@ function mergeChurch(liveChurch, defaultChurch) {
 
 function mergeChurches(liveChurches = [], defaultChurches = []) {
   const result = liveChurches.map((c) => ({ ...c }));
-  const indexByName = new Map(result.map((c, i) => [normalizeName(c.name), i]));
+  const indexByName = new Map(
+    result.flatMap((c, i) => { const k = normalizeName(c.name); return k ? [[k, i]] : []; })
+  );
   for (const dc of defaultChurches) {
     const key = normalizeName(dc.name);
+    if (!key) { result.push({ ...dc }); continue; }
     if (indexByName.has(key)) {
       const i = indexByName.get(key);
       result[i] = mergeChurch(result[i], dc);
@@ -37,9 +40,12 @@ function mergeChurches(liveChurches = [], defaultChurches = []) {
 
 export function mergePresbyteries(live = [], defaults = []) {
   const result = live.map((p) => ({ ...p }));
-  const indexByName = new Map(result.map((p, i) => [normalizeName(p.name), i]));
+  const indexByName = new Map(
+    result.flatMap((p, i) => { const k = normalizeName(p.name); return k ? [[k, i]] : []; })
+  );
   for (const dp of defaults) {
     const key = normalizeName(dp.name);
+    if (!key) { result.push({ ...dp }); continue; }
     if (indexByName.has(key)) {
       const i = indexByName.get(key);
       const livePres = result[i];
@@ -47,8 +53,7 @@ export function mergePresbyteries(live = [], defaults = []) {
         ? dp.officers
         : (livePres.officers || []);
       result[i] = {
-        ...livePres,
-        ...dp,
+        ...mergeChurch(livePres, dp),
         officers,
         churches: mergeChurches(livePres.churches, dp.churches),
       };
