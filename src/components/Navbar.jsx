@@ -5,6 +5,7 @@ import { getSettings } from '../lib/store.js';
 const navLinks = [
     { name: 'About', href: '#message' },
     { name: 'Sermons', href: '#sermons' },
+    { name: 'History', href: '/history' },
     { name: 'Churches', href: '/churches' },
     { name: 'Seminaries', href: '/seminaries' },
     { name: 'Library', href: '/library' },

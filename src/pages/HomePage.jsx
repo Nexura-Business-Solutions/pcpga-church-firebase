@@ -135,9 +135,10 @@ const STATS = [
 const NAV_LINKS = [
   { href: '#message', label: 'About', roman: 'i.' },
   { href: '#sermons', label: 'Sermons', roman: 'ii.' },
-  { href: '/churches', label: 'Churches', roman: 'iii.' },
-  { href: '/library', label: 'Library', roman: 'iv.' },
-  { href: '#donate', label: 'Give', roman: 'v.' },
+  { href: '/history', label: 'History', roman: 'iii.' },
+  { href: '/churches', label: 'Churches', roman: 'iv.' },
+  { href: '/library', label: 'Library', roman: 'v.' },
+  { href: '#donate', label: 'Give', roman: 'vi.' },
 ];
 
 // Turn a YouTube watch / youtu.be / embed URL into an embeddable URL so sermons
