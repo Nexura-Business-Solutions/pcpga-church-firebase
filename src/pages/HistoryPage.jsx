@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Helmet } from 'react-helmet-async';
 import { Landmark, Milestone, Users, MapPin, Mail, Globe, Phone } from 'lucide-react';
 import { getSettings } from '../lib/store.js';
+import { safeExternalHref } from '../lib/url.js';
 import { defaultHistory } from '../lib/seed-data.js';
 import { Skeleton } from '../components/Skeleton.jsx';
 import Navbar from '../components/Navbar.jsx';
@@ -146,8 +147,8 @@ export default function HistoryPage() {
                                             {h.office.email && (
                                                 <li className="flex items-start gap-3"><Mail className="w-4 h-4 mt-0.5 text-accent shrink-0" /> <a className="hover:underline" href={`mailto:${h.office.email}`}>{h.office.email}</a></li>
                                             )}
-                                            {h.office.website && (
-                                                <li className="flex items-start gap-3"><Globe className="w-4 h-4 mt-0.5 text-accent shrink-0" /> <a className="hover:underline" href={h.office.website} target="_blank" rel="noreferrer">{h.office.website.replace(/^https?:\/\//, '')}</a></li>
+                                            {safeExternalHref(h.office.website) && (
+                                                <li className="flex items-start gap-3"><Globe className="w-4 h-4 mt-0.5 text-accent shrink-0" /> <a className="hover:underline" href={safeExternalHref(h.office.website)} target="_blank" rel="noreferrer">{h.office.website.replace(/^https?:\/\//, '')}</a></li>
                                             )}
                                         </ul>
                                     </section>

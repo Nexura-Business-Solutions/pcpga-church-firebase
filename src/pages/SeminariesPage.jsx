@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Helmet } from 'react-helmet-async';
 import { GraduationCap, MapPin, ExternalLink, BookOpen, Users, CalendarClock, ArrowLeft } from 'lucide-react';
 import { getSettings } from '../lib/store.js';
+import { safeExternalHref } from '../lib/url.js';
 import { Skeleton } from '../components/Skeleton.jsx';
 import Navbar from '../components/Navbar.jsx';
 import Footer from '../components/Footer.jsx';
@@ -130,8 +131,8 @@ function SeminaryDetail({ seminary, onBack }) {
                     )}
                 </Section>
             )}
-            {s.website && (
-                <a href={s.website} target="_blank" rel="noreferrer"
+            {safeExternalHref(s.website) && (
+                <a href={safeExternalHref(s.website)} target="_blank" rel="noreferrer"
                    className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-accent text-white font-semibold hover:shadow-lg hover:shadow-accent/30 transition-all">
                     Visit Website <ExternalLink className="w-4 h-4" />
                 </a>

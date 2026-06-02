@@ -9,6 +9,7 @@ import {
     Download,
 } from 'lucide-react';
 import { getLibraryResources } from '../lib/store.js';
+import { safeExternalHref } from '../lib/url.js';
 import Navbar from '../components/Navbar.jsx';
 import Footer from '../components/Footer.jsx';
 import ChatbotWidget from '../components/ChatbotWidget.jsx';
@@ -177,7 +178,7 @@ export default function LibraryPage() {
                                                 {item.fileType} Asset
                                             </span>
                                             <a
-                                                href={item.fileUrl}
+                                                href={safeExternalHref(item.fileUrl)}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                                 className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest transition-transform hover:translate-x-1"
