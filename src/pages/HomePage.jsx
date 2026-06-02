@@ -461,7 +461,7 @@ export default function HomePage() {
     <>
       <Helmet>
         <title>Presbyterian Church of the Philippines · Sacred Heritage</title>
-        <meta name="description" content="A communion of Reformed congregations gathered around Scripture, Sacrament, and the historic Presbyterian faith — keeping the old paths across the islands since 1898." />
+        <meta name="description" content="A communion of Reformed congregations gathered around Scripture, Sacrament, and the historic Presbyterian faith — keeping the old paths across the islands since 1987." />
       </Helmet>
 
       <div className="scroll-bar" aria-hidden="true">
@@ -473,7 +473,7 @@ export default function HomePage() {
         <div className="masthead__inner">
           <span className="masthead__latin">Verbum Domini manet in aeternum</span>
           <div className="masthead__meta">
-            <span>Vol. CXXVIII · No. 12</span>
+            <span>Vol. XXXIX · No. 12</span>
             <span>Manila · A.D. MMXXVI</span>
             <span>Lord’s Day xliii</span>
             <span className="lang-toggle">
@@ -550,9 +550,9 @@ export default function HomePage() {
               <span className="brass">✦</span>
               <span>{hero.editionText || 'A Communion of Reformed Churches'}</span>
               <span className="sep">·</span>
-              <span>Est. MDCCCXCVIII</span>
+              <span>Est. MCMLXXXVII</span>
               <span className="sep">·</span>
-              <span className="brass">128 Years in the Islands</span>
+              <span className="brass">39 Years in the Islands</span>
             </div>
 
             <h1 className="hero__title">
@@ -576,7 +576,7 @@ export default function HomePage() {
             <div className="wax-seal__inner">
               <span className="wax-seal__diamond">✦</span>
               <span>General<br />Assembly</span>
-              <span className="wax-seal__year">MDCCCXCVIII</span>
+              <span className="wax-seal__year">MCMLXXXVII</span>
             </div>
           </div>
         </div>
@@ -645,7 +645,7 @@ export default function HomePage() {
               {cms.msg?.title || <>We are a church built on the <em>old foundation</em> — Christ, the Scriptures, and the fellowship of the saints.</>}
             </h2>
             <p className="editorial__para has-drop-cap">
-              {cms.msg?.paragraphs?.[0] || 'For over a century, the Gospel has travelled through these islands — from the seaside chapels of the Ilocos coast to the mountain parishes of the Cordillera, and into the neighborhoods of Metro Manila. Our congregations are ordinary and small; the God we worship is not. We gather weekly around the preached Word and the Lord’s Table, believing that grace still reaches the ordinary sinner through ordinary means.'}
+              {cms.msg?.paragraphs?.[0] || 'For nearly four decades, the Gospel has spread across these islands — from the neighborhoods of Metro Manila to the provinces of Luzon, the Visayas, and Mindanao. Our congregations are ordinary and small; the God we worship is not. We gather weekly around the preached Word and the Lord’s Table, believing that grace still reaches the ordinary sinner through ordinary means.'}
             </p>
             <blockquote className="pull-quote">
               {cms.msg?.pullQuote || 'Grace still reaches the ordinary sinner through ordinary means — the preached Word, the Sacraments, the prayers of the saints.'}
@@ -661,7 +661,7 @@ export default function HomePage() {
           <aside className="marginalia reveal">
             <div className="margin-note">
               <span className="label">Note</span>
-              The first PCP congregation gathered for worship in Ermita, Manila, on Easter Sunday, 1898 — twenty souls at table.
+              The first General Presbytery of the PCP convened at Bagong Bayan Presbyterian Church, Dasmariñas, Cavite, on 26 June 1987.
             </div>
             <div className="margin-note">
               <span className="label">Cf.</span>
@@ -1063,10 +1063,10 @@ export default function HomePage() {
               >
                 Direct GCash &amp; Maya. Questions? Write to{' '}
                 <a
-                  href="mailto:info@pcphilippines.org"
+                  href="mailto:pcpgainfo@gmail.com"
                   style={{ color: 'var(--brass-bright)', borderBottom: '1px solid currentColor' }}
                 >
-                  info@pcphilippines.org
+                  pcpgainfo@gmail.com
                 </a>.
               </div>
             </div>
@@ -1115,11 +1115,11 @@ export default function HomePage() {
                 <img src="/pcpga_logo.png" alt="" className="foot__logo" />
                 <div>
                   <div className="foot__name">{cms.identity?.name ? `${cms.identity.name}${cms.identity.sub ? ' ' + cms.identity.sub : ''}` : 'Presbyterian Church of the Philippines'}</div>
-                  <div className="foot__sub">General Assembly · Est. MDCCCXCVIII</div>
+                  <div className="foot__sub">General Assembly · Est. MCMLXXXVII</div>
                 </div>
               </div>
               <p className="foot__desc">
-                {cms.identity?.footerDesc || 'Serving the Philippines since 1898 — proclaiming the Gospel, equipping believers, and planting confessional Presbyterian congregations across the nation.'}
+                {cms.identity?.footerDesc || 'Serving the Philippines since 1987 — proclaiming the Gospel, equipping believers, and planting confessional Presbyterian congregations across the nation.'}
               </p>
             </div>
 
@@ -1145,9 +1145,9 @@ export default function HomePage() {
               <div>
                 <h5>Contact</h5>
                 <ul>
-                  <li>1200 Taft Avenue, Ermita, Manila 1000</li>
-                  <li>{cms.identity?.social?.email || 'info@pcphilippines.org'}</li>
-                  <li>+63 2 8524 0000</li>
+                  <li>#42 Banaag Street, Brgy. Pineda, Pasig City</li>
+                  <li>{cms.identity?.social?.email || 'pcpgainfo@gmail.com'}</li>
+                  <li>(02) 935 4741</li>
                   <li className="social">
                     <a href={cms.identity?.social?.facebook || '#'}>Facebook</a>
                     <a href={cms.identity?.social?.youtube || '#'}>YouTube</a>

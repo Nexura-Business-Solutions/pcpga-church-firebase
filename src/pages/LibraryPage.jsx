@@ -221,7 +221,7 @@ export default function LibraryPage() {
                             If you are looking for a specific document that isn&apos;t listed here, please contact the General Assembly office.
                         </p>
                         <a
-                            href="mailto:info@pcphilippines.org"
+                            href="mailto:pcpgainfo@gmail.com"
                             className="btn btn--on-dark btn--primary"
                         >
                             Contact Secretariat

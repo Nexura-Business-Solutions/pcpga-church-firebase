@@ -9,12 +9,12 @@ export default function Footer() {
         name: 'Presbyterian Church',
         sub: 'of the Philippines',
         footerDesc:
-            'Serving the Philippines since 1898 — proclaiming the Gospel, equipping believers, and planting confessional Presbyterian congregations across the nation.',
+            'Serving the Philippines since 1987 — proclaiming the Gospel, equipping believers, and planting confessional Presbyterian congregations across the nation.',
         social: {
             facebook: 'https://facebook.com',
             youtube: 'https://youtube.com',
             instagram: 'https://instagram.com',
-            email: 'info@pcphilippines.org',
+            email: 'pcpgainfo@gmail.com',
         },
     });
 
@@ -38,9 +38,9 @@ export default function Footer() {
         { name: 'Admin Panel', href: '/admin' },
     ];
     const contact = [
-        identity.address || '1200 Taft Avenue, Ermita, Manila 1000',
-        identity.social?.email || 'info@pcphilippines.org',
-        identity.phone || '+63 2 8524 0000',
+        identity.address || '#42 Banaag Street, Brgy. Pineda, Pasig City',
+        identity.social?.email || 'pcpgainfo@gmail.com',
+        identity.phone || '(02) 935 4741',
     ];
 
     return (
@@ -51,7 +51,7 @@ export default function Footer() {
                         <img src="/logo.png" alt="" className="foot__logo" />
                         <div>
                             <div className="foot__name">{identity.name || 'Presbyterian Church'} {identity.sub ? identity.sub : ''}</div>
-                            <div className="foot__sub">General Assembly · Est. 1898</div>
+                            <div className="foot__sub">General Assembly · Est. 1987</div>
                         </div>
                     </div>
                     <p className="foot__desc">{identity.footerDesc}</p>
