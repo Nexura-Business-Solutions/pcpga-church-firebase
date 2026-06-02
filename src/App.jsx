@@ -5,6 +5,7 @@ import HomePage from './pages/HomePage.jsx';
 import LibraryPage from './pages/LibraryPage.jsx';
 import ChurchesPage from './pages/ChurchesPage.jsx';
 import SeminariesPage from './pages/SeminariesPage.jsx';
+import HistoryPage from './pages/HistoryPage.jsx';
 import DonationPage from './pages/DonationPage.jsx';
 import DonationSuccessPage from './pages/DonationSuccessPage.jsx';
 import LoginPage from './pages/LoginPage.jsx';
@@ -46,6 +47,7 @@ export default function App() {
       <Route path="/library" element={<LibraryPage />} />
       <Route path="/churches" element={<ChurchesPage />} />
       <Route path="/seminaries" element={<SeminariesPage />} />
+      <Route path="/history" element={<HistoryPage />} />
       <Route path="/donation" element={<DonationPage />} />
       <Route path="/donation/success" element={<DonationSuccessPage />} />
       <Route path="/login" element={<LoginPage />} />

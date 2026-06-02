@@ -1378,3 +1378,57 @@ export const defaultSeminaries = [
         photoUrl: '',
     },
 ];
+
+// Denominational history & General Assembly. Admin-managed via the `history`
+// settings key; this is the seed/fallback. Sourced from the GAPCP history record
+// (PCP origins: 1977 Korean mission → 1987 General Presbytery → 1996 GAPCP).
+export const defaultHistory = {
+    kicker: 'Our Heritage',
+    title: 'A history of grace across the islands',
+    intro:
+        'The Presbyterian Church of the Philippines (PCP) traces its origins to Korean Reformed mission work begun in 1977, the first General Presbytery convened in 1987, and the inauguration of the General Assembly (GAPCP) in 1996 — a story of the Gospel taking root from Luzon to Mindanao.',
+    paragraphs: [
+        'The work began on March 30, 1977, when Rev. Gerardo Hwal Young Kim was sent to the Philippines by the Dong Shin Presbyterian Church of Korea — the first missionary of the Presbyterian Church of Korea to the country. On August 22, 1978 he organized the Evangelical Presbyterian Mission, Inc., and as more Korean missionaries arrived in 1979 and 1981, the mission chose the Tagalog region as its primary field on January 25, 1982.',
+        'The work was institutionalized through theological education and church planting. The Presbyterian School of Theology (later the Presbyterian Theological Seminary, PTS) was founded in Quezon City in 1983, and that same year the Church Planting program opened its first four congregations. In February 1985, Rev. Lemuel Dalisay was ordained as the first Filipino minister of the PCP.',
+        'A major governance milestone came on June 26, 1987, when the First Stated Meeting of the General Presbytery convened at Bagong Bayan Presbyterian Church in Dasmariñas, Cavite. The 1990s brought unification and expansion — the Manila Manifesto of 1991 affirmed the goal of one Presbyterian Church in the Philippines — culminating on October 30, 1996 in the formal organization of the General Assembly of the Presbyterian Church of the Philippines (GAPCP) at Los Baños, Laguna.',
+        'Since 1996 the GAPCP has grown through annual assemblies, new presbyteries, foreign-mission commissioning, and ecumenical partnerships. Today the GAPCP comprises fifteen organized presbyteries nationwide, with a stated vision of a PCP congregation in every province by 2030 and in every city and municipality by 2040.',
+    ],
+    milestones: [
+        { date: '1977', text: 'Rev. Gerardo Hwal Young Kim is sent by the Dong Shin Presbyterian Church of Korea — the first Korean Presbyterian missionary to the Philippines.' },
+        { date: 'Aug 22, 1978', text: 'The Evangelical Presbyterian Mission, Inc. is organized.' },
+        { date: '1979 & 1981', text: 'Additional Korean missionaries arrive, strengthening the young mission.' },
+        { date: 'Jan 25, 1982', text: 'A mission strategy is adopted, choosing the Tagalog region as the primary field.' },
+        { date: '1983', text: 'The Presbyterian School of Theology is founded in Quezon City, and the Church Planting program opens its first four congregations (Nabua, Diliman, Davao, Toril).' },
+        { date: 'Feb 1985', text: 'Rev. Lemuel Dalisay is ordained as the first Filipino minister of the PCP.' },
+        { date: 'Apr 1986', text: 'The Presbyterian Theological Seminary holds its first commencement, with fourteen graduates.' },
+        { date: 'Jun 26, 1987', text: 'The First Stated Meeting of the General Presbytery convenes at Bagong Bayan Presbyterian Church, Dasmariñas, Cavite.' },
+        { date: 'Apr 12, 1991', text: 'The “Manila Manifesto” is signed by 54 missionaries from four mission groups, affirming one Presbyterian Church in the Philippines.' },
+        { date: 'Dec 1993', text: 'The “PCP 2000” church-planting program is launched.' },
+        { date: 'Dec 1995', text: 'The Northern Luzon Presbytery is organized.' },
+        { date: 'Oct 30, 1996', text: 'The General Assembly of the Presbyterian Church of the Philippines (GAPCP) is formally organized and inaugurated at Los Baños Presbyterian Church, Laguna.' },
+        { date: 'Apr 30, 2000', text: 'Rev. Ernesto Gloria becomes the first Filipino minister GAPCP commissions for foreign church planting; the Mindanao Presbytery is organized.' },
+        { date: 'Oct 22, 2001', text: 'The 6th General Assembly approves the final reading of the Standard of Government of the PCP.' },
+        { date: 'Jun 11, 2007', text: '20th Founding Anniversary at the Cuneta Astrodome, with more than 10,000 in attendance.' },
+        { date: 'Jun 12, 2012', text: '25th (Silver) Founding Anniversary celebrated in Quezon City.' },
+        { date: '2014 – 2015', text: 'The Southern Visayas (2014) and Bicol (2015) Presbyteries are organized.' },
+        { date: 'Today', text: 'The GAPCP comprises fifteen organized presbyteries nationwide, pursuing a PCP congregation in every province by 2030 and every city and municipality by 2040.' },
+    ],
+    generalAssembly: {
+        summary:
+            'The General Assembly is the national governing body of the GAPCP, led by an Executive Committee elected at its Stated Meetings (held roughly each October). Beneath it are the regional presbyteries — fifteen at present — each with its own Executive Committee overseeing its member congregations.',
+        officers: [
+            { name: 'Rev. Edgar P. Adra', role: 'Moderator' },
+            { name: 'Rev. Orlando M. Tabotabo', role: 'Vice-Moderator' },
+            { name: 'Rev. Nelson M. Dangan', role: 'General Secretary' },
+            { name: 'Rev. Victorino G. Dagaman', role: 'Treasurer' },
+            { name: 'Rev. Roberto G. Fabia', role: 'Recording Clerk' },
+            { name: 'Rev. Arturo Dumayag', role: 'Internal Auditor' },
+        ],
+    },
+    office: {
+        address: '#42 Banaag Street, Barangay Pineda, Pasig City',
+        tel: '(02) 935 4741',
+        email: 'gapcp_1987@yahoo.com.ph',
+        website: 'https://gapcp.org',
+    },
+};
