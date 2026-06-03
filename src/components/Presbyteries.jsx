@@ -159,6 +159,7 @@ export default function Presbyteries() {
                                                     {ch.associatePastors?.length > 0 && (
                                                         <p className="pcp-modal__church-line"><strong>Associate Pastors:</strong> {ch.associatePastors.join(', ')}</p>
                                                     )}
+                                                    {ch.moderatorInCharge && <p className="pcp-modal__church-line"><strong>Moderator in Charge:</strong> {ch.moderatorInCharge}</p>}
                                                     {ch.worshipTime && <p className="pcp-modal__church-line"><strong>Worship:</strong> {ch.worshipTime}</p>}
                                                     {ch.contact && <p className="pcp-modal__church-line"><strong>Contact:</strong> {ch.contact}</p>}
                                                     {ch.email && (
