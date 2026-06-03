@@ -205,16 +205,10 @@ function Donations({ donations }) {
                 <h2 className="text-2xl font-bold mb-2">{fallback(donations?.heading, 'Give Generously')}</h2>
                 <p className="text-sm opacity-75 max-w-md mx-auto mb-3">{fallback(donations?.subtitle, 'Your generosity sustains the ministry of the church.')}</p>
                 {donations?.scriptureRef && <p className="text-[10px] uppercase tracking-[0.3em] opacity-60 mb-8">— {donations.scriptureRef}</p>}
-                <div className="flex justify-center gap-6">
-                    {[['GCash', donations?.gcashQR], ['Maya', donations?.mayaQR]].map(([name, qr]) => (
-                        <div key={name} className="text-center">
-                            <div className="w-28 h-28 rounded-2xl flex items-center justify-center mb-2" style={{ background: '#fff', border: '1px solid rgba(0,0,0,0.08)' }}>
-                                {qr ? <img src={qr} alt={name} className="w-full h-full object-contain rounded-2xl" /> : <Lucide.QrCode className="w-8 h-8 opacity-20" />}
-                            </div>
-                            <p className="text-[10px] uppercase tracking-[0.2em] opacity-60">{name}</p>
-                        </div>
-                    ))}
+                <div className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl text-xs font-bold uppercase tracking-widest" style={{ background: '#0f172a', color: '#fff' }}>
+                    <Lucide.CreditCard className="w-4 h-4" /> Donate Now
                 </div>
+                <p className="text-[10px] opacity-50 mt-3">Secure online giving via Xendit (GCash, Maya, cards &amp; bank).</p>
             </div>
         </Frame>
     );

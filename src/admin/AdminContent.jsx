@@ -223,8 +223,6 @@ export default function AdminContent() {
             const path = `content/${target}/${Date.now()}-${safeName}`;
             const url = await uploadFile(path, file);
             if (target === 'hero') setHero({ ...hero, heroImage: url });
-            else if (target === 'gcash') setDonations({ ...donations, gcashQR: url });
-            else if (target === 'maya') setDonations({ ...donations, mayaQR: url });
             else if (target === 'announcement') {
                 const mediaType = file.type.startsWith('video/') ? 'video' : 'image';
                 setAnnouncement({ ...announcement, mediaUrl: url, mediaType });
@@ -1152,37 +1150,6 @@ export default function AdminContent() {
                                             </div>
                                         </div>
 
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-6 border-t border-[hsl(var(--admin-border))]">
-                                            {[
-                                                { id: 'gcash', label: 'GCash Payment QR', key: 'gcashQR' },
-                                                { id: 'maya', label: 'Maya Payment QR', key: 'mayaQR' },
-                                            ].map(qr => (
-                                                <div key={qr.id} className="space-y-4">
-                                                    <label className="text-[10px] font-bold uppercase tracking-widest text-coral ml-1">{qr.label}</label>
-                                                    <div className={`aspect-square w-full max-w-[200px] rounded-2xl border-2 border-dashed flex flex-col items-center justify-center overflow-hidden relative group ${donations[qr.key] ? 'border-coral/20 bg-coral/5' : 'border-[hsl(var(--admin-border))]'}`}>
-                                                        {donations[qr.key] ? (
-                                                            <img src={donations[qr.key]} alt={qr.label} className="w-full h-full object-contain" />
-                                                        ) : (
-                                                            <ImagePlus className="w-7 h-7 opacity-20" />
-                                                        )}
-                                                        <div className="absolute inset-0 bg-black/40 backdrop-blur-sm flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                                            <label className="cursor-pointer px-4 py-2 bg-white text-coral text-[9px] font-bold uppercase rounded-xl">
-                                                                Upload
-                                                                <input type="file" accept="image/*" className="hidden" onChange={e => handleImageUpload(e.target.files[0], qr.id)} />
-                                                            </label>
-                                                            {donations[qr.key] && (
-                                                                <button
-                                                                    onClick={() => setDonations({ ...donations, [qr.key]: '' })}
-                                                                    className="mt-2 text-white text-[8px] font-bold uppercase hover:text-red-400"
-                                                                >
-                                                                    Remove
-                                                                </button>
-                                                            )}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            ))}
-                                        </div>
                                     </div>
                                 )}
 

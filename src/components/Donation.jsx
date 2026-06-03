@@ -13,19 +13,15 @@ const DEFAULT_CONTENT = {
     scriptureRef: '2 Corinthians 9:7',
     subtitle:
         'Your gifts sustain the preaching of the Word, the training of pastors, the planting of congregations, and the mercy ministries of the Church.',
-    gcashQR: '',
-    mayaQR: '',
     contactEmail: '',
 };
 
 export default function Donation() {
     const [content, setContent] = useState(DEFAULT_CONTENT);
-    const [open, setOpen] = useState(false);
     const [amount, setAmount] = useState(1000);
     const [isCustom, setIsCustom] = useState(false);
     const [donorName, setDonorName] = useState('');
     const [generating, setGenerating] = useState(false);
-    const [invoiceUrl, setInvoiceUrl] = useState(null);
 
     useEffect(() => {
         (async () => {
@@ -34,12 +30,6 @@ export default function Donation() {
         })();
     }, []);
 
-    const close = () => {
-        setOpen(false);
-        setInvoiceUrl(null);
-        setGenerating(false);
-    };
-
     const initiate = async () => {
         const final = Math.floor(Number(amount));
         if (!final || final < 20) {
@@ -47,7 +37,6 @@ export default function Donation() {
             return;
         }
         setGenerating(true);
-        setOpen(true);
 
         try {
             const { data } = await createInvoice({
@@ -55,16 +44,17 @@ export default function Donation() {
                 donorName: donorName || 'Anonymous',
                 description: 'PCP General Donation',
             });
-            if (data?.invoice_url) setInvoiceUrl(data.invoice_url);
-            else {
+            // Xendit's hosted checkout cannot be embedded in an iframe
+            // (X-Frame-Options), so send the donor there via a full-page redirect.
+            if (data?.invoice_url) {
+                window.location.href = data.invoice_url;
+            } else {
                 alert(data?.error || 'Payment failed to initialize.');
-                close();
+                setGenerating(false);
             }
         } catch (e) {
             console.error(e);
             alert('Could not connect to payment gateway.');
-            close();
-        } finally {
             setGenerating(false);
         }
     };
@@ -154,25 +144,8 @@ export default function Donation() {
                         onClick={initiate}
                         disabled={generating}
                     >
-                        {generating ? 'Initializing…' : 'Donate Now'}
+                        {generating ? 'Redirecting to secure checkout…' : 'Donate Now'}
                     </button>
-
-                    {(content.gcashQR || content.mayaQR) && (
-                        <div className="give-form__qrs">
-                            {content.gcashQR && (
-                                <div className="give-form__qr">
-                                    <img src={content.gcashQR} alt="GCash QR" />
-                                    <span className="give-form__qr-label">GCash</span>
-                                </div>
-                            )}
-                            {content.mayaQR && (
-                                <div className="give-form__qr">
-                                    <img src={content.mayaQR} alt="Maya QR" />
-                                    <span className="give-form__qr-label">Maya</span>
-                                </div>
-                            )}
-                        </div>
-                    )}
 
                     {content.contactEmail && (
                         <p className="give-form__contact">
@@ -181,33 +154,6 @@ export default function Donation() {
                     )}
                 </motion.div>
             </div>
-
-            <AnimatePresence>
-                {open && (
-                    <motion.div className="pcp-modal pcp-modal--xendit" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                        <div className="pcp-modal__backdrop" onClick={close} />
-                        <motion.div
-                            className="pcp-modal__card"
-                            initial={{ opacity: 0, y: 18, scale: 0.97 }}
-                            animate={{ opacity: 1, y: 0, scale: 1 }}
-                            exit={{ opacity: 0, y: 18, scale: 0.97 }}
-                        >
-                            <div style={{ padding: '1.25rem 1.5rem', borderBottom: '1px solid var(--line-soft)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                <span className="kicker" style={{ margin: 0 }}>{generating ? 'Generating Invoice' : 'Secure Donation'}</span>
-                                <button className="pcp-modal__close" style={{ position: 'static' }} onClick={close} aria-label="Close">×</button>
-                            </div>
-                            {generating && (
-                                <div style={{ flex: 1, display: 'grid', placeItems: 'center', padding: '3rem' }}>
-                                    <p style={{ fontFamily: 'var(--font-serif)', fontStyle: 'italic', color: 'var(--ink-mute)' }}>Connecting to Xendit…</p>
-                                </div>
-                            )}
-                            {invoiceUrl && (
-                                <iframe className="pcp-modal__iframe" src={invoiceUrl} title="Xendit Donation" />
-                            )}
-                        </motion.div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
         </section>
     );
 }

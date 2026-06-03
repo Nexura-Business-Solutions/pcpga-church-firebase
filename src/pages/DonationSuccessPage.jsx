@@ -1,10 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useSearchParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { doc, onSnapshot } from 'firebase/firestore';
 import { jsPDF } from 'jspdf';
-import { db } from '../lib/firebase.js';
 import Navbar from '../components/Navbar.jsx';
 import Footer from '../components/Footer.jsx';
 import ChatbotWidget from '../components/ChatbotWidget.jsx';
@@ -20,20 +18,12 @@ function SuccessContent() {
     const ref = sanitize(searchParams.get('ref')) || 'N/A';
     const donorName = sanitize(searchParams.get('name')) || 'Anonymous';
     const [isDownloading, setIsDownloading] = useState(false);
-    const [donation, setDonation] = useState(null);
-    const [timedOut, setTimedOut] = useState(false);
 
-    useEffect(() => {
-        if (!ref || ref === 'N/A') return;
-        const unsub = onSnapshot(doc(db, 'donations', ref), (snap) => {
-            if (snap.exists()) setDonation(snap.data());
-        });
-        const t = setTimeout(() => setTimedOut(true), 30000);
-        return () => {
-            unsub();
-            clearTimeout(t);
-        };
-    }, [ref]);
+    // Xendit only redirects a donor to this page after a completed payment
+    // (failed/expired invoices redirect back to the give section), so we treat
+    // arrival here as a confirmed gift. The webhook records the authoritative
+    // PAID status server-side for admin reporting; `donations` stays
+    // admin-only, so we intentionally do NOT read it from this public page.
 
     const downloadReceipt = () => {
         setIsDownloading(true);
@@ -82,103 +72,6 @@ function SuccessContent() {
         setIsDownloading(false);
     };
 
-    const status = donation?.status;
-    const isFailed = status === 'EXPIRED' || status === 'FAILED';
-    const isPending = !donation || status === 'PENDING';
-
-    // -- PENDING / CONFIRMING --
-    if (isPending) {
-        return (
-            <div className="min-h-screen bg-[#f9f9fb] flex flex-col items-center justify-center p-6 text-center">
-                <motion.div
-                    initial={{ scale: 0.5, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    className="w-24 h-24 bg-amber-500/10 rounded-full flex items-center justify-center text-4xl mb-8 border border-amber-500/20"
-                >
-                    <motion.span
-                        animate={{ rotate: 360 }}
-                        transition={{ repeat: Infinity, duration: 2, ease: 'linear' }}
-                        className="inline-block"
-                    >
-                        ⏳
-                    </motion.span>
-                </motion.div>
-
-                <motion.div
-                    initial={{ y: 20, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    transition={{ delay: 0.2 }}
-                    className="max-w-xl"
-                >
-                    <h1 className="text-4xl md:text-5xl font-bold text-[#0f172a] mb-6 font-display">
-                        Confirming your donation…
-                    </h1>
-                    <p className="text-lg text-gray-500 mb-6 leading-relaxed font-medium">
-                        We&rsquo;re waiting for confirmation from the payment gateway. This usually takes just a few seconds.
-                    </p>
-                    {timedOut && (
-                        <motion.p
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            className="text-sm text-gray-500 italic mb-8 leading-relaxed"
-                        >
-                            Some payment methods (like bank transfer) take longer to confirm.
-                            We&rsquo;ll email you when it clears.
-                        </motion.p>
-                    )}
-                    <p className="text-xs text-gray-400 font-bold tracking-widest uppercase opacity-60">
-                        Reference: {ref}
-                    </p>
-                </motion.div>
-            </div>
-        );
-    }
-
-    // -- FAILED / EXPIRED --
-    if (isFailed) {
-        return (
-            <div className="min-h-screen bg-[#f9f9fb] flex flex-col items-center justify-center p-6 text-center">
-                <motion.div
-                    initial={{ scale: 0.5, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    className="w-24 h-24 bg-red-500/10 rounded-full flex items-center justify-center text-4xl mb-8 border border-red-500/20"
-                >
-                    ⚠️
-                </motion.div>
-
-                <motion.div
-                    initial={{ y: 20, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    transition={{ delay: 0.2 }}
-                    className="max-w-xl"
-                >
-                    <h1 className="text-4xl md:text-5xl font-bold text-[#0f172a] mb-6 font-display">
-                        Your donation could not be processed
-                    </h1>
-                    <p className="text-lg text-gray-500 mb-12 leading-relaxed font-medium">
-                        Please try again or contact us if the problem persists. No funds have been collected.
-                    </p>
-
-                    <div className="flex flex-col md:flex-row gap-4 justify-center items-center">
-                        <Link
-                            to="/donation"
-                            className="h-14 px-8 bg-[#0f172a] text-white rounded-2xl font-bold text-xs tracking-widest uppercase hover:shadow-xl hover:shadow-black/10 transition-all flex items-center gap-3"
-                        >
-                            Try Again
-                        </Link>
-                        <Link
-                            to="/"
-                            className="h-14 px-8 bg-white border border-black/5 text-[#0f172a] rounded-2xl font-bold text-xs tracking-widest uppercase hover:bg-gray-50 transition-all flex items-center gap-3 shadow-sm"
-                        >
-                            Back to Home
-                        </Link>
-                    </div>
-                </motion.div>
-            </div>
-        );
-    }
-
-    // -- PAID (success) --
     return (
         <div className="min-h-screen bg-[#f9f9fb] flex flex-col items-center justify-center p-6 text-center">
             <motion.div
