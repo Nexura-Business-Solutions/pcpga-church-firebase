@@ -26,7 +26,7 @@ export async function createInvoiceHandler(request) {
       payer_email: donorEmail || 'donations@pcpga.org',
       description: 'PCP General Donation',
       currency: 'PHP',
-      success_redirect_url: `${successBase}/donation/success?ref=${externalId}&name=${encodeURIComponent(donorName || 'Anonymous')}`,
+      success_redirect_url: `${successBase}/donation/success?ref=${externalId}&amount=${amount}&name=${encodeURIComponent(donorName || 'Anonymous')}`,
       failure_redirect_url: `${successBase}/#donate`,
     }),
   });
