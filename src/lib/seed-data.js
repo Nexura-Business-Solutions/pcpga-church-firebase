@@ -263,9 +263,7 @@ export const defaultPresbyteries = [
         churches: [
             {
                 name: 'Sungbok Presbyterian Church',
-                minister: 'Rev. Virgilio A. Delas Armas',
-                contact: '0999 813 3334',
-                email: 'gildelasarmas@yahoo.com',
+                minister: 'Rev. Paul Myeongsig Son',
             },
             {
                 name: 'Blessed Suan Presbyterian Church',
@@ -359,6 +357,13 @@ export const defaultPresbyteries = [
                 name: 'San Rafael Banglim Presbyterian Church',
                 minister: 'Pastora Josephine A. Adul',
                 email: 'amatajosephine@gmail.com',
+            },
+            {
+                name: 'Jesus Loves Presbyterian Church',
+                address: 'Kasunduan Extension, Commonwealth, Quezon City',
+                minister: 'Rev. Virgilio A. Delas Armas',
+                contact: '0991 250 4894',
+                email: 'gildelasarmas@yahoo.com',
             },
         ],
     },
