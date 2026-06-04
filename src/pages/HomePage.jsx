@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import PhilippinesMap from '../components/PhilippinesMap.jsx';
 import AnnouncementModal from '../components/AnnouncementModal.jsx';
+import EventsCarousel from '../components/EventsCarousel.jsx';
 import { getSettings, getSermons } from '../lib/store.js';
 import { defaultPresbyteries } from '../lib/seed-data.js';
 import '../styles/landing-v3.css';
@@ -197,20 +198,23 @@ export default function HomePage() {
   useEffect(() => {
     let active = true;
     (async () => {
-      const keys = ['hero', 'site-identity', 'mission-vision', 'core-principles', 'invitation-stats', 'announcement', 'standing-committees', 'presbyteries'];
-      const [hero, identity, mv, msg, stats, ann, committees, pres, sermons] = await Promise.all([
+      const keys = ['hero', 'site-identity', 'mission-vision', 'core-principles', 'invitation-stats', 'announcement', 'standing-committees', 'presbyteries', 'upcoming-events'];
+      const [hero, identity, mv, msg, stats, ann, committees, pres, events, sermons] = await Promise.all([
         ...keys.map((k) => getSettings(k)), getSermons(),
       ]);
       if (active) setCms({
         hero: hero || {}, identity: identity || {}, mv: mv || {}, msg: msg || {},
         stats: stats || {}, ann: ann || {}, committees: Array.isArray(committees) ? committees : [],
         presbyteries: Array.isArray(pres) ? pres : [],
+        events: Array.isArray(events) ? events : [],
         sermons: Array.isArray(sermons) ? sermons : [],
       });
     })();
     return () => { active = false; };
   }, []);
   const hero = cms.hero || {};
+  // Upcoming events — rotating posters from settings/upcoming-events (seeded via admin).
+  const upcomingEvents = Array.isArray(cms.events) ? cms.events : [];
   // Normalize committees (editor stores `details`; landing modal reads `duties`).
   const committees = (cms.committees?.length ? cms.committees : COMMITTEES).map((c) => ({
     name: c.name,
@@ -616,7 +620,7 @@ export default function HomePage() {
       </section>
 
       {/* EVENTS */}
-      <section className="events" aria-label="Upcoming events">
+      <section className="events" id="events" aria-label="Upcoming events">
         <div className="events__inner">
           <div className="events__head">
             <h3 className="events__title">Upcoming &amp; <em>in session.</em></h3>
@@ -625,9 +629,13 @@ export default function HomePage() {
               <span>Denominational Feed</span>
             </span>
           </div>
-          <div className="events__empty reveal">
-            <p>Upcoming events &amp; dispatches will be posted here as the General Assembly and the presbyteries convene.</p>
-          </div>
+          {upcomingEvents.length > 0 ? (
+            <EventsCarousel events={upcomingEvents} />
+          ) : (
+            <div className="events__empty reveal">
+              <p>Upcoming events &amp; dispatches will be posted here as the General Assembly and the presbyteries convene.</p>
+            </div>
+          )}
         </div>
       </section>
 
