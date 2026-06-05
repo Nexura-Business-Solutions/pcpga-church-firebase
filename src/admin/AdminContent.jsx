@@ -653,7 +653,7 @@ export default function AdminContent() {
                                                 <input
                                                     value={principles.signer || ''}
                                                     onChange={(e) => setPrinciples({ ...principles, signer: e.target.value })}
-                                                    placeholder="Rev. Dr. Eduardo T. Reyes"
+                                                    placeholder="Rev. Edgar P. Adra"
                                                     className="w-full bg-[hsl(var(--admin-bg-alt))] border border-[hsl(var(--admin-text))]/20 rounded-2xl p-5 text-sm font-medium focus:ring-2 focus:ring-coral/20 outline-none transition-all"
                                                 />
                                             </div>

@@ -45,7 +45,14 @@ const COMMITTEES = [
       'To prepare all matters for the next General Assembly meeting.',
       'To represent the denomination in ecumenical relations.',
     ],
-    officers: [],
+    officers: [
+      { name: 'Rev. Edgar P. Adra', role: 'Moderator' },
+      { name: 'Rev. Orlando M. Tabotabo', role: 'Vice-Moderator' },
+      { name: 'Rev. Nelson M. Dangan', role: 'General Secretary' },
+      { name: 'Rev. Victorino G. Dagaman', role: 'Treasurer' },
+      { name: 'Rev. Roberto G. Fabia', role: 'Recording Clerk' },
+      { name: 'Rev. Arturo Dumayag', role: 'Internal Auditor' },
+    ],
   },
   {
     name: 'Mission Committee',
