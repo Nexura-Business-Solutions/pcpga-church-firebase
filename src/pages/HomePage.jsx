@@ -1224,7 +1224,9 @@ function OfficerList({ officers }) {
     <div className="modal__officers">
       {officers.map((o) => (
         <div key={o.name} className="modal__officer">
-          <div className="modal__officer-photo">{(o.name || '·').trim().charAt(0)}</div>
+          <div className="modal__officer-photo">
+            {o.photo ? <img src={o.photo} alt={o.name} /> : (o.name || '·').trim().charAt(0)}
+          </div>
           <div className="modal__officer-name">{o.name}</div>
           {o.role && <div className="modal__officer-role">{o.role}</div>}
         </div>
