@@ -8,32 +8,11 @@ import {
   signOut,
   sendPasswordResetEmail,
 } from 'firebase/auth';
-import { doc, getDoc, addDoc, collection, serverTimestamp } from 'firebase/firestore';
+import { doc, getDoc } from 'firebase/firestore';
 import { auth, db, googleProvider } from './firebase.js';
 
 export function loginWithEmail(email, password) {
   return signInWithEmailAndPassword(auth, email, password);
-}
-
-// TEMP diagnostic — record a login failure so it can be read back with the
-// admin SDK. Append-only (auto-id, create-only rule). Logs only the error code,
-// a capped message, and host/path (NO query/fragment, which can carry OAuth
-// tokens). Best-effort; never throws. Remove after debugging.
-export async function recordLoginDiagnostic(stage, err) {
-  try {
-    const loc = typeof window !== 'undefined' ? window.location : null;
-    await addDoc(collection(db, 'loginDiagnostics'), {
-      stage,
-      code: err?.code || '',
-      message: (err?.message || '').slice(0, 300),
-      hostname: loc ? loc.hostname : '',
-      path: loc ? loc.pathname : '',
-      ua: typeof navigator !== 'undefined' ? navigator.userAgent : '',
-      at: serverTimestamp(),
-    });
-  } catch {
-    /* diagnostic must never break the login flow */
-  }
 }
 
 // Verify a signed-in Google user against the email allowlist
