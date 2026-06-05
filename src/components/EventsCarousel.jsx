@@ -76,11 +76,6 @@ export default function EventsCarousel({ events = [] }) {
                             <img className="evcar__img" src={ev.imageUrl} alt={ev.title || 'Upcoming event'} />
                         </button>
 
-                        <div className="evcar__caption">
-                            {ev.date && <span className="evcar__date">{ev.date}</span>}
-                            {ev.title && <h4 className="evcar__title">{ev.title}</h4>}
-                            {ev.venue && <p className="evcar__venue">{ev.venue}</p>}
-                        </div>
                     </motion.div>
                 </AnimatePresence>
 
@@ -91,6 +86,14 @@ export default function EventsCarousel({ events = [] }) {
                     </>
                 )}
             </div>
+
+            {(ev.date || ev.title || ev.venue) && (
+                <div className="evcar__caption">
+                    {ev.date && <span className="evcar__date">{ev.date}</span>}
+                    {ev.title && <h4 className="evcar__title">{ev.title}</h4>}
+                    {ev.venue && <p className="evcar__venue">{ev.venue}</p>}
+                </div>
+            )}
 
             {count > 1 && (
                 <div className="evcar__dots" role="tablist" aria-label="Choose event">

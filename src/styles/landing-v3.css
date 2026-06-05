@@ -2055,10 +2055,6 @@ body.lp-v3 .evcar__fill {
   filter: blur(28px) saturate(0.9) brightness(0.7);
   transform: scale(1.15);
 }
-body.lp-v3 .evcar__slide::after {
-  content: ''; position: absolute; inset: 0;
-  background: linear-gradient(to top, rgba(26,14,8,0.78) 0%, rgba(26,14,8,0.12) 42%, rgba(26,14,8,0.18) 100%);
-}
 body.lp-v3 .evcar__imgbtn {
   position: absolute; inset: 0;
   display: flex; align-items: center; justify-content: center;
@@ -2071,9 +2067,7 @@ body.lp-v3 .evcar__img {
   box-shadow: 0 18px 50px rgba(0,0,0,0.45);
 }
 body.lp-v3 .evcar__caption {
-  position: absolute; left: 0; right: 0; bottom: 0; z-index: 2;
-  padding: 1.4rem clamp(1.25rem, 3vw, 2.2rem);
-  pointer-events: none;
+  padding: 1.1rem clamp(0.25rem, 2vw, 0.75rem) 0;
 }
 body.lp-v3 .evcar__date {
   display: inline-block;
@@ -2085,12 +2079,10 @@ body.lp-v3 .evcar__date {
 body.lp-v3 .evcar__title {
   font-family: var(--font-serif); font-style: italic; font-weight: 500;
   font-size: clamp(1.1rem, 2vw, 1.6rem); line-height: 1.2;
-  color: #fff; margin: 0 0 0.3rem; max-width: 34ch;
-  text-shadow: 0 2px 12px rgba(0,0,0,0.5);
+  color: var(--ink); margin: 0 0 0.3rem; max-width: 44ch;
 }
 body.lp-v3 .evcar__venue {
-  font-size: 0.9rem; color: rgba(255,255,255,0.86); margin: 0;
-  text-shadow: 0 1px 8px rgba(0,0,0,0.5);
+  font-size: 0.9rem; color: var(--ink-mute); margin: 0;
 }
 body.lp-v3 .evcar__nav {
   position: absolute; top: 50%; transform: translateY(-50%); z-index: 3;
