@@ -1995,3 +1995,64 @@ export const defaultHistory = {
         website: 'https://gapcp.org',
     },
 };
+
+// "A Word of Welcome" carousel — one rotating slide per General Assembly officer.
+// `photo` is empty until a real portrait is uploaded (the carousel falls back to
+// an initials monogram). Messages are editable drafts; only officers that still
+// have a `message` are shown as slides. Mirrors defaultHistory.generalAssembly.officers.
+export const defaultWelcomeOfficers = [
+    {
+        id: 'moderator',
+        name: 'Rev. Edgar P. Adra',
+        role: 'Moderator, General Assembly',
+        photo: '',
+        greeting: 'Welcome — you are among friends on the old paths.',
+        message:
+            'On behalf of the General Assembly of the Presbyterian Church of the Philippines, it is my joy to welcome you. We are an ordinary fellowship of congregations gathered around the preached Word, the Sacraments, and the prayers of the saints — believing that grace still reaches ordinary sinners through ordinary means. Whether you are seeking a church home or simply visiting for a season, there is a seat for you here.',
+    },
+    {
+        id: 'vice-moderator',
+        name: 'Rev. Orlando M. Tabotabo',
+        role: 'Vice-Moderator, General Assembly',
+        photo: '',
+        greeting: 'Come and see what Christ is building among us.',
+        message:
+            'From Luzon to the Visayas and Mindanao, the Lord has planted congregations that hold fast to the Reformed faith and the Scriptures. We labor not for numbers but for faithfulness, that Christ may be honored in every province and city. I warmly invite you to worship with the nearest congregation and taste the goodness of the Lord with us.',
+    },
+    {
+        id: 'general-secretary',
+        name: 'Rev. Nelson M. Dangan',
+        role: 'General Secretary, General Assembly',
+        photo: '',
+        greeting: 'A house of order, built on the Word.',
+        message:
+            'As servants of the Assembly, we give ourselves to keeping the work of the church orderly, prayerful, and faithful to Scripture. Behind every congregation is a fellowship of ministers and elders committed to shepherding God’s people with care. We are glad you are here, and we pray the Lord meets you in His Word and welcomes you into His family.',
+    },
+    {
+        id: 'treasurer',
+        name: 'Rev. Victorino G. Dagaman',
+        role: 'Treasurer, General Assembly',
+        photo: '',
+        greeting: 'Every gift sustains the preaching of the Gospel.',
+        message:
+            'The mission of the church is carried forward by the cheerful stewardship of God’s people — the training of pastors, the planting of churches, and the mercy ministries across the islands. We hold this trust with care and gratitude, before the Lord and before you. Thank you for partnering with us; your prayers and support advance the Gospel in places you may never see.',
+    },
+    {
+        id: 'recording-clerk',
+        name: 'Rev. Roberto G. Fabia',
+        role: 'Recording Clerk, General Assembly',
+        photo: '',
+        greeting: 'His faithfulness, written down for the generations.',
+        message:
+            'It is a quiet privilege to keep the record of what God has done among us — the assemblies convened, the ministers ordained, the congregations born. The story of the PCP is, at its heart, a story of grace across the islands since 1987. We welcome you to become part of that ongoing story, gathered with us around Christ and His Word.',
+    },
+    {
+        id: 'internal-auditor',
+        name: 'Rev. Arturo Dumayag',
+        role: 'Internal Auditor, General Assembly',
+        photo: '',
+        greeting: 'Faithful in much, faithful in little.',
+        message:
+            'We seek to serve the church with integrity, accountable to God and to one another in all things. A church worthy of trust is one that handles the things of God honestly and humbly. We are grateful you have come, and we pray you will find here a people striving, by grace, to walk uprightly before the Lord.',
+    },
+];

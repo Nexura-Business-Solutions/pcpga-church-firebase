@@ -4,8 +4,9 @@ import { Helmet } from 'react-helmet-async';
 import PhilippinesMap from '../components/PhilippinesMap.jsx';
 import AnnouncementModal from '../components/AnnouncementModal.jsx';
 import EventsCarousel from '../components/EventsCarousel.jsx';
+import WelcomeCarousel from '../components/WelcomeCarousel.jsx';
 import { getSettings, getSermons } from '../lib/store.js';
-import { defaultPresbyteries } from '../lib/seed-data.js';
+import { defaultPresbyteries, defaultWelcomeOfficers } from '../lib/seed-data.js';
 import '../styles/landing-v3.css';
 
 const REGION_ORDER = ['Luzon', 'NCR', 'Visayas', 'Mindanao', 'CAR'];
@@ -210,8 +211,8 @@ export default function HomePage() {
   useEffect(() => {
     let active = true;
     (async () => {
-      const keys = ['hero', 'site-identity', 'mission-vision', 'core-principles', 'invitation-stats', 'announcement', 'standing-committees', 'presbyteries', 'upcoming-events'];
-      const [hero, identity, mv, msg, stats, ann, committees, pres, events, sermons] = await Promise.all([
+      const keys = ['hero', 'site-identity', 'mission-vision', 'core-principles', 'invitation-stats', 'announcement', 'standing-committees', 'presbyteries', 'upcoming-events', 'welcome-officers'];
+      const [hero, identity, mv, msg, stats, ann, committees, pres, events, welcomeOfficers, sermons] = await Promise.all([
         ...keys.map((k) => getSettings(k)), getSermons(),
       ]);
       if (active) setCms({
@@ -219,6 +220,7 @@ export default function HomePage() {
         stats: stats || {}, ann: ann || {}, committees: Array.isArray(committees) ? committees : [],
         presbyteries: Array.isArray(pres) ? pres : [],
         events: Array.isArray(events) ? events : [],
+        welcomeOfficers: Array.isArray(welcomeOfficers) ? welcomeOfficers : [],
         sermons: Array.isArray(sermons) ? sermons : [],
       });
     })();
@@ -243,6 +245,9 @@ export default function HomePage() {
   // (defaultPresbyteries) so the page works even before any admin edits.
   const presbyteries = (cms.presbyteries && cms.presbyteries.length > 0)
     ? cms.presbyteries : defaultPresbyteries;
+  // "A Word of Welcome" carousel — editable officers from settings, else seeded drafts.
+  const welcomeOfficers = (cms.welcomeOfficers && cms.welcomeOfficers.length > 0)
+    ? cms.welcomeOfficers : defaultWelcomeOfficers;
 
   // Group by `region` (data-driven) so the section scales as more presbyteries
   // are added without touching the layout code.
@@ -658,25 +663,10 @@ export default function HomePage() {
         <div className="editorial__grid">
           <aside className="editorial__meta reveal">
             <span className="kicker">A Word of Welcome</span>
-            <span className="bylabel">From the Moderator</span>
+            <span className="bylabel">From the General Assembly</span>
           </aside>
           <div className="editorial__body reveal">
-            <h2 className="editorial__title">
-              {cms.msg?.title || <>We are a church built on the <em>old foundation</em> — Christ, the Scriptures, and the fellowship of the saints.</>}
-            </h2>
-            <p className="editorial__para has-drop-cap">
-              {cms.msg?.paragraphs?.[0] || 'For nearly four decades, the Gospel has spread across these islands — from the neighborhoods of Metro Manila to the provinces of Luzon, the Visayas, and Mindanao. Our congregations are ordinary and small; the God we worship is not. We gather weekly around the preached Word and the Lord’s Table, believing that grace still reaches the ordinary sinner through ordinary means.'}
-            </p>
-            <blockquote className="pull-quote">
-              {cms.msg?.pullQuote || 'Grace still reaches the ordinary sinner through ordinary means — the preached Word, the Sacraments, the prayers of the saints.'}
-            </blockquote>
-            <p className="editorial__para">
-              {cms.msg?.paragraphs?.[1] || 'Whether you are new to the faith, returning after many years away, or simply visiting for a season — you will find a seat here, a Bible opened, and a community that believes the Gospel is good news for you today.'}
-            </p>
-            <div className="signature">
-              <em>{cms.msg?.signer || 'Office of the Moderator'}</em>
-              <span>{cms.msg?.role || 'General Assembly of the Presbyterian Church of the Philippines'}</span>
-            </div>
+            <WelcomeCarousel officers={welcomeOfficers} />
           </div>
           <aside className="marginalia reveal">
             <div className="margin-note">
