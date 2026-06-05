@@ -2,24 +2,30 @@
 
 ## Adding a new admin
 
-1. Firebase Console → Authentication → Users → **Add user**
-2. Enter their email + a temporary password
-3. Copy their UID (shown after the user is created)
-4. Firestore Console → `admins` collection → **Add document**
-   - Doc ID: paste the UID
-   - Fields:
-     - `email` (string) — their email
-     - `role` (string) — e.g. `"editor"` or `"owner"`
-     - `addedAt` (timestamp) — set to current time
-5. Email the new admin their temporary password and ask them to log in at https://pcpga-church-prod.web.app/login, then click **Forgot password?** to set their own.
+Admins sign in with **one-click Google** — there is no Firebase Auth user to
+create. An admin is simply their Google email on the allowlist.
 
-## Password reset
+1. Sign in at https://pcpga-church-prod.web.app/login (as an **owner**).
+2. Go to `/admin` → **Access Control** and add the person's **Google email**
+   with a role (`admin` or `manager`).
+   - (Equivalent: Firestore Console → `admins` collection → Add document with
+     **Doc ID = their lowercased email**, field `role` = `"admin"`.)
+3. The new admin opens `/login` and clicks **Continue with Google** using that
+   same Google account. Done — no password, no manual user creation.
 
-Anyone with an existing admin account can click **Forgot password?** on `/login`. Firebase sends a reset email automatically.
+> The allowlist is keyed by **email** (doc id = lowercased email), not UID. A
+> Google account that isn't on the allowlist is signed straight back out.
+
+## Sign-in methods
+
+- **Google (primary)** — one-click, for any allowlisted Google email.
+- **Email + password (fallback)** — still available for legacy accounts; use
+  **Forgot password?** on `/login` to reset. Firebase sends a reset email.
 
 ## Removing an admin
 
-Firestore Console → `admins` collection → delete their document. Optionally also disable their auth user in **Authentication → Users**.
+`/admin` → **Access Control** → remove them (or Firestore Console → `admins`
+collection → delete the doc keyed by their email).
 
 ## Xendit webhook URL
 
