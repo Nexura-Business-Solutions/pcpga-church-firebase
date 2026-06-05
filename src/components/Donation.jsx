@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { httpsCallable } from 'firebase/functions';
 import { getDonationContent } from '../lib/store.js';
@@ -17,10 +18,15 @@ const DEFAULT_CONTENT = {
 };
 
 export default function Donation() {
+    const [searchParams] = useSearchParams();
+    // Prefill from the homepage giving card (e.g. /donation?amount=2500&name=Juan).
+    const presetAmount = Math.floor(Number(searchParams.get('amount')));
+    const initialAmount = presetAmount >= 20 ? presetAmount : 1000;
+
     const [content, setContent] = useState(DEFAULT_CONTENT);
-    const [amount, setAmount] = useState(1000);
-    const [isCustom, setIsCustom] = useState(false);
-    const [donorName, setDonorName] = useState('');
+    const [amount, setAmount] = useState(initialAmount);
+    const [isCustom, setIsCustom] = useState(!PRESETS.includes(initialAmount));
+    const [donorName, setDonorName] = useState(searchParams.get('name') || '');
     const [generating, setGenerating] = useState(false);
 
     useEffect(() => {

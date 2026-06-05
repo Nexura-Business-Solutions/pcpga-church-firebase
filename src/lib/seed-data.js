@@ -1991,7 +1991,7 @@ export const defaultHistory = {
     office: {
         address: '#42 Banaag Street, Barangay Pineda, Pasig City',
         tel: '(02) 935 4741',
-        email: 'gapcp_1987@yahoo.com.ph',
+        email: 'pcpgainfo@gmail.com',
         website: 'https://gapcp.org',
     },
 };

@@ -9,7 +9,7 @@ const navLinks = [
     { name: 'Churches', href: '/churches' },
     { name: 'Seminaries', href: '/seminaries' },
     { name: 'Library', href: '/library' },
-    { name: 'Give', href: '#donate' },
+    { name: 'Give', href: '/donation' },
 ];
 
 export default function Navbar() {

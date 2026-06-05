@@ -268,8 +268,9 @@ export default function ChurchesPage() {
 
                                                 <div className="flex gap-3">
                                                     <a
-                                                        href={selected.mapLink}
+                                                        href={selected.mapLink || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${selected.name} ${selected.address || ''}`.trim())}`}
                                                         target="_blank"
+                                                        rel="noopener noreferrer"
                                                         className="flex-1 h-12 lg:h-14 bg-church-dark text-white font-bold text-[10px] lg:text-xs tracking-widest uppercase flex items-center justify-center rounded-2xl hover:bg-black shadow-lg shadow-black/10 transition-all"
                                                     >
                                                         Open in Maps
