@@ -30,8 +30,10 @@ export default function Navbar() {
     }, []);
 
     useEffect(() => {
-        document.body.style.overflow = mobileOpen ? 'hidden' : '';
-        return () => { document.body.style.overflow = ''; };
+        // Toggle a class so the `html:has(body.menu-open)` lock in index.css can
+        // hold the real <html> scroller (body overflow alone fails on iOS).
+        document.body.classList.toggle('menu-open', mobileOpen);
+        return () => { document.body.classList.remove('menu-open'); };
     }, [mobileOpen]);
 
     const handleNavClick = (e, href) => {

@@ -5,7 +5,6 @@ import { Helmet } from 'react-helmet-async';
 import { getChurches } from '../lib/store.js';
 import { regions } from '../lib/seed-data.js';
 import { Skeleton } from '../components/Skeleton.jsx';
-import Navbar from '../components/Navbar.jsx';
 import Footer from '../components/Footer.jsx';
 import ChatbotWidget from '../components/ChatbotWidget.jsx';
 
@@ -62,7 +61,10 @@ export default function ChurchesPage() {
                 <title>Churches | PCP</title>
                 <meta name="description" content="Find Presbyterian churches across the Philippines." />
             </Helmet>
-            <Navbar />
+            {/* This page ships its own fixed "PCP Finder" header below, so we do
+                NOT also render the global <Navbar/> — two fixed top-0 bars would
+                overlap and the global nav's pre-scroll white links are invisible
+                on the white sub-nav. */}
             <div className="min-h-screen bg-[#f8f7ff] selection:bg-accent/10">
                 {/* Header / Sub-Navbar */}
                 <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-xl border-b border-black/[0.04]">
@@ -80,7 +82,7 @@ export default function ChurchesPage() {
                     </div>
                 </nav>
 
-                <div className="pt-16 flex flex-col lg:flex-row h-auto lg:h-screen lg:overflow-hidden relative">
+                <div className="pt-16 flex flex-col lg:flex-row h-auto lg:h-[100dvh] lg:overflow-hidden relative">
                     {/* ── SEARCH & RESULTS SIDEBAR ── */}
                     <aside className={`w-full lg:w-[420px] xl:w-[480px] bg-white border-b lg:border-r border-black/[0.04] flex flex-col shadow-2xl shadow-black/[0.02] z-10 ${viewMode === 'map' ? 'hidden lg:flex' : 'flex'}`}>
                         {/* Header Group */}
@@ -208,7 +210,7 @@ export default function ChurchesPage() {
                     </aside>
 
                     {/* ── INTERACTIVE MAP AREA ── */}
-                    <main className={`flex-1 relative bg-church-light/20 min-h-0 h-screen lg:h-auto ${viewMode === 'list' ? 'hidden lg:block' : 'block'}`}>
+                    <main className={`flex-1 relative bg-church-light/20 min-h-0 h-[100dvh] lg:h-auto ${viewMode === 'list' ? 'hidden lg:block' : 'block'}`}>
                         <AnimatePresence mode="wait">
                             <motion.div
                                 key={selected?.id || 'default'}
@@ -313,7 +315,7 @@ export default function ChurchesPage() {
                     {/* Mobile View Toggle Switch (Glassmorphic Segmented Control) */}
                     <div
                         aria-hidden={footerNear}
-                        className={`lg:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-[80] w-auto transition-all duration-300 ${footerNear ? 'opacity-0 translate-y-24 pointer-events-none' : 'opacity-100 translate-y-0'}`}
+                        className={`lg:hidden fixed bottom-[max(1.5rem,env(safe-area-inset-bottom))] left-1/2 -translate-x-1/2 z-[80] w-auto transition-all duration-300 ${footerNear ? 'opacity-0 translate-y-24 pointer-events-none' : 'opacity-100 translate-y-0'}`}
                     >
                         <div className="flex p-1.5 bg-black/40 backdrop-blur-2xl rounded-full border border-white/10 shadow-2xl">
                             <button
