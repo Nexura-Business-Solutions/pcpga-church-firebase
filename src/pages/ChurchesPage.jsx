@@ -166,7 +166,7 @@ export default function ChurchesPage() {
                                                 <div className="flex items-start justify-between mb-2 lg:mb-3">
                                                     <span className={`px-2 py-0.5 lg:px-2.5 lg:py-1 text-[8px] lg:text-[9px] font-bold tracking-widest uppercase rounded-md lg:rounded-lg ${church.region === 'NCR' ? 'bg-accent/10 text-accent' : 'bg-black/5 text-church-gray'
                                                         }`}>
-                                                        {church.region} · {church.province}
+                                                        {church.region}{church.province ? ` · ${church.province}` : ''}
                                                     </span>
                                                     <div className={`w-7 h-7 lg:w-8 lg:h-8 rounded-full flex items-center justify-center transition-all ${selected?.id === church.id ? 'bg-accent text-white' : 'bg-black/[0.03] text-church-gray/40'
                                                         }`}>
@@ -178,12 +178,14 @@ export default function ChurchesPage() {
                                                 </h3>
                                                 <p className="text-church-gray text-[11px] lg:text-xs mb-3 lg:mb-4 line-clamp-1 opacity-60">{church.address}</p>
 
-                                                <div className="flex items-center gap-4 text-[9px] lg:text-[10px] font-bold text-church-gray/40">
-                                                    <div className="flex items-center gap-1.5 uppercase tracking-widest">
-                                                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>
-                                                        {church.serviceTime}
+                                                {church.serviceTime && (
+                                                    <div className="flex items-center gap-4 text-[9px] lg:text-[10px] font-bold text-church-gray/40">
+                                                        <div className="flex items-center gap-1.5 uppercase tracking-widest">
+                                                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>
+                                                            {church.serviceTime}
+                                                        </div>
                                                     </div>
-                                                </div>
+                                                )}
                                             </motion.div>
                                         ))}
                                     </AnimatePresence>
@@ -249,22 +251,37 @@ export default function ChurchesPage() {
                                                     </button>
                                                 </div>
 
-                                                <div className="grid grid-cols-1 gap-3 lg:gap-4 mb-8">
-                                                    <div className="flex items-center gap-4 p-4 bg-black/[0.03] rounded-2xl">
-                                                        <div className="text-lg lg:text-xl">👤</div>
-                                                        <div>
-                                                            <p className="text-[9px] uppercase tracking-widest text-church-gray font-bold mb-0.5 opacity-50">Pastor</p>
-                                                            <p className="text-xs lg:text-[13px] font-bold text-church-dark">{selected.pastor}</p>
-                                                        </div>
+                                                {(selected.pastor || selected.serviceTime || selected.address) && (
+                                                    <div className="grid grid-cols-1 gap-3 lg:gap-4 mb-8">
+                                                        {selected.address && (
+                                                            <div className="flex items-center gap-4 p-4 bg-black/[0.03] rounded-2xl">
+                                                                <div className="text-lg lg:text-xl">📍</div>
+                                                                <div>
+                                                                    <p className="text-[9px] uppercase tracking-widest text-church-gray font-bold mb-0.5 opacity-50">Address</p>
+                                                                    <p className="text-xs lg:text-[13px] font-bold text-church-dark">{selected.address}</p>
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                        {selected.pastor && (
+                                                            <div className="flex items-center gap-4 p-4 bg-black/[0.03] rounded-2xl">
+                                                                <div className="text-lg lg:text-xl">👤</div>
+                                                                <div>
+                                                                    <p className="text-[9px] uppercase tracking-widest text-church-gray font-bold mb-0.5 opacity-50">Pastor</p>
+                                                                    <p className="text-xs lg:text-[13px] font-bold text-church-dark">{selected.pastor}</p>
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                        {selected.serviceTime && (
+                                                            <div className="flex items-center gap-4 p-4 bg-black/[0.03] rounded-2xl">
+                                                                <div className="text-lg lg:text-xl">🕐</div>
+                                                                <div>
+                                                                    <p className="text-[9px] uppercase tracking-widest text-church-gray font-bold mb-0.5 opacity-50">Sunday Service</p>
+                                                                    <p className="text-xs lg:text-[13px] font-bold text-church-dark">{selected.serviceTime}</p>
+                                                                </div>
+                                                            </div>
+                                                        )}
                                                     </div>
-                                                    <div className="flex items-center gap-4 p-4 bg-black/[0.03] rounded-2xl">
-                                                        <div className="text-lg lg:text-xl">🕐</div>
-                                                        <div>
-                                                            <p className="text-[9px] uppercase tracking-widest text-church-gray font-bold mb-0.5 opacity-50">Sunday Service</p>
-                                                            <p className="text-xs lg:text-[13px] font-bold text-church-dark">{selected.serviceTime}</p>
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                                )}
 
                                                 <div className="flex gap-3">
                                                     <a
