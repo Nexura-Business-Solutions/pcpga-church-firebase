@@ -2250,6 +2250,42 @@ a, button {
   border-radius: 999px;
   background: var(--oxblood);
 }
+.login-page__google {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  height: 3.25rem;
+  background: #fff;
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 0.75rem;
+  font-family: var(--font-sans-var);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+}
+.login-page__google:hover { border-color: var(--brass); box-shadow: 0 0 0 4px var(--brass-soft); }
+.login-page__google:disabled { opacity: 0.6; cursor: default; box-shadow: none; }
+.login-page__google svg { width: 1.15rem; height: 1.15rem; }
+.login-page__divider {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+}
+.login-page__divider::before,
+.login-page__divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}
 .login-page__submit {
   height: 3.25rem;
   font-size: 11px;
