@@ -13,6 +13,7 @@ import {
     loginWithGoogle,
     loginWithGoogleRedirect,
     completeGoogleRedirect,
+    recordLoginDiagnostic,
     sendReset,
     useAuth,
 } from '../lib/auth.js';
@@ -36,6 +37,7 @@ export default function LoginPage() {
             .then((role) => { if (role) navigate(fromPath, { replace: true }); })
             .catch((err) => {
                 console.error('Google redirect completion error:', err);
+                recordLoginDiagnostic('redirect', err);
                 const code = err?.code || '';
                 setError(code === 'admin/not-authorized'
                     ? 'This Google account is not an authorized admin.'
@@ -83,6 +85,7 @@ export default function LoginPage() {
             navigate(fromPath, { replace: true });
         } catch (err) {
             console.error('Google sign-in error:', err);
+            recordLoginDiagnostic('popup', err);
             const code = err?.code || '';
             // Popups are blocked in many in-app/mobile browsers — fall back to a
             // full-page redirect, which works where popups don't.
