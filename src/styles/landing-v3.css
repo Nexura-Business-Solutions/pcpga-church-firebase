@@ -2911,3 +2911,85 @@ html:has(body.lp-v3.modal-open) { overflow: hidden; }
     padding-right: clamp(1.25rem, 4vw, 3rem);
   }
 }
+
+/* ============================================================
+   Mobile reading aids (2026) — desktop unaffected.
+   Show-all toggles to shorten the long landing, a scroll-progress
+   bar, and a back-to-top button. All scoped to <=768px.
+   ============================================================ */
+
+/* "View all / Show less" toggle — hidden on desktop (lists show in full). */
+body.lp-v3 .show-more { display: none; }
+@media (max-width: 768px) {
+  body.lp-v3 .show-more {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: fit-content;
+    margin: 1.5rem auto 0;
+    padding: 0.85rem 1.5rem;
+    min-height: 44px;
+    background: transparent;
+    border: 1px solid var(--brass);
+    border-radius: 999px;
+    color: var(--brass-bright, var(--brass));
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease;
+  }
+  body.lp-v3 .show-more:hover { background: var(--brass); color: var(--paper); }
+  body.lp-v3 .show-more__chev { font-size: 0.95rem; line-height: 1; }
+
+  /* Collapsed: committees show first 5, presbyteries show first 2 regions.
+     The :nth-child is qualified by the element/class so the trailing .show-more
+     button (a different element) is never hidden. */
+  body.lp-v3 .committees__list.is-collapsed li:nth-child(n+6) { display: none; }
+  body.lp-v3 .presbyteries__col.is-collapsed .presbyteries__region:nth-child(n+3) { display: none; }
+}
+
+/* Scroll-progress bar (top) + back-to-top (bottom-left). Mobile only.
+   Scoped with body.lp-v3 .to-top so it out-specifies body.lp-v3 button. */
+body.lp-v3 .scrollbar,
+body.lp-v3 .to-top { display: none; }
+@media (max-width: 768px) {
+  body.lp-v3 .scrollbar {
+    display: block;
+    position: fixed; top: 0; left: 0; right: 0;
+    height: 3px; z-index: 60;
+    pointer-events: none;
+    background: transparent;
+  }
+  body.lp-v3 .scrollbar__fill {
+    height: 100%; width: 100%;
+    transform-origin: left center;
+    transform: scaleX(0);
+    background: var(--brass-bright, var(--brass));
+  }
+  body.lp-v3 .to-top {
+    display: flex; align-items: center; justify-content: center;
+    position: fixed;
+    left: max(1.1rem, env(safe-area-inset-left));
+    bottom: max(1.1rem, env(safe-area-inset-bottom));
+    width: 46px; height: 46px;
+    border-radius: 50%;
+    background: var(--ink);
+    color: var(--paper);
+    border: 1px solid rgba(251, 244, 220, 0.2);
+    font-size: 1.3rem; line-height: 1;
+    cursor: pointer;
+    z-index: 80;
+    opacity: 0; transform: translateY(12px); pointer-events: none;
+    box-shadow: 0 10px 26px -8px rgba(26, 14, 8, 0.5);
+    transition: opacity 0.25s ease, transform 0.25s ease, background 0.2s ease;
+  }
+  body.lp-v3 .to-top.is-visible { opacity: 1; transform: translateY(0); pointer-events: auto; }
+  body.lp-v3 .to-top:hover { background: var(--oxblood, var(--ink)); }
+}
+
+/* Respect reduced-motion: scroll reveals appear instantly, no transform. */
+@media (prefers-reduced-motion: reduce) {
+  body.lp-v3 .reveal { transition: none !important; opacity: 1 !important; transform: none !important; }
+}

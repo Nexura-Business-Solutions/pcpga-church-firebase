@@ -5,6 +5,7 @@ import PhilippinesMap from '../components/PhilippinesMap.jsx';
 import AnnouncementModal from '../components/AnnouncementModal.jsx';
 import EventsCarousel from '../components/EventsCarousel.jsx';
 import WelcomeCarousel from '../components/WelcomeCarousel.jsx';
+import MobileScrollAids from '../components/MobileScrollAids.jsx';
 import { getSettings, getSermons } from '../lib/store.js';
 import { defaultPresbyteries, defaultWelcomeOfficers } from '../lib/seed-data.js';
 import '../styles/landing-v3.css';
@@ -209,6 +210,9 @@ export default function HomePage() {
   const [donorName, setDonorName] = useState('');
   const [activeSermon, setActiveSermon] = useState(0);
   const [playing, setPlaying] = useState(false);
+  // Mobile-only progressive disclosure for the two longest lists.
+  const [showAllPres, setShowAllPres] = useState(false);
+  const [showAllCommittees, setShowAllCommittees] = useState(false);
   const scrollFillRef = useRef(null);
   const countRefs = useRef([]);
 
@@ -877,7 +881,7 @@ export default function HomePage() {
               Nine committees carry out the ministries and administrative work of the General Assembly between sessions. Select a committee to view its standing rules and officers.
             </p>
           </div>
-          <ul className="committees__list">
+          <ul className={`committees__list${showAllCommittees ? '' : ' is-collapsed'}`}>
             {committees.map((c, i) => {
               const romans = ['I.', 'II.', 'III.', 'IV.', 'V.', 'VI.', 'VII.', 'VIII.', 'IX.'];
               return (
@@ -892,6 +896,12 @@ export default function HomePage() {
               );
             })}
           </ul>
+          {committees.length > 5 && (
+            <button type="button" className="show-more" onClick={() => setShowAllCommittees((v) => !v)}>
+              {showAllCommittees ? 'Show less' : `View all ${committees.length} committees`}
+              <span className="show-more__chev" aria-hidden="true">{showAllCommittees ? '↑' : '↓'}</span>
+            </button>
+          )}
         </div>
       </section>
 
@@ -918,7 +928,7 @@ export default function HomePage() {
               </div>
             </aside>
 
-            <div className="presbyteries__col">
+            <div className={`presbyteries__col${showAllPres ? '' : ' is-collapsed'}`}>
               {presbyteriesByRegion.map((region) => (
                 <div key={region.region} className="presbyteries__region reveal">
                   <div className="presbyteries__region-head">
@@ -954,6 +964,12 @@ export default function HomePage() {
                   </div>
                 </div>
               ))}
+              {presbyteriesByRegion.length > 2 && (
+                <button type="button" className="show-more" onClick={() => setShowAllPres((v) => !v)}>
+                  {showAllPres ? 'Show less' : `View all ${presbyteries.length} presbyteries`}
+                  <span className="show-more__chev" aria-hidden="true">{showAllPres ? '↑' : '↓'}</span>
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -1083,7 +1099,7 @@ export default function HomePage() {
       {/* INVITATION */}
       <section className="invitation" id="visit" aria-label="You are invited">
         <div className="invitation__bg" data-parallax="0.18">
-          <img src="/pcp-hero.jpg" alt="" />
+          <img src="/pcp-hero.jpg" alt="" loading="lazy" decoding="async" />
         </div>
         <div className="invitation__inner reveal">
           <span className="kicker kicker--on-dark" style={{ color: 'var(--brass-bright)' }}>You’re Invited</span>
@@ -1117,7 +1133,7 @@ export default function HomePage() {
           <div className="foot__top">
             <div>
               <div className="foot__brand">
-                <img src="/pcpga_logo.png" alt="" className="foot__logo" />
+                <img src="/pcpga_logo.png" alt="" className="foot__logo" loading="lazy" decoding="async" />
                 <div>
                   <div className="foot__name">{cms.identity?.name ? `${cms.identity.name}${cms.identity.sub ? ' ' + cms.identity.sub : ''}` : 'Presbyterian Church of the Philippines'}</div>
                   <div className="foot__sub">General Assembly · Est. MCMLXXXVII</div>
@@ -1200,6 +1216,7 @@ export default function HomePage() {
 
       {/* Announcement popup — shows once per visitor when active (Site Content → Announcement) */}
       <AnnouncementModal />
+      <MobileScrollAids />
     </>
   );
 }
@@ -1211,7 +1228,7 @@ function OfficerList({ officers }) {
       {officers.map((o) => (
         <div key={o.name} className="modal__officer">
           <div className="modal__officer-photo">
-            {o.photo ? <img src={o.photo} alt={o.name} /> : (o.name || '·').trim().charAt(0)}
+            {o.photo ? <img src={o.photo} alt={o.name} loading="lazy" decoding="async" /> : (o.name || '·').trim().charAt(0)}
           </div>
           <div className="modal__officer-name">{o.name}</div>
           {o.role && <div className="modal__officer-role">{o.role}</div>}

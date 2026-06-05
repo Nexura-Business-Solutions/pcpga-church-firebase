@@ -78,7 +78,7 @@ export default function WelcomeCarousel({ officers = [] }) {
                 >
                     <div className="welcar__portrait">
                         {o.photo
-                            ? <img src={o.photo} alt={o.name} />
+                            ? <img src={o.photo} alt={o.name} loading="lazy" decoding="async" />
                             : <span className="welcar__monogram" aria-hidden="true">{initials(o.name)}</span>}
                     </div>
                     <div className="welcar__text">
