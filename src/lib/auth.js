@@ -3,6 +3,8 @@ import {
   onAuthStateChanged,
   signInWithEmailAndPassword,
   signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
   signOut,
   sendPasswordResetEmail,
 } from 'firebase/auth';
@@ -13,11 +15,9 @@ export function loginWithEmail(email, password) {
   return signInWithEmailAndPassword(auth, email, password);
 }
 
-// One-click Google sign-in. Access is gated by the email allowlist
-// (admins/{lowercased-email}); a Google account that isn't on it is signed
-// straight back out so no non-admin session lingers. Resolves to the role.
-export async function loginWithGoogle() {
-  const { user } = await signInWithPopup(auth, googleProvider);
+// Verify a signed-in Google user against the email allowlist
+// (admins/{lowercased-email}); sign out + throw if they're not an admin.
+async function enforceAllowlist(user) {
   const email = (user.email || '').trim().toLowerCase();
   const snap = await getDoc(doc(db, 'admins', email));
   if (!snap.exists()) {
@@ -27,6 +27,26 @@ export async function loginWithGoogle() {
     throw err;
   }
   return snap.data().role || 'admin';
+}
+
+// One-click Google sign-in (popup). Resolves to the admin role.
+export async function loginWithGoogle() {
+  const { user } = await signInWithPopup(auth, googleProvider);
+  return enforceAllowlist(user);
+}
+
+// Fallback for environments where popups are blocked/unsupported (in-app
+// browsers, some mobile). Navigates away; completeGoogleRedirect() finishes it.
+export function loginWithGoogleRedirect() {
+  return signInWithRedirect(auth, googleProvider);
+}
+
+// Call once on load: if we just came back from a redirect sign-in, enforce the
+// allowlist. Returns the role, or null when there is no pending redirect.
+export async function completeGoogleRedirect() {
+  const result = await getRedirectResult(auth);
+  if (!result || !result.user) return null;
+  return enforceAllowlist(result.user);
 }
 
 export function logout() {

@@ -3,12 +3,19 @@
 // then sign in with one-click Google — no Firebase Auth user to create. The
 // useAuth() hook reads this allowlist to set isAdmin=true.
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
-import { loginWithEmail, loginWithGoogle, sendReset, useAuth } from '../lib/auth.js';
+import {
+    loginWithEmail,
+    loginWithGoogle,
+    loginWithGoogleRedirect,
+    completeGoogleRedirect,
+    sendReset,
+    useAuth,
+} from '../lib/auth.js';
 
 export default function LoginPage() {
     const { user, isAdmin, loading } = useAuth();
@@ -21,6 +28,20 @@ export default function LoginPage() {
     const [error, setError] = useState('');
     const [submitting, setSubmitting] = useState(false);
     const [googling, setGoogling] = useState(false);
+
+    // If we just returned from a redirect-based Google sign-in, finish it here.
+    // (Must run before any early return so the hook order stays stable.)
+    useEffect(() => {
+        completeGoogleRedirect()
+            .then((role) => { if (role) navigate(fromPath, { replace: true }); })
+            .catch((err) => {
+                console.error('Google redirect completion error:', err);
+                const code = err?.code || '';
+                setError(code === 'admin/not-authorized'
+                    ? 'This Google account is not an authorized admin.'
+                    : `Google sign-in failed${code ? ` (${code})` : ''}.`);
+            });
+    }, [navigate, fromPath]);
 
     if (!loading && user && isAdmin) {
         if (typeof window !== 'undefined') {
@@ -61,12 +82,30 @@ export default function LoginPage() {
             await loginWithGoogle();
             navigate(fromPath, { replace: true });
         } catch (err) {
+            console.error('Google sign-in error:', err);
+            const code = err?.code || '';
+            // Popups are blocked in many in-app/mobile browsers — fall back to a
+            // full-page redirect, which works where popups don't.
+            const popupFailed = [
+                'auth/popup-blocked',
+                'auth/cancelled-popup-request',
+                'auth/operation-not-supported-in-this-environment',
+                'auth/web-storage-unsupported',
+            ].includes(code);
+            if (popupFailed) {
+                try {
+                    await loginWithGoogleRedirect(); // navigates away
+                    return;
+                } catch (e2) {
+                    console.error('Google redirect error:', e2);
+                }
+            }
             const msg =
-                err?.code === 'admin/not-authorized'
+                code === 'admin/not-authorized'
                     ? 'This Google account is not an authorized admin.'
-                    : err?.code === 'auth/popup-closed-by-user' || err?.code === 'auth/cancelled-popup-request'
+                    : code === 'auth/popup-closed-by-user'
                         ? 'Sign-in was cancelled.'
-                        : 'Google sign-in failed. Please try again.';
+                        : `Google sign-in failed${code ? ` (${code})` : ''}. You can use the email login below.`;
             setError(msg);
             toast.error(msg);
         } finally {
