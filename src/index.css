@@ -2552,3 +2552,16 @@ html { scrollbar-color: var(--brass) var(--paper-2); scrollbar-width: thin; }
 
   @page { size: A4; margin: 1.4cm; }
 }
+
+/* ── Mobile fix: content cards — prevent text flush against edges ── */
+@media (max-width: 768px) {
+  .resources__card {
+    padding: 1.75rem 1.5rem;
+  }
+  .committees__card {
+    padding: 1.5rem 1.25rem 1.25rem;
+  }
+  .editorial__body {
+    padding: 0 0.5rem;
+  }
+}

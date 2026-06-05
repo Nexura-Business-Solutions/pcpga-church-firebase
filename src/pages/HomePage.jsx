@@ -565,12 +565,6 @@ export default function HomePage() {
         <div className="hero__bg" data-parallax="0.15">
           <img src="/pcp-hero.jpg" alt="" />
         </div>
-        <div className="hero__frame" aria-hidden="true">
-          <span className="hero__frame-corner hero__frame-corner--tl" />
-          <span className="hero__frame-corner hero__frame-corner--tr" />
-          <span className="hero__frame-corner hero__frame-corner--bl" />
-          <span className="hero__frame-corner hero__frame-corner--br" />
-        </div>
 
         <div className="hero__inner">
           <div className="hero__copy reveal">
@@ -789,7 +783,6 @@ export default function HomePage() {
         <div className="sundays__bg" data-parallax="0.10">
           <div className="img-placeholder" />
         </div>
-        <div className="sundays__frame" aria-hidden="true" />
         <div className="sundays__inner reveal">
           <span className="kicker kicker--on-dark" style={{ color: 'var(--brass-bright)' }}>A Lord’s Day at PCP</span>
           <h2 className="sundays__title">Worship as the saints have, <em>for centuries.</em></h2>
@@ -968,7 +961,6 @@ export default function HomePage() {
 
       {/* RESOURCES */}
       <section className="dark-section" id="resources" aria-label="Official governance documents">
-        <div className="dark-section__frame" aria-hidden="true" />
         <div className="resources__inner">
           <div className="section-head reveal">
             <span className="kicker kicker--on-dark" style={{ color: 'var(--brass-bright)' }}>Official Governance · The Library</span>
@@ -1007,7 +999,6 @@ export default function HomePage() {
 
       {/* GIVE */}
       <section className="dark-section" id="donate" aria-label="Give">
-        <div className="dark-section__frame" aria-hidden="true" />
         <div className="give__inner">
           <div className="give__copy reveal">
             <span className="kicker kicker--on-dark" style={{ color: 'var(--brass-bright)' }}>Stewardship</span>
@@ -1024,10 +1015,6 @@ export default function HomePage() {
           </div>
 
           <div className="covenant-card reveal reveal--scale">
-            <span className="covenant-card__corner covenant-card__corner--tl" />
-            <span className="covenant-card__corner covenant-card__corner--tr" />
-            <span className="covenant-card__corner covenant-card__corner--bl" />
-            <span className="covenant-card__corner covenant-card__corner--br" />
             <div className="covenant-card__head">
               <div className="covenant-card__kicker">— A Card of Stewardship —</div>
               <div className="covenant-card__title">For the work of the Gospel</div>
@@ -1098,7 +1085,6 @@ export default function HomePage() {
         <div className="invitation__bg" data-parallax="0.18">
           <img src="/pcp-hero.jpg" alt="" />
         </div>
-        <div className="invitation__frame" aria-hidden="true" />
         <div className="invitation__inner reveal">
           <span className="kicker kicker--on-dark" style={{ color: 'var(--brass-bright)' }}>You’re Invited</span>
           <h2 className="invitation__title">You belong <em>here.</em></h2>
