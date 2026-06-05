@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import PhilippinesMap from '../components/PhilippinesMap.jsx';
 import AnnouncementModal from '../components/AnnouncementModal.jsx';
@@ -126,12 +126,22 @@ const COMMITTEES = [
   },
 ];
 
+// Derive the "at a glance" numbers from the real canon directory so they can
+// never drift back into placeholder territory (was 128yrs/1898, 144, 42K).
+const TOTAL_CONGREGATIONS = defaultPresbyteries.reduce((n, p) => n + congregationCount(p), 0);
+const POPULATED_REGIONS = new Set(
+  defaultPresbyteries.filter((p) => congregationCount(p) > 0).map((p) => p.region),
+).size;
+
 const STATS = [
-  { roman: 'I.', target: 128, label: 'Years of Ministry', note: 'since 1898' },
-  { roman: 'II.', target: 144, label: 'Congregations', note: 'across the archipelago' },
-  { roman: 'III.', target: 42, suffix: 'K', label: 'Communicant Members', note: 'in good standing' },
-  { roman: 'IV.', target: defaultPresbyteries.length, label: 'Presbyteries', note: 'Luzon · NCR · Visayas · Mindanao' },
+  { roman: 'I.', target: 39, label: 'Years of Ministry', note: 'since 1987' },
+  { roman: 'II.', target: TOTAL_CONGREGATIONS, label: 'Congregations', note: 'across the archipelago' },
+  { roman: 'III.', target: defaultPresbyteries.length, label: 'Presbyteries', note: 'regional governing bodies' },
+  { roman: 'IV.', target: POPULATED_REGIONS, label: 'Regions', note: 'Luzon to Mindanao' },
 ];
+
+// Preset giving amounts (PHP) shown on the homepage card; mirror Donation.jsx PRESETS.
+const GIVE_AMOUNTS = [500, 1000, 2500, 5000];
 
 const NAV_LINKS = [
   { href: '#message', label: 'About', roman: 'i.' },
@@ -183,10 +193,12 @@ function StatItem({ stat, refSetter }) {
 }
 
 export default function HomePage() {
+  const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [lang, setLang] = useState('en');
   const [modal, setModal] = useState(null);
   const [activeAmount, setActiveAmount] = useState(1);
+  const [donorName, setDonorName] = useState('');
   const [activeSermon, setActiveSermon] = useState(0);
   const [playing, setPlaying] = useState(false);
   const scrollFillRef = useRef(null);
@@ -492,13 +504,13 @@ export default function HomePage() {
       {/* NAV */}
       <header className="nav">
         <div className="nav__inner">
-          <a href="#" className="nav__brand">
+          <Link to="/" className="nav__brand">
             <img src="/pcpga_logo.png" alt="" className="nav__logo" />
             <div className="nav__brand-text">
               <span className="nav__name">{cms.identity?.name || 'Presbyterian Church'}</span>
               <span className="nav__sub">{cms.identity?.sub || 'of the Philippines'}</span>
             </div>
-          </a>
+          </Link>
           <nav className="nav__links">
             {NAV_LINKS.map((l) => (
               <a key={l.href} href={l.href} className="nav__link">{l.label}</a>
@@ -565,7 +577,7 @@ export default function HomePage() {
             </h1>
 
             <p className="hero__lede">
-              {hero.lede || 'A communion of Reformed congregations gathered around Scripture, Sacrament, and the historic Presbyterian faith — keeping the old paths across the islands since the dying years of the 19th century.'}
+              {hero.lede || 'A communion of Reformed congregations gathered around Scripture, Sacrament, and the historic Presbyterian faith — keeping the old paths across the islands since 1987.'}
             </p>
 
             <div className="hero__actions">
@@ -1025,19 +1037,25 @@ export default function HomePage() {
             </div>
             <div>
               <label className="give-form__label">Your name (optional)</label>
-              <input className="give-form__input" type="text" placeholder="Anonymous" />
+              <input
+                className="give-form__input"
+                type="text"
+                placeholder="Anonymous"
+                value={donorName}
+                onChange={(e) => setDonorName(e.target.value)}
+              />
             </div>
             <div>
               <label className="give-form__label">Choose an amount</label>
               <div className="give-form__amounts">
-                {['₱500', '₱1,000', '₱2,500', '₱5,000'].map((amt, i) => (
+                {GIVE_AMOUNTS.map((amt, i) => (
                   <button
                     key={amt}
                     type="button"
                     className={`give-form__chip${i === activeAmount ? ' is-active' : ''}`}
                     onClick={() => setActiveAmount(i)}
                   >
-                    {amt}
+                    ₱{amt.toLocaleString()}
                   </button>
                 ))}
               </div>
@@ -1046,38 +1064,34 @@ export default function HomePage() {
               type="button"
               className="btn btn--primary"
               style={{ width: '100%', justifyContent: 'center', padding: '1.1rem' }}
+              onClick={() => {
+                const amt = GIVE_AMOUNTS[activeAmount] || 1000;
+                const q = new URLSearchParams({ amount: String(amt) });
+                if (donorName.trim()) q.set('name', donorName.trim());
+                navigate(`/donation?${q.toString()}`);
+              }}
             >
               Donate Now
             </button>
-            <div className="give-form__qrs">
-              <div>
-                <div className="give-form__qr">GCASH</div>
-                <span className="give-form__qr-label">GCash</span>
-              </div>
-              <div>
-                <div className="give-form__qr">MAYA</div>
-                <span className="give-form__qr-label">Maya</span>
-              </div>
-              <div
-                style={{
-                  flex: 1,
-                  paddingLeft: '0.5rem',
-                  fontFamily: 'var(--font-serif)',
-                  fontStyle: 'italic',
-                  color: 'rgba(251,244,220,0.65)',
-                  fontSize: '0.92rem',
-                  lineHeight: 1.5,
-                }}
+            <p
+              className="give-form__note"
+              style={{
+                marginTop: '1rem',
+                fontFamily: 'var(--font-serif)',
+                fontStyle: 'italic',
+                color: 'rgba(251,244,220,0.65)',
+                fontSize: '0.92rem',
+                lineHeight: 1.5,
+              }}
+            >
+              Secure online giving via GCash, Maya, cards &amp; bank — powered by Xendit. Questions? Write to{' '}
+              <a
+                href="mailto:pcpgainfo@gmail.com"
+                style={{ color: 'var(--brass-bright)', borderBottom: '1px solid currentColor' }}
               >
-                Direct GCash &amp; Maya. Questions? Write to{' '}
-                <a
-                  href="mailto:pcpgainfo@gmail.com"
-                  style={{ color: 'var(--brass-bright)', borderBottom: '1px solid currentColor' }}
-                >
-                  pcpgainfo@gmail.com
-                </a>.
-              </div>
-            </div>
+                pcpgainfo@gmail.com
+              </a>.
+            </p>
           </div>
         </div>
       </section>
@@ -1138,7 +1152,7 @@ export default function HomePage() {
                   <li><a href="#message">About</a></li>
                   <li><a href="#sermons">Sermons</a></li>
                   <li><a href="#presbyteries">Find a Church</a></li>
-                  <li><a href="#donate">Give Online</a></li>
+                  <li><Link to="/donation">Give Online</Link></li>
                 </ul>
               </div>
               <div>

@@ -29,7 +29,7 @@ export default function Footer() {
         { name: 'About', href: '#message' },
         { name: 'Sermons', href: '#sermons' },
         { name: 'Find a Church', href: '/churches' },
-        { name: 'Give Online', href: '#donate' },
+        { name: 'Give Online', href: '/donation' },
     ];
     const resources = [
         { name: 'Westminster Standards', href: '/library' },
