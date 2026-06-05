@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getSettings } from '../lib/store.js';
+import { safeExternalHref } from '../lib/url.js';
 
 const TYPE_KICKER = {
     info: 'Notice',
@@ -72,6 +73,9 @@ export default function AnnouncementModal() {
     if (!announcement) return null;
 
     const kicker = TYPE_KICKER[announcement.type] || 'Notice';
+    // Gate the admin-editable CTA link to http(s) only — blocks javascript:/data:
+    // URI stored-XSS. An unsafe/empty link falls back to the plain Close button.
+    const safeLink = safeExternalHref(announcement.buttonLink);
 
     return (
         <AnimatePresence>
@@ -119,10 +123,12 @@ export default function AnnouncementModal() {
                             )}
 
                             <div className="announce__actions">
-                                {(announcement.buttonText && announcement.buttonLink) ? (
+                                {(announcement.buttonText && safeLink) ? (
                                     <>
                                         <a
-                                            href={announcement.buttonLink}
+                                            href={safeLink}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
                                             onClick={handleClose}
                                             className="btn btn--primary btn--on-dark"
                                         >
