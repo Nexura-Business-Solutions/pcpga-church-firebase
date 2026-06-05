@@ -2565,6 +2565,10 @@ body.lp-v3 .modal__officer-photo {
   font-family: var(--font-serif);
   font-style: italic;
   font-size: 1.4rem;
+  overflow: hidden;
+}
+body.lp-v3 .modal__officer-photo img {
+  width: 100%; height: 100%; border-radius: 50%; object-fit: cover; display: block;
 }
 body.lp-v3 .modal__officer-name {
   font-family: var(--font-serif);
