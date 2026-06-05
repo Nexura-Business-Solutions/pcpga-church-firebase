@@ -29,9 +29,14 @@ service cloud.firestore {
 
     match /audit/{id}     { allow read: if isStaff(); allow create: if isStaff(); allow update, delete: if false; }
 
-    // TEMP diagnostic — captures the login error code + hostname (no PII) so a
-    // Google sign-in failure can be debugged. Public write, staff read.
+    // TEMP diagnostic — captures the login error code + host/path (no PII, no
+    // query/fragment) so a Google sign-in failure can be debugged. Append-only:
+    // anyone may create, nobody may overwrite/delete, only staff may read.
     // REMOVE after debugging.
-    match /loginDiagnostics/{id} { allow read: if isStaff(); allow write: if true; }
+    match /loginDiagnostics/{id} {
+      allow read: if isStaff();
+      allow create: if true;
+      allow update, delete: if false;
+    }
   }
 }
