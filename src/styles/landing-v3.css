@@ -2134,6 +2134,59 @@ body.lp-v3 .evcar__lightbox-close {
   body.lp-v3 .evcar__img { max-width: 96%; }
 }
 
+/* A Word of Welcome — officers carousel (sits on the light editorial background) */
+body.lp-v3 .welcar { position: relative; }
+body.lp-v3 .welcar__slide {
+  display: flex;
+  gap: clamp(1.25rem, 3vw, 2.25rem);
+  align-items: flex-start;
+}
+body.lp-v3 .welcar__portrait {
+  flex: 0 0 auto;
+  width: clamp(112px, 14vw, 168px);
+  aspect-ratio: 4 / 5;
+  border-radius: 4px;
+  overflow: hidden;
+  background: var(--paper-2);
+  border: 1px solid var(--line);
+  box-shadow: 0 14px 34px rgba(44, 24, 16, 0.12);
+  display: grid;
+  place-items: center;
+}
+body.lp-v3 .welcar__portrait img { width: 100%; height: 100%; object-fit: cover; display: block; }
+body.lp-v3 .welcar__monogram {
+  font-family: var(--font-serif);
+  font-size: clamp(2.2rem, 4vw, 3.2rem);
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  color: var(--brass);
+}
+body.lp-v3 .welcar__text { flex: 1 1 0; min-width: 0; }
+body.lp-v3 .welcar__greeting { font-size: clamp(1.5rem, 2.3vw, 2.1rem); margin-bottom: 1.25rem; }
+body.lp-v3 .welcar__controls {
+  display: flex; align-items: center; justify-content: flex-start;
+  gap: 1.1rem; margin-top: 2rem;
+}
+body.lp-v3 .welcar__nav {
+  width: 40px; height: 40px; border-radius: 50%;
+  border: 1px solid var(--brass); background: transparent;
+  color: var(--brass); font-size: 1.4rem; line-height: 1; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+body.lp-v3 .welcar__nav:hover { background: var(--brass); color: var(--paper); }
+body.lp-v3 .welcar__dots { display: flex; gap: 0.5rem; align-items: center; }
+body.lp-v3 .welcar__dot {
+  width: 9px; height: 9px; border-radius: 50%; padding: 0; cursor: pointer;
+  border: 1px solid var(--brass); background: transparent;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+body.lp-v3 .welcar__dot.is-active { background: var(--brass); transform: scale(1.25); }
+@media (max-width: 760px) {
+  body.lp-v3 .welcar__slide { flex-direction: column; align-items: flex-start; }
+  body.lp-v3 .welcar__portrait { width: clamp(108px, 32vw, 150px); }
+}
+
 body.lp-v3 .event-card {
   background: var(--cream-card);
   border: 1px solid var(--line);
