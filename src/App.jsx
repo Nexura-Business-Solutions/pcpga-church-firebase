@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useLocation } from 'react-router-dom';
 import AdminRoute from './components/AdminRoute.jsx';
 import ChatbotWidget from './components/ChatbotWidget.jsx';
 import HomePage from './pages/HomePage.jsx';
@@ -42,6 +42,10 @@ function adminRoute(Component, { ownerOnly = false } = {}) {
 }
 
 export default function App() {
+  // Keep the third-party chat script OFF privileged routes (admin/login) — those
+  // pages render donor / admin PII. Load the widget on public pages only.
+  const { pathname } = useLocation();
+  const showChat = !pathname.startsWith('/admin') && pathname !== '/login';
   return (
     <>
     <Routes>
@@ -67,8 +71,8 @@ export default function App() {
 
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
-    {/* Site-wide Botpress support chat (floating bubble) */}
-    <ChatbotWidget />
+    {/* Botpress support chat — public pages only, never on admin/login */}
+    {showChat && <ChatbotWidget />}
     </>
   );
 }
