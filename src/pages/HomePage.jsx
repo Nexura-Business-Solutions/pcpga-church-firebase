@@ -4,6 +4,7 @@ import { Helmet } from 'react-helmet-async';
 import PhilippinesMap from '../components/PhilippinesMap.jsx';
 import AnnouncementModal from '../components/AnnouncementModal.jsx';
 import EventsCarousel from '../components/EventsCarousel.jsx';
+import VideoCarousel from '../components/VideoCarousel.jsx';
 import WelcomeCarousel from '../components/WelcomeCarousel.jsx';
 import MobileScrollAids from '../components/MobileScrollAids.jsx';
 import { getSettings, getSermons } from '../lib/store.js';
@@ -222,8 +223,8 @@ export default function HomePage() {
   useEffect(() => {
     let active = true;
     (async () => {
-      const keys = ['hero', 'site-identity', 'mission-vision', 'core-principles', 'invitation-stats', 'announcement', 'standing-committees', 'presbyteries', 'upcoming-events', 'welcome-officers'];
-      const [hero, identity, mv, msg, stats, ann, committees, pres, events, welcomeOfficers, sermons] = await Promise.all([
+      const keys = ['hero', 'site-identity', 'mission-vision', 'core-principles', 'invitation-stats', 'announcement', 'standing-committees', 'presbyteries', 'upcoming-events', 'welcome-officers', 'video-greetings'];
+      const [hero, identity, mv, msg, stats, ann, committees, pres, events, welcomeOfficers, videoGreetings, sermons] = await Promise.all([
         ...keys.map((k) => getSettings(k)), getSermons(),
       ]);
       if (active) setCms({
@@ -232,6 +233,7 @@ export default function HomePage() {
         presbyteries: Array.isArray(pres) ? pres : [],
         events: Array.isArray(events) ? events : [],
         welcomeOfficers: Array.isArray(welcomeOfficers) ? welcomeOfficers : [],
+        videoGreetings: Array.isArray(videoGreetings) ? videoGreetings : [],
         sermons: Array.isArray(sermons) ? sermons : [],
       });
     })();
@@ -244,6 +246,10 @@ export default function HomePage() {
   // empty-state copy when nothing has a poster yet.
   const upcomingEvents = (Array.isArray(cms.events) ? cms.events : [])
     .filter((ev) => ev && typeof ev.imageUrl === 'string' && ev.imageUrl.trim() !== '');
+  // Video greetings — rotating greeting videos (uploaded MP4 or YouTube link),
+  // shown right after the hero. Drop rows without a source.
+  const videoGreetings = (Array.isArray(cms.videoGreetings) ? cms.videoGreetings : [])
+    .filter((v) => v && typeof v.videoUrl === 'string' && v.videoUrl.trim() !== '');
   // Normalize committees (editor stores `details`; landing modal reads `duties`).
   const committees = (cms.committees?.length ? cms.committees : COMMITTEES).map((c) => ({
     name: c.name,
@@ -616,6 +622,19 @@ export default function HomePage() {
           <span className="hero__scroll-line" />
         </div>
       </section>
+
+      {/* VIDEO GREETINGS — rotating greeting videos, right after the hero */}
+      {videoGreetings.length > 0 && (
+        <section className="vidgreet" id="video-greetings" aria-label="Video greetings">
+          <div className="vidgreet__inner">
+            <div className="vidgreet__head">
+              <h3 className="vidgreet__title">A <em>video</em> greeting.</h3>
+              <span className="vidgreet__kicker">Watch &amp; be welcomed</span>
+            </div>
+            <VideoCarousel videos={videoGreetings} />
+          </div>
+        </section>
+      )}
 
       {/* STATS */}
       <section className="stats" aria-label="At a glance">

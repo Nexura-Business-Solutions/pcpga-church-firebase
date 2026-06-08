@@ -149,7 +149,7 @@ export async function saveDonationContent(content) {
 export async function getSettings(key) {
   try {
     const data = await getSetting(key);
-    const arrayKeys = ['standing-committees', 'presbyteries', 'seminaries', 'upcoming-events', 'welcome-officers'];
+    const arrayKeys = ['standing-committees', 'presbyteries', 'seminaries', 'upcoming-events', 'welcome-officers', 'video-greetings'];
     if (arrayKeys.includes(key)) {
       if (!data || (typeof data === 'object' && !Array.isArray(data) && Object.keys(data).length === 0)) {
         return [];

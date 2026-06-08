@@ -52,7 +52,8 @@ const TABS = [
     { id: 'presbyteries', label: 'Regional', icon: Globe },
     { id: 'donations', label: 'Giving', icon: CircleDollarSign },
     { id: 'announcement', label: 'Announcement', icon: Bell },
-    { id: 'events', label: 'Upcoming Events', icon: CalendarDays }
+    { id: 'events', label: 'Upcoming Events', icon: CalendarDays },
+    { id: 'videos', label: 'Video Greetings', icon: Film }
 ];
 
 export default function AdminContent() {
@@ -78,6 +79,7 @@ export default function AdminContent() {
     const [donations, setDonations] = useState({});
     const [announcement, setAnnouncement] = useState({});
     const [events, setEvents] = useState([]);
+    const [videoGreetings, setVideoGreetings] = useState([]);
     const [showPopupPreview, setShowPopupPreview] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
 
@@ -117,6 +119,8 @@ export default function AdminContent() {
             setAnnouncement(an && Object.keys(an).length > 0 ? { type: 'info', ...an } : { isActive: false, type: 'info', title: 'Upcoming Service', message: 'Join us this Sunday!', buttonText: '', buttonLink: '', updatedAt: Date.now() });
             const ue = await getSettings('upcoming-events');
             setEvents(Array.isArray(ue) ? ue : []);
+            const vg = await getSettings('video-greetings');
+            setVideoGreetings(Array.isArray(vg) ? vg : []);
             setLoading(false);
         }
         load();
@@ -135,7 +139,8 @@ export default function AdminContent() {
                 saveSettings('hero', hero),
                 saveSettings('donations', donations),
                 saveSettings('announcement', { ...announcement, updatedAt: Date.now() }),
-                saveSettings('upcoming-events', events)
+                saveSettings('upcoming-events', events),
+                saveSettings('video-greetings', videoGreetings)
             ]);
             if (results.every(r => r)) {
                 toast.success('Website updated ✦ Site revalidated.');
@@ -188,19 +193,28 @@ export default function AdminContent() {
         if (!file) return;
 
         const isEvent = target.startsWith('event-');
+        const isVgVideo = target.startsWith('vg-video-');
+        const isVgPoster = target.startsWith('vg-poster-');
 
-        // Validate announcement / event media: announcements accept image or video,
-        // event posters accept images only. Cap size to keep payloads lean.
-        if (target === 'announcement' || isEvent) {
-            const isImage = file.type.startsWith('image/');
-            const isVideo = !isEvent && file.type.startsWith('video/');
-            if (!isImage && !isVideo) {
-                toast.error(isEvent ? 'Event posters must be an image file.' : 'Only image or video files are allowed.');
+        // Validate by kind. Images (announcement, event poster, video-greeting
+        // poster) are capped small; greeting videos accept video files up to
+        // 50 MB — for longer clips the admin pastes a YouTube/Facebook link.
+        if (target === 'announcement' || isEvent || isVgPoster) {
+            if (!file.type.startsWith('image/')) {
+                toast.error('Please choose an image file (JPG, PNG, WEBP, GIF).');
                 return;
             }
-            const maxBytes = isVideo ? 25 * 1024 * 1024 : (isEvent ? 10 : 8) * 1024 * 1024;
-            if (file.size > maxBytes) {
-                toast.error(isVideo ? 'Video must be 25 MB or smaller.' : `Image must be ${isEvent ? 10 : 8} MB or smaller.`);
+            if (file.size > 10 * 1024 * 1024) {
+                toast.error('Image must be 10 MB or smaller.');
+                return;
+            }
+        } else if (isVgVideo) {
+            if (!file.type.startsWith('video/')) {
+                toast.error('Please choose a video file (MP4, MOV, WEBM).');
+                return;
+            }
+            if (file.size > 50 * 1024 * 1024) {
+                toast.error('Video must be 50 MB or smaller. For a longer video, paste a YouTube/Facebook link instead.');
                 return;
             }
         }
@@ -233,18 +247,23 @@ export default function AdminContent() {
                 return;
             }
 
-            // Other uploads (hero, QR codes, announcement media, event posters): upload to Firebase Storage
+            // Other uploads (hero, QR, announcement, event poster, video greetings): Firebase Storage
             const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
-            const folder = isEvent ? 'events' : target;
+            const folder = isEvent ? 'events' : ((isVgVideo || isVgPoster) ? 'videos' : target);
             const path = `content/${folder}/${Date.now()}-${safeName}`;
             const url = await uploadFile(path, file);
             if (target === 'hero') setHero({ ...hero, heroImage: url });
             else if (target === 'announcement') {
-                const mediaType = file.type.startsWith('video/') ? 'video' : 'image';
-                setAnnouncement({ ...announcement, mediaUrl: url, mediaType });
+                setAnnouncement({ ...announcement, mediaUrl: url, mediaType: 'image' });
             } else if (isEvent) {
                 const idx = parseInt(target.split('-')[1], 10);
                 setEvents((prev) => prev.map((ev, i) => (i === idx ? { ...ev, imageUrl: url } : ev)));
+            } else if (isVgVideo) {
+                const idx = parseInt(target.split('-')[2], 10);
+                setVideoGreetings((prev) => prev.map((g, i) => (i === idx ? { ...g, videoUrl: url } : g)));
+            } else if (isVgPoster) {
+                const idx = parseInt(target.split('-')[2], 10);
+                setVideoGreetings((prev) => prev.map((g, i) => (i === idx ? { ...g, posterUrl: url } : g)));
             }
 
             toast.success('Media uploaded successfully ✦');
@@ -309,6 +328,33 @@ export default function AdminContent() {
         if (ok) toast.success('Re-published — all visitors will see the popup again ✦');
         else toast.error('Could not re-publish the popup.');
     };
+
+    // Video Greetings helpers — a capped, reorderable list shown after the hero.
+    const MAX_VIDEO_GREETINGS = 6;
+    const addVideoGreeting = () => {
+        if (videoGreetings.length >= MAX_VIDEO_GREETINGS) {
+            return toast.error(`You can add up to ${MAX_VIDEO_GREETINGS} videos.`);
+        }
+        const id = `vg-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+        setVideoGreetings([...videoGreetings, { id, videoUrl: '', posterUrl: '', title: '', caption: '' }]);
+    };
+    const updateVideoGreeting = (i, patch) => {
+        setVideoGreetings((prev) => prev.map((g, idx) => (idx === i ? { ...g, ...patch } : g)));
+    };
+    const removeVideoGreeting = (i) => {
+        setVideoGreetings((prev) => prev.filter((_, idx) => idx !== i));
+    };
+    const moveVideoGreeting = (i, dir) => {
+        const j = i + dir;
+        if (j < 0 || j >= videoGreetings.length) return;
+        setVideoGreetings((prev) => {
+            const next = [...prev];
+            [next[i], next[j]] = [next[j], next[i]];
+            return next;
+        });
+    };
+    // Detect a direct (uploaded) video file vs a YouTube/link, for the editor preview.
+    const isVideoFileUrl = (url) => /\.(mp4|webm|mov|m4v)(\?|$)/i.test(String(url || ''));
 
     if (loading) return (
         <AdminLayout>
@@ -1592,6 +1638,124 @@ export default function AdminContent() {
                                                 >
                                                     <Plus className="w-4 h-4" /> Add Event
                                                 </button>
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+
+                                {/* VIDEO GREETINGS TAB */}
+                                {activeTab === 'videos' && (
+                                    <div className="space-y-8">
+                                        {/* Header */}
+                                        <div className="flex items-start gap-4 p-6 bg-[hsl(var(--admin-bg-alt))] rounded-2xl border border-[hsl(var(--admin-border))]">
+                                            <div className="w-12 h-12 rounded-2xl bg-coral/10 flex items-center justify-center flex-shrink-0">
+                                                <Film className="w-5 h-5 text-coral" />
+                                            </div>
+                                            <div>
+                                                <h3 className="text-[hsl(var(--admin-text))] font-bold text-base mb-1">Video Greetings Carousel</h3>
+                                                <p className="text-[hsl(var(--admin-text-dim))] text-xs leading-relaxed max-w-md">
+                                                    Rotating greeting videos shown <strong>right after the hero</strong> on the homepage. <strong>Upload a short video</strong> (drag it in, or from your phone — ≤50&nbsp;MB) <strong>or paste a YouTube/Facebook link</strong>. Up to {MAX_VIDEO_GREETINGS} videos.
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        {videoGreetings.length === 0 ? (
+                                            <AdminEmptyState
+                                                title="No Video Greetings"
+                                                description="Add a greeting video to feature it right after the hero."
+                                                icon={<Film className="w-12 h-12 text-coral/20" />}
+                                                actionText="Add Video"
+                                                onAction={addVideoGreeting}
+                                            />
+                                        ) : (
+                                            <div className="space-y-6">
+                                                {videoGreetings.map((g, i) => (
+                                                    <div key={g.id || i} className="p-5 sm:p-6 bg-[hsl(var(--admin-bg-alt))] rounded-3xl border border-[hsl(var(--admin-border))] space-y-5 relative">
+                                                        <div className="flex items-center justify-between">
+                                                            <span className="text-[10px] font-bold uppercase tracking-widest text-coral">Video {i + 1}</span>
+                                                            <div className="flex items-center gap-2">
+                                                                <button onClick={() => moveVideoGreeting(i, -1)} disabled={i === 0} className="p-2 rounded-xl text-[hsl(var(--admin-text-dim))] hover:bg-coral/5 hover:text-coral disabled:opacity-20 disabled:cursor-not-allowed transition-colors" aria-label="Move video up"><ChevronUp className="w-4 h-4" /></button>
+                                                                <button onClick={() => moveVideoGreeting(i, 1)} disabled={i === videoGreetings.length - 1} className="p-2 rounded-xl text-[hsl(var(--admin-text-dim))] hover:bg-coral/5 hover:text-coral disabled:opacity-20 disabled:cursor-not-allowed transition-colors" aria-label="Move video down"><ChevronDown className="w-4 h-4" /></button>
+                                                                <button onClick={() => removeVideoGreeting(i)} className="p-2 rounded-xl text-red-500 hover:bg-red-50 transition-colors" aria-label="Delete video"><Trash2 className="w-4 h-4" /></button>
+                                                            </div>
+                                                        </div>
+
+                                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                                            {/* Video + poster (left column) */}
+                                                            <div className="space-y-3">
+                                                            <div className="relative aspect-video rounded-2xl overflow-hidden border-2 border-dashed border-coral/20 bg-[hsl(var(--admin-bg))] group/vid" onDragOver={allowDrop} onDrop={(e) => handleDrop(e, `vg-video-${i}`)}>
+                                                                {isVideoFileUrl(g.videoUrl) ? (
+                                                                    <video src={g.videoUrl} className="w-full h-full object-contain bg-black" controls preload="metadata" />
+                                                                ) : (
+                                                                    <div className="w-full h-full flex flex-col items-center justify-center text-coral/40 gap-2 p-4 text-center">
+                                                                        <Film className="w-7 h-7" />
+                                                                        <span className="text-[9px] font-bold uppercase tracking-widest leading-relaxed">Drag a video here<br />or upload · ≤50 MB</span>
+                                                                    </div>
+                                                                )}
+                                                                <label className="absolute top-2 right-2 px-3 py-1.5 bg-black/60 text-white text-[9px] font-bold uppercase tracking-widest rounded-lg cursor-pointer hover:bg-black/80 transition-colors">
+                                                                    {isVideoFileUrl(g.videoUrl) ? 'Replace' : 'Upload'}
+                                                                    <input type="file" accept=".mp4,.mov,.m4v,.webm" className="hidden" onChange={(e) => handleImageUpload(e.target.files[0], `vg-video-${i}`)} />
+                                                                </label>
+                                                            </div>
+                                                            {/* Poster — optional; used for uploaded MP4s (YouTube auto-thumbnails) */}
+                                                            <div className="relative h-20 rounded-2xl overflow-hidden border-2 border-dashed border-coral/20 bg-[hsl(var(--admin-bg))] flex items-center" onDragOver={allowDrop} onDrop={(e) => handleDrop(e, `vg-poster-${i}`)}>
+                                                                {g.posterUrl ? (
+                                                                    <img src={g.posterUrl} alt="" className="h-full w-auto object-cover" />
+                                                                ) : (
+                                                                    <div className="flex items-center gap-2 px-4 text-coral/40">
+                                                                        <ImagePlus className="w-4 h-4" />
+                                                                        <span className="text-[9px] font-bold uppercase tracking-widest">Poster · optional (for uploaded video)</span>
+                                                                    </div>
+                                                                )}
+                                                                <label className="absolute top-1.5 right-1.5 px-2.5 py-1 bg-black/60 text-white text-[9px] font-bold uppercase tracking-widest rounded-lg cursor-pointer hover:bg-black/80 transition-colors">
+                                                                    {g.posterUrl ? 'Replace' : 'Upload'}
+                                                                    <input type="file" accept=".jpg,.jpeg,.png,.webp,.gif" className="hidden" onChange={(e) => handleImageUpload(e.target.files[0], `vg-poster-${i}`)} />
+                                                                </label>
+                                                            </div>
+                                                            </div>
+
+                                                            {/* Fields */}
+                                                            <div className="space-y-3">
+                                                                <div>
+                                                                    <label className="block text-coral text-[9px] tracking-[0.25em] uppercase mb-2 font-bold">Or YouTube / Facebook link</label>
+                                                                    <input
+                                                                        value={g.videoUrl || ''}
+                                                                        onChange={(e) => updateVideoGreeting(i, { videoUrl: e.target.value })}
+                                                                        placeholder="https://youtu.be/…"
+                                                                        className="w-full bg-[hsl(var(--admin-bg))] border border-[hsl(var(--admin-text))]/20 rounded-2xl p-3.5 text-sm font-medium focus:ring-2 focus:ring-coral/20 outline-none transition-all"
+                                                                    />
+                                                                </div>
+                                                                <div>
+                                                                    <label className="block text-coral text-[9px] tracking-[0.25em] uppercase mb-2 font-bold">Title</label>
+                                                                    <input
+                                                                        value={g.title || ''}
+                                                                        onChange={(e) => updateVideoGreeting(i, { title: e.target.value })}
+                                                                        placeholder="e.g. A welcome from the Moderator"
+                                                                        className="w-full bg-[hsl(var(--admin-bg))] border border-[hsl(var(--admin-text))]/20 rounded-2xl p-3.5 text-sm font-semibold focus:ring-2 focus:ring-coral/20 outline-none transition-all"
+                                                                    />
+                                                                </div>
+                                                                <div>
+                                                                    <label className="block text-coral text-[9px] tracking-[0.25em] uppercase mb-2 font-bold">Caption</label>
+                                                                    <input
+                                                                        value={g.caption || ''}
+                                                                        onChange={(e) => updateVideoGreeting(i, { caption: e.target.value })}
+                                                                        placeholder="Short line shown under the video"
+                                                                        className="w-full bg-[hsl(var(--admin-bg))] border border-[hsl(var(--admin-text))]/20 rounded-2xl p-3.5 text-sm font-medium focus:ring-2 focus:ring-coral/20 outline-none transition-all"
+                                                                    />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                ))}
+
+                                                {videoGreetings.length < MAX_VIDEO_GREETINGS && (
+                                                    <button
+                                                        onClick={addVideoGreeting}
+                                                        className="w-full py-6 rounded-2xl border-2 border-dashed border-[hsl(var(--admin-border))] text-[10px] font-bold uppercase tracking-widest text-coral hover:bg-coral/5 transition-all flex items-center justify-center gap-2"
+                                                    >
+                                                        <Plus className="w-4 h-4" /> Add Video ({videoGreetings.length}/{MAX_VIDEO_GREETINGS})
+                                                    </button>
+                                                )}
                                             </div>
                                         )}
                                     </div>
