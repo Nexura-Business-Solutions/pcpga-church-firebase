@@ -15,7 +15,10 @@ export default function EventsCarousel({ events = [] }) {
     const [lightbox, setLightbox] = useState(false);
     const timer = useRef(null);
 
-    const count = events.length;
+    // Only posters with an image render — a row saved without an uploaded poster
+    // (imageUrl '') would otherwise paint a broken <img src=""> slide here.
+    const slides = events.filter((e) => e && e.imageUrl);
+    const count = slides.length;
     const reduce = prefersReducedMotion();
 
     const go = useCallback((next) => {
@@ -41,7 +44,7 @@ export default function EventsCarousel({ events = [] }) {
     }, [go, index]);
 
     if (count === 0) return null;
-    const ev = events[index];
+    const ev = slides[index % count];
 
     return (
         <div
@@ -97,7 +100,7 @@ export default function EventsCarousel({ events = [] }) {
 
             {count > 1 && (
                 <div className="evcar__dots" role="tablist" aria-label="Choose event">
-                    {events.map((e, i) => (
+                    {slides.map((e, i) => (
                         <button
                             key={e.id || i}
                             type="button"

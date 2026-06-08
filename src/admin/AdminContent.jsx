@@ -11,6 +11,7 @@ import AdminEmptyState from '../components/admin/AdminEmptyState.jsx';
 import AdminLayout from '../components/admin/AdminLayout.jsx';
 import ContentPreview from '../components/admin/ContentPreview.jsx';
 import IconPicker from '../components/admin/IconPicker.jsx';
+import AnnouncementModal from '../components/AnnouncementModal.jsx';
 import {
     Home,
     Palette,
@@ -28,6 +29,11 @@ import {
     Activity,
     Clock,
     Bell,
+    CalendarDays,
+    ChevronUp,
+    ChevronDown,
+    RefreshCw,
+    Plus,
     ImagePlus,
     Film,
     Trash2,
@@ -45,7 +51,8 @@ const TABS = [
     { id: 'committees', label: 'Governance', icon: Landmark },
     { id: 'presbyteries', label: 'Regional', icon: Globe },
     { id: 'donations', label: 'Giving', icon: CircleDollarSign },
-    { id: 'announcement', label: 'Announcement', icon: Bell }
+    { id: 'announcement', label: 'Announcement', icon: Bell },
+    { id: 'events', label: 'Upcoming Events', icon: CalendarDays }
 ];
 
 export default function AdminContent() {
@@ -70,6 +77,8 @@ export default function AdminContent() {
     const [hero, setHero] = useState({});
     const [donations, setDonations] = useState({});
     const [announcement, setAnnouncement] = useState({});
+    const [events, setEvents] = useState([]);
+    const [showPopupPreview, setShowPopupPreview] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
 
     useEffect(() => {
@@ -106,6 +115,8 @@ export default function AdminContent() {
             setHero(hr || {});
             setDonations(dn || {});
             setAnnouncement(an && Object.keys(an).length > 0 ? { type: 'info', ...an } : { isActive: false, type: 'info', title: 'Upcoming Service', message: 'Join us this Sunday!', buttonText: '', buttonLink: '', updatedAt: Date.now() });
+            const ue = await getSettings('upcoming-events');
+            setEvents(Array.isArray(ue) ? ue : []);
             setLoading(false);
         }
         load();
@@ -123,7 +134,8 @@ export default function AdminContent() {
                 saveSettings('presbyteries', presbyteries),
                 saveSettings('hero', hero),
                 saveSettings('donations', donations),
-                saveSettings('announcement', { ...announcement, updatedAt: Date.now() })
+                saveSettings('announcement', { ...announcement, updatedAt: Date.now() }),
+                saveSettings('upcoming-events', events)
             ]);
             if (results.every(r => r)) {
                 toast.success('Website updated ✦ Site revalidated.');
@@ -175,17 +187,20 @@ export default function AdminContent() {
     const handleImageUpload = async (file, target = 'hero') => {
         if (!file) return;
 
-        // Validate announcement media: accept images and videos, cap size to keep modal lean
-        if (target === 'announcement') {
+        const isEvent = target.startsWith('event-');
+
+        // Validate announcement / event media: announcements accept image or video,
+        // event posters accept images only. Cap size to keep payloads lean.
+        if (target === 'announcement' || isEvent) {
             const isImage = file.type.startsWith('image/');
-            const isVideo = file.type.startsWith('video/');
+            const isVideo = !isEvent && file.type.startsWith('video/');
             if (!isImage && !isVideo) {
-                toast.error('Only image or video files are allowed.');
+                toast.error(isEvent ? 'Event posters must be an image file.' : 'Only image or video files are allowed.');
                 return;
             }
-            const maxBytes = isVideo ? 25 * 1024 * 1024 : 8 * 1024 * 1024;
+            const maxBytes = isVideo ? 25 * 1024 * 1024 : (isEvent ? 10 : 8) * 1024 * 1024;
             if (file.size > maxBytes) {
-                toast.error(isVideo ? 'Video must be 25 MB or smaller.' : 'Image must be 8 MB or smaller.');
+                toast.error(isVideo ? 'Video must be 25 MB or smaller.' : `Image must be ${isEvent ? 10 : 8} MB or smaller.`);
                 return;
             }
         }
@@ -218,14 +233,18 @@ export default function AdminContent() {
                 return;
             }
 
-            // Other uploads (hero, QR codes, announcement media): upload to Firebase Storage
+            // Other uploads (hero, QR codes, announcement media, event posters): upload to Firebase Storage
             const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
-            const path = `content/${target}/${Date.now()}-${safeName}`;
+            const folder = isEvent ? 'events' : target;
+            const path = `content/${folder}/${Date.now()}-${safeName}`;
             const url = await uploadFile(path, file);
             if (target === 'hero') setHero({ ...hero, heroImage: url });
             else if (target === 'announcement') {
                 const mediaType = file.type.startsWith('video/') ? 'video' : 'image';
                 setAnnouncement({ ...announcement, mediaUrl: url, mediaType });
+            } else if (isEvent) {
+                const idx = parseInt(target.split('-')[1], 10);
+                setEvents((prev) => prev.map((ev, i) => (i === idx ? { ...ev, imageUrl: url } : ev)));
             }
 
             toast.success('Media uploaded successfully ✦');
@@ -246,6 +265,37 @@ export default function AdminContent() {
         const newList = [...list];
         newList.splice(index, 1);
         setFn(newList);
+    };
+
+    // Upcoming Events helpers — a free-length, reorderable list (no minimum).
+    const addEvent = () => {
+        const id = `ev-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+        setEvents([...events, { id, imageUrl: '', title: '', date: '', venue: '' }]);
+    };
+    const updateEvent = (i, patch) => {
+        setEvents((prev) => prev.map((ev, idx) => (idx === i ? { ...ev, ...patch } : ev)));
+    };
+    const removeEvent = (i) => {
+        setEvents((prev) => prev.filter((_, idx) => idx !== i));
+    };
+    const moveEvent = (i, dir) => {
+        const j = i + dir;
+        if (j < 0 || j >= events.length) return;
+        setEvents((prev) => {
+            const next = [...prev];
+            [next[i], next[j]] = [next[j], next[i]];
+            return next;
+        });
+    };
+
+    // Re-publish the popup so every visitor (even those who already closed it)
+    // sees it again — bumping updatedAt changes the per-visitor "seen" id.
+    const handleShowAgainToAll = async () => {
+        const bumped = { ...announcement, updatedAt: Date.now() };
+        setAnnouncement(bumped);
+        const ok = await saveSettings('announcement', bumped);
+        if (ok) toast.success('Re-published — all visitors will see the popup again ✦');
+        else toast.error('Could not re-publish the popup.');
     };
 
     if (loading) return (
@@ -1183,6 +1233,22 @@ export default function AdminContent() {
                                             </label>
                                         </div>
 
+                                        {/* Admin actions: preview the real popup anytime + re-show to everyone */}
+                                        <div className="flex flex-wrap gap-3">
+                                            <button
+                                                onClick={() => setShowPopupPreview(true)}
+                                                className="flex items-center gap-2 px-6 py-3 bg-accent/10 text-accent rounded-2xl text-[10px] font-bold uppercase tracking-widest hover:bg-accent/15 transition-all"
+                                            >
+                                                <Eye className="w-4 h-4" /> Preview Popup
+                                            </button>
+                                            <button
+                                                onClick={handleShowAgainToAll}
+                                                className="flex items-center gap-2 px-6 py-3 bg-[hsl(var(--admin-bg-alt))] border border-[hsl(var(--admin-border))] text-[hsl(var(--admin-text))] rounded-2xl text-[10px] font-bold uppercase tracking-widest hover:bg-coral/5 hover:text-coral transition-all"
+                                            >
+                                                <RefreshCw className="w-4 h-4" /> Show Again to All
+                                            </button>
+                                        </div>
+
                                         {/* Type Selector */}
                                         <div>
                                             <label className="block text-accent text-[10px] tracking-[0.25em] uppercase mb-4 font-bold">Announcement Type</label>
@@ -1414,9 +1480,106 @@ export default function AdminContent() {
                                         {/* Reset notice */}
                                         <div className="p-5 bg-amber-50 border border-amber-200 rounded-2xl">
                                             <p className="text-amber-900 text-xs leading-relaxed">
-                                                <strong>Tip:</strong> Each visitor will see this popup only once. If you change the <strong>Title</strong> or <strong>Message</strong>, all visitors will see the updated popup again on their next visit (it&apos;s treated as a new announcement).
+                                                <strong>Tip:</strong> Each visitor sees this popup only once — that&apos;s why it may not pop up again for you after you close it. Use <strong>Preview Popup</strong> above to see exactly how it looks anytime, or <strong>Show Again to All</strong> to re-show it to everyone (also happens automatically when you change the title or message and Save).
                                             </p>
                                         </div>
+                                    </div>
+                                )}
+
+                                {/* UPCOMING EVENTS TAB */}
+                                {activeTab === 'events' && (
+                                    <div className="space-y-8">
+                                        {/* Header */}
+                                        <div className="flex items-start gap-4 p-6 bg-[hsl(var(--admin-bg-alt))] rounded-2xl border border-[hsl(var(--admin-border))]">
+                                            <div className="w-12 h-12 rounded-2xl bg-coral/10 flex items-center justify-center flex-shrink-0">
+                                                <CalendarDays className="w-5 h-5 text-coral" />
+                                            </div>
+                                            <div>
+                                                <h3 className="text-[hsl(var(--admin-text))] font-bold text-base mb-1">Upcoming Events Carousel</h3>
+                                                <p className="text-[hsl(var(--admin-text-dim))] text-xs leading-relaxed max-w-md">
+                                                    These rotating posters appear in the &ldquo;Upcoming &amp; in session&rdquo; section of the homepage. Add as many as you like, reorder them with the arrows, and remember to click <strong>Update</strong> below to publish.
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        {events.length === 0 ? (
+                                            <AdminEmptyState
+                                                title="No Upcoming Events"
+                                                description="Add event posters to display them in the homepage carousel."
+                                                icon={<CalendarDays className="w-12 h-12 text-coral/20" />}
+                                                actionText="Add Event"
+                                                onAction={addEvent}
+                                            />
+                                        ) : (
+                                            <div className="space-y-6">
+                                                {events.map((ev, i) => (
+                                                    <div key={ev.id || i} className="p-5 sm:p-6 bg-[hsl(var(--admin-bg-alt))] rounded-3xl border border-[hsl(var(--admin-border))] flex flex-col sm:flex-row gap-6 relative">
+                                                        {/* Poster */}
+                                                        <div className="relative w-full sm:w-40 aspect-[3/4] rounded-2xl overflow-hidden border-2 border-dashed border-coral/20 shrink-0 bg-[hsl(var(--admin-bg))] group/poster">
+                                                            {ev.imageUrl ? (
+                                                                <img src={ev.imageUrl} alt={ev.title || `Event ${i + 1}`} className="w-full h-full object-cover" />
+                                                            ) : (
+                                                                <div className="w-full h-full flex flex-col items-center justify-center text-coral/30 gap-2">
+                                                                    <ImagePlus className="w-6 h-6" />
+                                                                    <span className="text-[9px] font-bold uppercase tracking-widest">Poster</span>
+                                                                </div>
+                                                            )}
+                                                            <label className="absolute inset-0 bg-black/45 flex items-center justify-center opacity-0 group-hover/poster:opacity-100 transition-opacity cursor-pointer">
+                                                                <span className="text-white text-[10px] font-bold uppercase tracking-widest">{ev.imageUrl ? 'Replace' : 'Upload'}</span>
+                                                                <input type="file" accept="image/*" className="hidden" onChange={(e) => handleImageUpload(e.target.files[0], `event-${i}`)} />
+                                                            </label>
+                                                        </div>
+
+                                                        {/* Fields */}
+                                                        <div className="flex-1 space-y-4">
+                                                            <div>
+                                                                <label className="block text-coral text-[9px] tracking-[0.25em] uppercase mb-2 font-bold">Event Title</label>
+                                                                <input
+                                                                    value={ev.title || ''}
+                                                                    onChange={(e) => updateEvent(i, { title: e.target.value })}
+                                                                    placeholder="e.g. 60th Stated Meeting of the Visayas Presbytery"
+                                                                    className="w-full bg-[hsl(var(--admin-bg))] border border-[hsl(var(--admin-text))]/20 rounded-2xl p-4 text-sm font-semibold focus:ring-2 focus:ring-coral/20 outline-none transition-all"
+                                                                />
+                                                            </div>
+                                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                                <div>
+                                                                    <label className="block text-coral text-[9px] tracking-[0.25em] uppercase mb-2 font-bold">Date</label>
+                                                                    <input
+                                                                        value={ev.date || ''}
+                                                                        onChange={(e) => updateEvent(i, { date: e.target.value })}
+                                                                        placeholder="e.g. June 9, 2026"
+                                                                        className="w-full bg-[hsl(var(--admin-bg))] border border-[hsl(var(--admin-text))]/20 rounded-2xl p-4 text-sm font-medium focus:ring-2 focus:ring-coral/20 outline-none transition-all"
+                                                                    />
+                                                                </div>
+                                                                <div>
+                                                                    <label className="block text-coral text-[9px] tracking-[0.25em] uppercase mb-2 font-bold">Venue</label>
+                                                                    <input
+                                                                        value={ev.venue || ''}
+                                                                        onChange={(e) => updateEvent(i, { venue: e.target.value })}
+                                                                        placeholder="e.g. Cogon Cruz Presbyterian Church, Danao City, Cebu"
+                                                                        className="w-full bg-[hsl(var(--admin-bg))] border border-[hsl(var(--admin-text))]/20 rounded-2xl p-4 text-sm font-medium focus:ring-2 focus:ring-coral/20 outline-none transition-all"
+                                                                    />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        {/* Controls */}
+                                                        <div className="flex sm:flex-col items-center justify-end sm:justify-start gap-2 shrink-0">
+                                                            <button onClick={() => moveEvent(i, -1)} disabled={i === 0} className="p-2 rounded-xl text-[hsl(var(--admin-text-dim))] hover:bg-coral/5 hover:text-coral disabled:opacity-20 disabled:cursor-not-allowed transition-colors" aria-label="Move event up"><ChevronUp className="w-4 h-4" /></button>
+                                                            <button onClick={() => moveEvent(i, 1)} disabled={i === events.length - 1} className="p-2 rounded-xl text-[hsl(var(--admin-text-dim))] hover:bg-coral/5 hover:text-coral disabled:opacity-20 disabled:cursor-not-allowed transition-colors" aria-label="Move event down"><ChevronDown className="w-4 h-4" /></button>
+                                                            <button onClick={() => removeEvent(i)} className="p-2 rounded-xl text-red-500 hover:bg-red-50 transition-colors" aria-label="Delete event"><Trash2 className="w-4 h-4" /></button>
+                                                        </div>
+                                                    </div>
+                                                ))}
+
+                                                <button
+                                                    onClick={addEvent}
+                                                    className="w-full py-6 rounded-2xl border-2 border-dashed border-[hsl(var(--admin-border))] text-[10px] font-bold uppercase tracking-widest text-coral hover:bg-coral/5 transition-all flex items-center justify-center gap-2"
+                                                >
+                                                    <Plus className="w-4 h-4" /> Add Event
+                                                </button>
+                                            </div>
+                                        )}
                                     </div>
                                 )}
                             </motion.div>
@@ -1483,6 +1646,14 @@ export default function AdminContent() {
                     isActive={isTourActive}
                     steps={tourSteps}
                     onComplete={() => setIsTourActive(false)}
+                />
+
+                {/* Faithful preview of the live announcement popup — bypasses the
+                    once-per-visitor "seen" lock so admins can review it anytime. */}
+                <AnnouncementModal
+                    previewData={announcement}
+                    open={showPopupPreview}
+                    onRequestClose={() => setShowPopupPreview(false)}
                 />
             </div>
         </AdminLayout>

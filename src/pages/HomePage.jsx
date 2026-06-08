@@ -238,8 +238,12 @@ export default function HomePage() {
     return () => { active = false; };
   }, []);
   const hero = cms.hero || {};
-  // Upcoming events — rotating posters from settings/upcoming-events (seeded via admin).
-  const upcomingEvents = Array.isArray(cms.events) ? cms.events : [];
+  // Upcoming events — rotating posters from settings/upcoming-events (managed in admin).
+  // Drop posterless rows so an event saved before its image was uploaded never
+  // paints a broken slide; the section's length>0 gate then falls back to the
+  // empty-state copy when nothing has a poster yet.
+  const upcomingEvents = (Array.isArray(cms.events) ? cms.events : [])
+    .filter((ev) => ev && typeof ev.imageUrl === 'string' && ev.imageUrl.trim() !== '');
   // Normalize committees (editor stores `details`; landing modal reads `duties`).
   const committees = (cms.committees?.length ? cms.committees : COMMITTEES).map((c) => ({
     name: c.name,
