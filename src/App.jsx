@@ -1,6 +1,7 @@
 import { lazy, Suspense } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import AdminRoute from './components/AdminRoute.jsx';
+import ChatbotWidget from './components/ChatbotWidget.jsx';
 import HomePage from './pages/HomePage.jsx';
 import LibraryPage from './pages/LibraryPage.jsx';
 import ChurchesPage from './pages/ChurchesPage.jsx';
@@ -42,6 +43,7 @@ function adminRoute(Component, { ownerOnly = false } = {}) {
 
 export default function App() {
   return (
+    <>
     <Routes>
       <Route path="/" element={<HomePage />} />
       <Route path="/library" element={<LibraryPage />} />
@@ -65,5 +67,8 @@ export default function App() {
 
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
+    {/* Site-wide Botpress support chat (floating bubble) */}
+    <ChatbotWidget />
+    </>
   );
 }
