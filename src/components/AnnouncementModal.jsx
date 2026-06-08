@@ -24,36 +24,46 @@ function readSeenList() {
     }
 }
 
-export default function AnnouncementModal() {
-    const [announcement, setAnnouncement] = useState(null);
-    const [isOpen, setIsOpen] = useState(false);
+export default function AnnouncementModal({ previewData = null, open = false, onRequestClose } = {}) {
+    // Admin "Preview Popup" mode: render the supplied draft directly, skip the
+    // Firestore fetch + once-per-visitor "seen" suppression, and let the parent
+    // control open/close. Homepage mode (no props) keeps the original behavior.
+    const isPreview = previewData != null;
+
+    const [loaded, setLoaded] = useState(null);        // homepage-fetched announcement
+    const [openState, setOpenState] = useState(false);  // homepage open state
 
     useEffect(() => {
+        if (isPreview) return undefined;
+        let cancelled = false;
         (async () => {
             const data = await getSettings('announcement');
-            if (data && data.isActive) {
-                const seenList = readSeenList();
-                const id = [data.title, data.message, data.mediaUrl, data.updatedAt].filter(Boolean).join('|');
-                if (!seenList.includes(id)) {
-                    setAnnouncement({ ...data, id });
-                    setTimeout(() => setIsOpen(true), 1200);
-                }
-            }
+            if (cancelled || !data || !data.isActive) return;
+            const seenList = readSeenList();
+            const id = [data.title, data.message, data.mediaUrl, data.updatedAt].filter(Boolean).join('|');
+            if (seenList.includes(id)) return;
+            setLoaded({ ...data, id });
+            setTimeout(() => { if (!cancelled) setOpenState(true); }, 1200);
         })();
-    }, []);
+        return () => { cancelled = true; };
+    }, [isPreview]);
+
+    const announcement = isPreview ? { ...previewData, id: 'preview' } : loaded;
+    const isOpen = isPreview ? open : openState;
 
     const handleClose = useCallback(() => {
-        setIsOpen(false);
-        setAnnouncement((current) => {
-            if (current?.id) {
-                const seenList = readSeenList();
-                seenList.push(current.id);
-                if (seenList.length > 10) seenList.shift();
-                localStorage.setItem(SEEN_KEY, JSON.stringify(seenList));
-            }
-            return current;
-        });
-    }, []);
+        if (isPreview) {
+            onRequestClose?.();
+            return;
+        }
+        setOpenState(false);
+        if (loaded?.id) {
+            const seenList = readSeenList();
+            seenList.push(loaded.id);
+            if (seenList.length > 10) seenList.shift();
+            localStorage.setItem(SEEN_KEY, JSON.stringify(seenList));
+        }
+    }, [isPreview, onRequestClose, loaded]);
 
     // Esc-to-close + lock background scroll while the popup is open, so the page
     // behind the card can't scroll/rubber-band and make dismissal feel "stuck".
