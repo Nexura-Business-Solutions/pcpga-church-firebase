@@ -249,7 +249,9 @@ export default function AdminContent() {
 
             toast.success('Media uploaded successfully ✦');
         } catch (err) {
-            toast.error(err.message || 'Upload failed');
+            // Show the Firebase error code when present — it's the actionable
+            // part (e.g. storage/unauthorized → re-login; storage/canceled).
+            toast.error(err?.code ? `${err.message} (${err.code})` : (err?.message || 'Upload failed'));
         } finally {
             setIsUploading(false);
         }
