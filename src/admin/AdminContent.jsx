@@ -36,6 +36,7 @@ import {
     Plus,
     ImagePlus,
     Film,
+    Quote,
     Trash2,
     X
 } from 'lucide-react';
@@ -47,6 +48,7 @@ const TABS = [
     { id: 'points', label: 'Mission', icon: Footprints },
     { id: 'commitments', label: 'Spirit', icon: Amphora },
     { id: 'principles', label: 'Message', icon: Cross },
+    { id: 'welcome', label: 'Welcome', icon: Quote },
     { id: 'stats', label: 'Visitor', icon: BarChart3 },
     { id: 'committees', label: 'Governance', icon: Landmark },
     { id: 'presbyteries', label: 'Regional', icon: Globe },
@@ -80,6 +82,7 @@ export default function AdminContent() {
     const [announcement, setAnnouncement] = useState({});
     const [events, setEvents] = useState([]);
     const [videoGreetings, setVideoGreetings] = useState([]);
+    const [welcomeOfficers, setWelcomeOfficers] = useState([]);
     const [showPopupPreview, setShowPopupPreview] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
 
@@ -121,6 +124,8 @@ export default function AdminContent() {
             setEvents(Array.isArray(ue) ? ue : []);
             const vg = await getSettings('video-greetings');
             setVideoGreetings(Array.isArray(vg) ? vg : []);
+            const wo = await getSettings('welcome-officers');
+            setWelcomeOfficers(Array.isArray(wo) ? wo : []);
             setLoading(false);
         }
         load();
@@ -140,7 +145,8 @@ export default function AdminContent() {
                 saveSettings('donations', donations),
                 saveSettings('announcement', { ...announcement, updatedAt: Date.now() }),
                 saveSettings('upcoming-events', events),
-                saveSettings('video-greetings', videoGreetings)
+                saveSettings('video-greetings', videoGreetings),
+                saveSettings('welcome-officers', welcomeOfficers)
             ]);
             if (results.every(r => r)) {
                 toast.success('Website updated ✦ Site revalidated.');
@@ -195,11 +201,12 @@ export default function AdminContent() {
         const isEvent = target.startsWith('event-');
         const isVgVideo = target.startsWith('vg-video-');
         const isVgPoster = target.startsWith('vg-poster-');
+        const isWoPhoto = target.startsWith('wo-photo-');
 
         // Validate by kind. Images (announcement, event poster, video-greeting
-        // poster) are capped small; greeting videos accept video files up to
-        // 50 MB — for longer clips the admin pastes a YouTube/Facebook link.
-        if (target === 'announcement' || isEvent || isVgPoster) {
+        // poster, welcome-officer photo) are capped small; greeting videos accept
+        // video files up to 50 MB — for longer clips the admin pastes a link.
+        if (target === 'announcement' || isEvent || isVgPoster || isWoPhoto) {
             if (!file.type.startsWith('image/')) {
                 toast.error('Please choose an image file (JPG, PNG, WEBP, GIF).');
                 return;
@@ -247,9 +254,12 @@ export default function AdminContent() {
                 return;
             }
 
-            // Other uploads (hero, QR, announcement, event poster, video greetings): Firebase Storage
+            // Other uploads (hero, QR, announcement, event poster, video greetings,
+            // welcome-officer photo): Firebase Storage
             const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
-            const folder = isEvent ? 'events' : ((isVgVideo || isVgPoster) ? 'videos' : target);
+            const folder = isEvent ? 'events'
+                : ((isVgVideo || isVgPoster) ? 'videos'
+                    : (isWoPhoto ? 'welcome-officers' : target));
             const path = `content/${folder}/${Date.now()}-${safeName}`;
             const url = await uploadFile(path, file);
             if (target === 'hero') setHero({ ...hero, heroImage: url });
@@ -264,6 +274,9 @@ export default function AdminContent() {
             } else if (isVgPoster) {
                 const idx = parseInt(target.split('-')[2], 10);
                 setVideoGreetings((prev) => prev.map((g, i) => (i === idx ? { ...g, posterUrl: url } : g)));
+            } else if (isWoPhoto) {
+                const idx = parseInt(target.split('-')[2], 10);
+                setWelcomeOfficers((prev) => prev.map((o, i) => (i === idx ? { ...o, photo: url } : o)));
             }
 
             toast.success('Media uploaded successfully ✦');
@@ -355,6 +368,32 @@ export default function AdminContent() {
     };
     // Detect a direct (uploaded) video file vs a YouTube/link, for the editor preview.
     const isVideoFileUrl = (url) => /\.(mp4|webm|mov|m4v)(\?|$)/i.test(String(url || ''));
+
+    // Welcome Officers helpers — the "A Word of Welcome" carousel in the Message
+    // section. Only officers that carry a message render on the site.
+    const MAX_WELCOME_OFFICERS = 8;
+    const addOfficer = () => {
+        if (welcomeOfficers.length >= MAX_WELCOME_OFFICERS) {
+            return toast.error(`You can add up to ${MAX_WELCOME_OFFICERS} officers.`);
+        }
+        const id = `wo-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+        setWelcomeOfficers([...welcomeOfficers, { id, name: '', role: '', photo: '', greeting: '', message: '' }]);
+    };
+    const updateOfficer = (i, patch) => {
+        setWelcomeOfficers((prev) => prev.map((o, idx) => (idx === i ? { ...o, ...patch } : o)));
+    };
+    const removeOfficer = (i) => {
+        setWelcomeOfficers((prev) => prev.filter((_, idx) => idx !== i));
+    };
+    const moveOfficer = (i, dir) => {
+        const j = i + dir;
+        if (j < 0 || j >= welcomeOfficers.length) return;
+        setWelcomeOfficers((prev) => {
+            const next = [...prev];
+            [next[i], next[j]] = [next[j], next[i]];
+            return next;
+        });
+    };
 
     if (loading) return (
         <AdminLayout>
@@ -1753,6 +1792,122 @@ export default function AdminContent() {
                                                         className="w-full py-6 rounded-2xl border-2 border-dashed border-[hsl(var(--admin-border))] text-[10px] font-bold uppercase tracking-widest text-coral hover:bg-coral/5 transition-all flex items-center justify-center gap-2"
                                                     >
                                                         <Plus className="w-4 h-4" /> Add Video ({videoGreetings.length}/{MAX_VIDEO_GREETINGS})
+                                                    </button>
+                                                )}
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+
+                                {/* WELCOME OFFICERS TAB ("A Word of Welcome") */}
+                                {activeTab === 'welcome' && (
+                                    <div className="space-y-8">
+                                        {/* Header */}
+                                        <div className="flex items-start gap-4 p-6 bg-[hsl(var(--admin-bg-alt))] rounded-2xl border border-[hsl(var(--admin-border))]">
+                                            <div className="w-12 h-12 rounded-2xl bg-coral/10 flex items-center justify-center flex-shrink-0">
+                                                <Quote className="w-5 h-5 text-coral" />
+                                            </div>
+                                            <div>
+                                                <h3 className="text-[hsl(var(--admin-text))] font-bold text-base mb-1">A Word of Welcome</h3>
+                                                <p className="text-[hsl(var(--admin-text-dim))] text-xs leading-relaxed max-w-md">
+                                                    The rotating welcome messages in the <strong>Message section</strong> of the homepage — one slide per officer (photo, greeting, message, signature). <strong>Only officers with a message appear</strong> on the site. Up to {MAX_WELCOME_OFFICERS}.
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        {welcomeOfficers.length === 0 ? (
+                                            <AdminEmptyState
+                                                title="No Welcome Officers"
+                                                description="Add an officer to show their word of welcome on the homepage."
+                                                icon={<Quote className="w-12 h-12 text-coral/20" />}
+                                                actionText="Add Officer"
+                                                onAction={addOfficer}
+                                            />
+                                        ) : (
+                                            <div className="space-y-6">
+                                                {welcomeOfficers.map((o, i) => (
+                                                    <div key={o.id || i} className="p-5 sm:p-6 bg-[hsl(var(--admin-bg-alt))] rounded-3xl border border-[hsl(var(--admin-border))] space-y-5 relative">
+                                                        <div className="flex items-center justify-between">
+                                                            <span className="text-[10px] font-bold uppercase tracking-widest text-coral">Officer {i + 1}{!String(o.message || '').trim() && <span className="ml-2 text-[hsl(var(--admin-text-dim))] normal-case tracking-normal">· hidden (no message)</span>}</span>
+                                                            <div className="flex items-center gap-2">
+                                                                <button onClick={() => moveOfficer(i, -1)} disabled={i === 0} className="p-2 rounded-xl text-[hsl(var(--admin-text-dim))] hover:bg-coral/5 hover:text-coral disabled:opacity-20 disabled:cursor-not-allowed transition-colors" aria-label="Move officer up"><ChevronUp className="w-4 h-4" /></button>
+                                                                <button onClick={() => moveOfficer(i, 1)} disabled={i === welcomeOfficers.length - 1} className="p-2 rounded-xl text-[hsl(var(--admin-text-dim))] hover:bg-coral/5 hover:text-coral disabled:opacity-20 disabled:cursor-not-allowed transition-colors" aria-label="Move officer down"><ChevronDown className="w-4 h-4" /></button>
+                                                                <button onClick={() => removeOfficer(i)} className="p-2 rounded-xl text-red-500 hover:bg-red-50 transition-colors" aria-label="Delete officer"><Trash2 className="w-4 h-4" /></button>
+                                                            </div>
+                                                        </div>
+
+                                                        <div className="grid grid-cols-1 md:grid-cols-[8rem,1fr] gap-5">
+                                                            {/* Photo (optional — falls back to a monogram) */}
+                                                            <div className="space-y-2">
+                                                                <div className="relative w-32 h-32 rounded-2xl overflow-hidden border-2 border-dashed border-coral/20 bg-[hsl(var(--admin-bg))]" onDragOver={allowDrop} onDrop={(e) => handleDrop(e, `wo-photo-${i}`)}>
+                                                                    {o.photo ? (
+                                                                        <img src={o.photo} alt={o.name || ''} className="w-full h-full object-cover" />
+                                                                    ) : (
+                                                                        <div className="w-full h-full flex flex-col items-center justify-center text-coral/40 gap-1.5 p-2 text-center">
+                                                                            <ImagePlus className="w-6 h-6" />
+                                                                            <span className="text-[8px] font-bold uppercase tracking-widest leading-tight">Drag photo<br />or upload</span>
+                                                                        </div>
+                                                                    )}
+                                                                    <label className="absolute bottom-1.5 right-1.5 px-2.5 py-1 bg-black/60 text-white text-[9px] font-bold uppercase tracking-widest rounded-lg cursor-pointer hover:bg-black/80 transition-colors">
+                                                                        {o.photo ? 'Replace' : 'Upload'}
+                                                                        <input type="file" accept=".jpg,.jpeg,.png,.webp,.gif" className="hidden" onChange={(e) => handleImageUpload(e.target.files[0], `wo-photo-${i}`)} />
+                                                                    </label>
+                                                                </div>
+                                                                <p className="text-[8px] text-[hsl(var(--admin-text-dim))] uppercase tracking-widest text-center leading-tight">No photo → initials shown</p>
+                                                            </div>
+
+                                                            {/* Fields */}
+                                                            <div className="space-y-3">
+                                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                                                    <div>
+                                                                        <label className="block text-coral text-[9px] tracking-[0.25em] uppercase mb-2 font-bold">Name</label>
+                                                                        <input
+                                                                            value={o.name || ''}
+                                                                            onChange={(e) => updateOfficer(i, { name: e.target.value })}
+                                                                            placeholder="e.g. Rev. Edgar P. Adra"
+                                                                            className="w-full bg-[hsl(var(--admin-bg))] border border-[hsl(var(--admin-text))]/20 rounded-2xl p-3.5 text-sm font-semibold focus:ring-2 focus:ring-coral/20 outline-none transition-all"
+                                                                        />
+                                                                    </div>
+                                                                    <div>
+                                                                        <label className="block text-coral text-[9px] tracking-[0.25em] uppercase mb-2 font-bold">Role / Title</label>
+                                                                        <input
+                                                                            value={o.role || ''}
+                                                                            onChange={(e) => updateOfficer(i, { role: e.target.value })}
+                                                                            placeholder="e.g. Moderator, General Assembly"
+                                                                            className="w-full bg-[hsl(var(--admin-bg))] border border-[hsl(var(--admin-text))]/20 rounded-2xl p-3.5 text-sm font-medium focus:ring-2 focus:ring-coral/20 outline-none transition-all"
+                                                                        />
+                                                                    </div>
+                                                                </div>
+                                                                <div>
+                                                                    <label className="block text-coral text-[9px] tracking-[0.25em] uppercase mb-2 font-bold">Greeting <span className="normal-case tracking-normal text-[hsl(var(--admin-text-dim))]">(short headline)</span></label>
+                                                                    <input
+                                                                        value={o.greeting || ''}
+                                                                        onChange={(e) => updateOfficer(i, { greeting: e.target.value })}
+                                                                        placeholder="e.g. Welcome — you are among friends on the old paths."
+                                                                        className="w-full bg-[hsl(var(--admin-bg))] border border-[hsl(var(--admin-text))]/20 rounded-2xl p-3.5 text-sm font-medium focus:ring-2 focus:ring-coral/20 outline-none transition-all"
+                                                                    />
+                                                                </div>
+                                                                <div>
+                                                                    <label className="block text-coral text-[9px] tracking-[0.25em] uppercase mb-2 font-bold">Message <span className="normal-case tracking-normal text-[hsl(var(--admin-text-dim))]">(the welcome paragraph)</span></label>
+                                                                    <textarea
+                                                                        value={o.message || ''}
+                                                                        onChange={(e) => updateOfficer(i, { message: e.target.value })}
+                                                                        rows={5}
+                                                                        placeholder="The officer's word of welcome…"
+                                                                        className="w-full bg-[hsl(var(--admin-bg))] border border-[hsl(var(--admin-text))]/20 rounded-2xl p-3.5 text-sm font-medium leading-relaxed focus:ring-2 focus:ring-coral/20 outline-none transition-all resize-y"
+                                                                    />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                ))}
+
+                                                {welcomeOfficers.length < MAX_WELCOME_OFFICERS && (
+                                                    <button
+                                                        onClick={addOfficer}
+                                                        className="w-full py-6 rounded-2xl border-2 border-dashed border-[hsl(var(--admin-border))] text-[10px] font-bold uppercase tracking-widest text-coral hover:bg-coral/5 transition-all flex items-center justify-center gap-2"
+                                                    >
+                                                        <Plus className="w-4 h-4" /> Add Officer ({welcomeOfficers.length}/{MAX_WELCOME_OFFICERS})
                                                     </button>
                                                 )}
                                             </div>
