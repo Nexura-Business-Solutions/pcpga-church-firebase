@@ -331,6 +331,7 @@ export default function AdminContent() {
                             <p className="text-[hsl(var(--admin-text-dim))] text-sm max-w-lg">
                                 Control every narrative, principle, and identity marker across the entire website from one unified dashboard.
                             </p>
+                            <p className="mt-2 text-[10px] font-bold uppercase tracking-[0.25em] text-coral/70">build&nbsp;2026-06-08&nbsp;·&nbsp;b29</p>
                         </div>
                         <div className="flex gap-4">
                             <button
@@ -1350,8 +1351,8 @@ export default function AdminContent() {
                                                                 <ImagePlus className="w-5 h-5 text-[hsl(var(--admin-text-dim))]/50" />
                                                                 <Film className="w-5 h-5 text-[hsl(var(--admin-text-dim))]/50" />
                                                             </div>
-                                                            <p className="text-[hsl(var(--admin-text-dim))] text-[10px] font-bold uppercase tracking-widest opacity-60 mb-1">Add a photo or short video</p>
-                                                            <p className="text-[hsl(var(--admin-text-dim))]/40 text-[9px] uppercase tracking-widest">Image up to 8 MB · Video up to 25 MB</p>
+                                                            <p className="text-[hsl(var(--admin-text-dim))] text-[10px] font-bold uppercase tracking-widest opacity-60 mb-1">Add a photo poster</p>
+                                                            <p className="text-[hsl(var(--admin-text-dim))]/40 text-[9px] uppercase tracking-widest">JPG / PNG / WEBP · up to 8 MB</p>
                                                         </div>
                                                     )}
                                                 </div>
@@ -1360,10 +1361,10 @@ export default function AdminContent() {
                                                     <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/45 backdrop-blur-sm rounded-3xl">
                                                         <div className="flex flex-col items-center gap-4">
                                                             <label className="cursor-pointer px-10 py-4 bg-white text-accent text-[11px] font-bold uppercase tracking-widest rounded-2xl hover:scale-105 transition-all shadow-xl">
-                                                                {announcement.mediaUrl ? 'Replace Media' : 'Upload Image or Video'}
+                                                                {announcement.mediaUrl ? 'Replace Media' : 'Upload Image'}
                                                                 <input
                                                                     type="file"
-                                                                    accept=".jpg,.jpeg,.png,.webp,.gif,.mp4,.mov,.m4v,.webm"
+                                                                    accept=".jpg,.jpeg,.png,.webp,.gif"
                                                                     className="hidden"
                                                                     onChange={(e) => handleImageUpload(e.target.files[0], 'announcement')}
                                                                 />
