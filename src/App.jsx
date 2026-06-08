@@ -12,16 +12,42 @@ import DonationSuccessPage from './pages/DonationSuccessPage.jsx';
 import LoginPage from './pages/LoginPage.jsx';
 import NotFoundPage from './pages/NotFoundPage.jsx';
 
-const AdminDashboard = lazy(() => import('./admin/AdminDashboard.jsx'));
-const AdminHero = lazy(() => import('./admin/AdminHero.jsx'));
-const AdminSermons = lazy(() => import('./admin/AdminSermons.jsx'));
-const AdminLibrary = lazy(() => import('./admin/AdminLibrary.jsx'));
-const AdminChurches = lazy(() => import('./admin/AdminChurches.jsx'));
-const AdminDonations = lazy(() => import('./admin/AdminDonations.jsx'));
-const AdminDonors = lazy(() => import('./admin/AdminDonors.jsx'));
-const AdminContent = lazy(() => import('./admin/AdminContent.jsx'));
-const AdminAdmins = lazy(() => import('./admin/AdminAdmins.jsx'));
-const AdminSeminaries = lazy(() => import('./admin/AdminSeminaries.jsx'));
+// Lazy chunks are hashed per build. When a new version is deployed, a tab that
+// still runs the old bundle (or hits a transient mobile network blip) can fail
+// to import a route chunk — surfacing as "Failed to fetch dynamically imported
+// module". Self-heal: retry once, then force ONE full reload so the no-cache
+// index.html pulls the fresh chunk URLs. A timestamp guard prevents a reload loop.
+function lazyWithRetry(factory) {
+  return lazy(() =>
+    factory().catch((err) =>
+      new Promise((resolve, reject) => {
+        setTimeout(() => {
+          factory().then(resolve).catch(() => {
+            const TS = 'pcp_chunk_reload_ts';
+            const last = Number(sessionStorage.getItem(TS) || 0);
+            if (Date.now() - last > 10000) {
+              sessionStorage.setItem(TS, String(Date.now()));
+              window.location.reload();
+            } else {
+              reject(err);
+            }
+          });
+        }, 800);
+      }),
+    ),
+  );
+}
+
+const AdminDashboard = lazyWithRetry(() => import('./admin/AdminDashboard.jsx'));
+const AdminHero = lazyWithRetry(() => import('./admin/AdminHero.jsx'));
+const AdminSermons = lazyWithRetry(() => import('./admin/AdminSermons.jsx'));
+const AdminLibrary = lazyWithRetry(() => import('./admin/AdminLibrary.jsx'));
+const AdminChurches = lazyWithRetry(() => import('./admin/AdminChurches.jsx'));
+const AdminDonations = lazyWithRetry(() => import('./admin/AdminDonations.jsx'));
+const AdminDonors = lazyWithRetry(() => import('./admin/AdminDonors.jsx'));
+const AdminContent = lazyWithRetry(() => import('./admin/AdminContent.jsx'));
+const AdminAdmins = lazyWithRetry(() => import('./admin/AdminAdmins.jsx'));
+const AdminSeminaries = lazyWithRetry(() => import('./admin/AdminSeminaries.jsx'));
 
 function AdminFallback() {
   return (

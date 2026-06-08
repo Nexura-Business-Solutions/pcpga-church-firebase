@@ -387,7 +387,6 @@ export default function AdminContent() {
                             <p className="text-[hsl(var(--admin-text-dim))] text-sm max-w-lg">
                                 Control every narrative, principle, and identity marker across the entire website from one unified dashboard.
                             </p>
-                            <p className="mt-2 text-[10px] font-bold uppercase tracking-[0.25em] text-coral/70">build&nbsp;2026-06-08&nbsp;·&nbsp;b31</p>
                         </div>
                         <div className="flex gap-4">
                             <button
