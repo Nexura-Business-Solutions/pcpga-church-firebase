@@ -2140,6 +2140,111 @@ body.lp-v3 .evcar__lightbox-close {
   body.lp-v3 .evcar__nav--next { right: 0.4rem; }
 }
 
+/* ---- Video Greetings section (right after the hero) ---- */
+body.lp-v3 .vidgreet {
+  padding: clamp(3rem, 5vw, 4.5rem) 0;
+  background: var(--paper);
+  border-bottom: 1px solid var(--line);
+}
+body.lp-v3 .vidgreet__inner { max-width: var(--max); margin: 0 auto; padding: 0 clamp(1.5rem, 4vw, 3rem); }
+body.lp-v3 .vidgreet__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 2rem;
+  padding-bottom: 1.5rem;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid var(--line);
+}
+body.lp-v3 .vidgreet__title {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-style: italic;
+  font-size: clamp(1.3rem, 1.8vw, 1.7rem);
+  color: var(--ink);
+}
+body.lp-v3 .vidgreet__title em { color: var(--brass); }
+body.lp-v3 .vidgreet__kicker {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+}
+
+/* ---- Video Greetings carousel ---- */
+body.lp-v3 .vidcar { position: relative; }
+body.lp-v3 .vidcar__stage {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  max-height: 70vh;
+  margin: 0 auto;
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--brass);
+  background: #0b0b0f;
+  overflow: hidden;
+}
+body.lp-v3 .vidcar__slide { position: absolute; inset: 0; }
+body.lp-v3 .vidcar__media {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  border: 0;
+  object-fit: contain;
+  background: #000;
+  display: block;
+}
+body.lp-v3 .vidcar__poster {
+  position: absolute; inset: 0;
+  width: 100%; padding: 0; border: 0; cursor: pointer;
+  background-size: cover; background-position: center;
+  display: flex; align-items: center; justify-content: center;
+}
+body.lp-v3 .vidcar__poster::after {
+  content: ''; position: absolute; inset: 0; background: rgba(10,8,12,0.30);
+}
+body.lp-v3 .vidcar__play {
+  position: relative; z-index: 1;
+  width: 76px; height: 76px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(201,162,74,0.94); color: #1a0e08;
+  font-size: 1.7rem; padding-left: 5px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  transition: transform 0.2s ease;
+}
+body.lp-v3 .vidcar__poster:hover .vidcar__play { transform: scale(1.08); }
+body.lp-v3 .vidcar__caption { padding: 1.1rem clamp(0.25rem, 2vw, 0.75rem) 0; }
+body.lp-v3 .vidcar__title {
+  font-family: var(--font-serif); font-style: italic; font-weight: 500;
+  font-size: clamp(1.1rem, 2vw, 1.6rem); line-height: 1.2;
+  color: var(--ink); margin: 0 0 0.3rem; max-width: 44ch;
+}
+body.lp-v3 .vidcar__text { font-size: 0.95rem; color: var(--ink-mute); margin: 0; line-height: 1.6; max-width: 60ch; }
+body.lp-v3 .vidcar__nav {
+  position: absolute; top: 50%; transform: translateY(-50%); z-index: 3;
+  width: 44px; height: 44px; border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.5);
+  background: rgba(26,14,8,0.55); backdrop-filter: blur(4px);
+  color: #fff; font-size: 1.6rem; line-height: 1; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+body.lp-v3 .vidcar__nav:hover { background: var(--brass); border-color: var(--brass); }
+body.lp-v3 .vidcar__nav--prev { left: 0.9rem; }
+body.lp-v3 .vidcar__nav--next { right: 0.9rem; }
+body.lp-v3 .vidcar__dots { display: flex; gap: 0.5rem; justify-content: center; margin-top: 1.1rem; }
+body.lp-v3 .vidcar__dot {
+  width: 9px; height: 9px; border-radius: 50%; padding: 0; cursor: pointer;
+  border: 1px solid var(--brass); background: transparent;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+body.lp-v3 .vidcar__dot.is-active { background: var(--brass); transform: scale(1.25); }
+@media (max-width: 560px) {
+  body.lp-v3 .vidcar__nav { width: 44px; height: 44px; font-size: 1.4rem; }
+  body.lp-v3 .vidcar__nav--prev { left: 0.4rem; }
+  body.lp-v3 .vidcar__nav--next { right: 0.4rem; }
+  body.lp-v3 .vidcar__play { width: 60px; height: 60px; font-size: 1.4rem; }
+}
+
 /* A Word of Welcome — officers carousel (sits on the light editorial background) */
 body.lp-v3 .welcar { position: relative; }
 body.lp-v3 .welcar__slide {
