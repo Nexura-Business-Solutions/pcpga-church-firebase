@@ -341,7 +341,7 @@ export default function AdminContent() {
                             <p className="text-[hsl(var(--admin-text-dim))] text-sm max-w-lg">
                                 Control every narrative, principle, and identity marker across the entire website from one unified dashboard.
                             </p>
-                            <p className="mt-2 text-[10px] font-bold uppercase tracking-[0.25em] text-coral/70">build&nbsp;2026-06-08&nbsp;·&nbsp;b30</p>
+                            <p className="mt-2 text-[10px] font-bold uppercase tracking-[0.25em] text-coral/70">build&nbsp;2026-06-08&nbsp;·&nbsp;b31</p>
                         </div>
                         <div className="flex gap-4">
                             <button
@@ -1375,7 +1375,7 @@ export default function AdminContent() {
                                                                 {announcement.mediaUrl ? 'Replace Media' : 'Upload Image'}
                                                                 <input
                                                                     type="file"
-                                                                    accept=".jpg,.jpeg,.png,.webp,.gif"
+                                                                    accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg,.gif,.webp"
                                                                     className="hidden"
                                                                     onChange={(e) => handleImageUpload(e.target.files[0], 'announcement')}
                                                                 />
@@ -1540,7 +1540,7 @@ export default function AdminContent() {
                                                             )}
                                                             <label className="absolute inset-0 bg-black/45 flex items-center justify-center opacity-0 group-hover/poster:opacity-100 transition-opacity cursor-pointer">
                                                                 <span className="text-white text-[10px] font-bold uppercase tracking-widest">{ev.imageUrl ? 'Replace' : 'Upload'}</span>
-                                                                <input type="file" accept=".jpg,.jpeg,.png,.webp,.gif" className="hidden" onChange={(e) => handleImageUpload(e.target.files[0], `event-${i}`)} />
+                                                                <input type="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg,.gif,.webp" className="hidden" onChange={(e) => handleImageUpload(e.target.files[0], `event-${i}`)} />
                                                             </label>
                                                         </div>
 
