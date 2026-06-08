@@ -1,5 +1,5 @@
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
-import { storage } from './firebase.js';
+import { storage, auth } from './firebase.js';
 
 // If the resumable upload makes no progress for this long, fail loudly instead
 // of hanging. The Firebase SDK otherwise retries silently for ~2 minutes on
@@ -8,7 +8,17 @@ import { storage } from './firebase.js';
 // large video on a slow connection is legitimately slow but still progressing.
 const STALL_TIMEOUT_MS = 30000;
 
-export function uploadFile(path, file, onProgress) {
+export async function uploadFile(path, file, onProgress) {
+  // Force-refresh the ID token first so a newly-granted custom claim (admin:true)
+  // is present WITHOUT the user having to sign out and back in. Storage rules
+  // read the claim from the token, and the cached session token may predate the
+  // grant. Best-effort: a refresh failure shouldn't block the upload attempt.
+  try {
+    await auth.currentUser?.getIdToken(true);
+  } catch (e) {
+    console.warn('[uploadFile] token refresh failed (continuing):', e?.code || e?.message);
+  }
+
   return new Promise((resolve, reject) => {
     const task = uploadBytesResumable(ref(storage, path), file);
     let settled = false;
