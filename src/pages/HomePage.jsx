@@ -342,7 +342,10 @@ export default function HomePage() {
     }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
     els.forEach((el) => io.observe(el));
     return () => io.disconnect();
-  }, []);
+    // Re-run when CMS content arrives: nodes rendered only after the async load
+    // (e.g. a stat whose label exists only in Firestore) aren't in the DOM on
+    // mount, so the first observer never sees them and they'd stay at opacity 0.
+  }, [cms]);
 
   // Scroll progress bar
   useEffect(() => {
@@ -400,7 +403,9 @@ export default function HomePage() {
     }, { threshold: 0.5 });
     nodes.forEach((n) => io.observe(n));
     return () => io.disconnect();
-  }, []);
+    // Same reason as the reveal observer: re-observe the count-up targets once
+    // the CMS-driven stat nodes exist.
+  }, [cms]);
 
   // Parallax
   useEffect(() => {
