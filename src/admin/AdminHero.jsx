@@ -114,7 +114,7 @@ export default function AdminHero() {
                                                 {form.heroImage ? 'Replace Image' : 'Upload Image'}
                                                 <input
                                                     type="file"
-                                                    accept="image/*"
+                                                    accept=".jpg,.jpeg,.png,.webp,.gif"
                                                     className="hidden"
                                                     onChange={(e) => handleImageUpload(e.target.files[0])}
                                                 />

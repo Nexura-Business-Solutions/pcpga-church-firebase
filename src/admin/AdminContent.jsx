@@ -398,7 +398,7 @@ export default function AdminContent() {
                                                     <div className="flex flex-col items-center gap-4">
                                                         <label className="cursor-pointer px-10 py-4 bg-white text-coral text-[11px] font-bold uppercase tracking-widest rounded-2xl hover:scale-105 transition-all">
                                                             {hero.heroImage ? 'Replace Image' : 'Upload Image'}
-                                                            <input type="file" accept="image/*" className="hidden" onChange={(e) => handleImageUpload(e.target.files[0], 'hero')} />
+                                                            <input type="file" accept=".jpg,.jpeg,.png,.webp,.gif" className="hidden" onChange={(e) => handleImageUpload(e.target.files[0], 'hero')} />
                                                         </label>
                                                         {hero.heroImage && (
                                                             <button
@@ -976,7 +976,7 @@ export default function AdminContent() {
                                                                             )}
                                                                             <label className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover/avatar:opacity-100 transition-opacity cursor-pointer">
                                                                                 <span className="text-white text-[8px] font-bold uppercase">📷</span>
-                                                                                <input type="file" accept="image/*" className="hidden" onChange={e => handleImageUpload(e.target.files[0], `committee-${i}-officer-${oi}`)} />
+                                                                                <input type="file" accept=".jpg,.jpeg,.png,.webp,.gif" className="hidden" onChange={e => handleImageUpload(e.target.files[0], `committee-${i}-officer-${oi}`)} />
                                                                             </label>
                                                                         </div>
                                                                         <div className="flex-1 space-y-2">
@@ -1118,7 +1118,7 @@ export default function AdminContent() {
                                                                                     )}
                                                                                     <label className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover/avatar:opacity-100 transition-opacity cursor-pointer">
                                                                                         <span className="text-white text-[8px] font-bold uppercase">📷</span>
-                                                                                        <input type="file" accept="image/*" className="hidden" onChange={e => handleImageUpload(e.target.files[0], `presbytery-${idx}-officer-${oIdx}`)} />
+                                                                                        <input type="file" accept=".jpg,.jpeg,.png,.webp,.gif" className="hidden" onChange={e => handleImageUpload(e.target.files[0], `presbytery-${idx}-officer-${oIdx}`)} />
                                                                                     </label>
                                                                                 </div>
                                                                                 <div className="flex-1 space-y-2">
@@ -1363,7 +1363,7 @@ export default function AdminContent() {
                                                                 {announcement.mediaUrl ? 'Replace Media' : 'Upload Image or Video'}
                                                                 <input
                                                                     type="file"
-                                                                    accept="image/*,video/*"
+                                                                    accept=".jpg,.jpeg,.png,.webp,.gif,.mp4,.mov,.m4v,.webm"
                                                                     className="hidden"
                                                                     onChange={(e) => handleImageUpload(e.target.files[0], 'announcement')}
                                                                 />
@@ -1528,7 +1528,7 @@ export default function AdminContent() {
                                                             )}
                                                             <label className="absolute inset-0 bg-black/45 flex items-center justify-center opacity-0 group-hover/poster:opacity-100 transition-opacity cursor-pointer">
                                                                 <span className="text-white text-[10px] font-bold uppercase tracking-widest">{ev.imageUrl ? 'Replace' : 'Upload'}</span>
-                                                                <input type="file" accept="image/*" className="hidden" onChange={(e) => handleImageUpload(e.target.files[0], `event-${i}`)} />
+                                                                <input type="file" accept=".jpg,.jpeg,.png,.webp,.gif" className="hidden" onChange={(e) => handleImageUpload(e.target.files[0], `event-${i}`)} />
                                                             </label>
                                                         </div>
 
