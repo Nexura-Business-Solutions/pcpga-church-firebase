@@ -269,7 +269,7 @@ export default function AdminChurches() {
                                                     : form.photoUrl ? 'Replace Photo' : 'Upload Photo'}
                                                 <input
                                                     type="file"
-                                                    accept="image/*"
+                                                    accept=".jpg,.jpeg,.png,.webp,.gif"
                                                     className="hidden"
                                                     onChange={(e) => handlePhotoUpload(e.target.files[0])}
                                                     disabled={photoUploading}

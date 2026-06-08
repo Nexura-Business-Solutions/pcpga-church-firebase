@@ -261,7 +261,7 @@ export default function AdminSeminaries() {
                                         <div className="flex items-center gap-3">
                                             <label className="cursor-pointer flex-1 h-12 flex items-center justify-center bg-accent/5 border border-dashed border-accent/30 rounded-2xl text-accent text-[11px] font-bold tracking-widest uppercase hover:bg-accent/10 transition-all">
                                                 {photoUploading ? 'Uploading…' : form.photoUrl ? 'Replace Photo' : 'Upload Photo'}
-                                                <input type="file" accept="image/*" className="hidden" disabled={photoUploading} onChange={(e) => handlePhotoUpload(e.target.files[0])} />
+                                                <input type="file" accept=".jpg,.jpeg,.png,.webp,.gif" className="hidden" disabled={photoUploading} onChange={(e) => handlePhotoUpload(e.target.files[0])} />
                                             </label>
                                             {form.photoUrl && <img src={form.photoUrl} alt="" className="w-12 h-12 rounded-xl object-cover border border-accent/20" />}
                                         </div>

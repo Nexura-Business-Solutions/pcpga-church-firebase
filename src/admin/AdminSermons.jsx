@@ -240,7 +240,7 @@ export default function AdminSermons() {
                                                     : form.audioUrl ? 'Replace Audio' : 'Upload Audio'}
                                                 <input
                                                     type="file"
-                                                    accept="audio/*"
+                                                    accept=".mp3,.m4a,.aac,.wav,.ogg"
                                                     className="hidden"
                                                     onChange={(e) => handleAudioUpload(e.target.files[0])}
                                                     disabled={audioUploading}
@@ -279,7 +279,7 @@ export default function AdminSermons() {
                                                     : form.thumbnailUrl ? 'Replace Thumbnail' : 'Upload Thumbnail'}
                                                 <input
                                                     type="file"
-                                                    accept="image/*"
+                                                    accept=".jpg,.jpeg,.png,.webp,.gif"
                                                     className="hidden"
                                                     onChange={(e) => handleThumbnailUpload(e.target.files[0])}
                                                     disabled={thumbUploading}
