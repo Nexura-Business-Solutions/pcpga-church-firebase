@@ -257,6 +257,16 @@ export default function AdminContent() {
         }
     };
 
+    // Drag-and-drop upload — a file-dialog-FREE path. The native Windows "Open"
+    // dialog can hang while enumerating large/cloud (OneDrive) image folders, so
+    // dragging a file straight onto the box lets the admin upload without it.
+    const handleDrop = (e, target) => {
+        e.preventDefault();
+        const file = e.dataTransfer?.files?.[0];
+        if (file) handleImageUpload(file, target);
+    };
+    const allowDrop = (e) => e.preventDefault();
+
     // Generic Add/Remove Helpers
     const addItem = (list, setFn, defaultItem) => {
         setFn([...list, defaultItem]);
@@ -331,7 +341,7 @@ export default function AdminContent() {
                             <p className="text-[hsl(var(--admin-text-dim))] text-sm max-w-lg">
                                 Control every narrative, principle, and identity marker across the entire website from one unified dashboard.
                             </p>
-                            <p className="mt-2 text-[10px] font-bold uppercase tracking-[0.25em] text-coral/70">build&nbsp;2026-06-08&nbsp;·&nbsp;b29</p>
+                            <p className="mt-2 text-[10px] font-bold uppercase tracking-[0.25em] text-coral/70">build&nbsp;2026-06-08&nbsp;·&nbsp;b30</p>
                         </div>
                         <div className="flex gap-4">
                             <button
@@ -1323,7 +1333,7 @@ export default function AdminContent() {
                                                 <span className="text-[9px] font-bold uppercase tracking-widest text-[hsl(var(--admin-text-dim))] px-2 py-0.5 rounded-full bg-[hsl(var(--admin-bg-alt))]">Optional</span>
                                             </div>
 
-                                            <div className="relative group">
+                                            <div className="relative group" onDragOver={allowDrop} onDrop={(e) => handleDrop(e, 'announcement')}>
                                                 <div className={`w-full aspect-[16/9] rounded-3xl border-2 border-dashed overflow-hidden transition-all duration-500 flex items-center justify-center ${announcement.mediaUrl ? 'border-accent/40 bg-black' : 'border-[hsl(var(--admin-border))] hover:border-accent/40 bg-[hsl(var(--admin-bg-alt))]'}`}>
                                                     {isUploading ? (
                                                         <div className="flex flex-col items-center gap-4">
@@ -1353,6 +1363,7 @@ export default function AdminContent() {
                                                             </div>
                                                             <p className="text-[hsl(var(--admin-text-dim))] text-[10px] font-bold uppercase tracking-widest opacity-60 mb-1">Add a photo poster</p>
                                                             <p className="text-[hsl(var(--admin-text-dim))]/40 text-[9px] uppercase tracking-widest">JPG / PNG / WEBP · up to 8 MB</p>
+                                                            <p className="text-accent/70 text-[9px] font-bold uppercase tracking-widest mt-2">↧ or DRAG a photo here (no file window)</p>
                                                         </div>
                                                     )}
                                                 </div>
@@ -1518,7 +1529,7 @@ export default function AdminContent() {
                                                 {events.map((ev, i) => (
                                                     <div key={ev.id || i} className="p-5 sm:p-6 bg-[hsl(var(--admin-bg-alt))] rounded-3xl border border-[hsl(var(--admin-border))] flex flex-col sm:flex-row gap-6 relative">
                                                         {/* Poster */}
-                                                        <div className="relative w-full sm:w-40 aspect-[3/4] rounded-2xl overflow-hidden border-2 border-dashed border-coral/20 shrink-0 bg-[hsl(var(--admin-bg))] group/poster">
+                                                        <div className="relative w-full sm:w-40 aspect-[3/4] rounded-2xl overflow-hidden border-2 border-dashed border-coral/20 shrink-0 bg-[hsl(var(--admin-bg))] group/poster" onDragOver={allowDrop} onDrop={(e) => handleDrop(e, `event-${i}`)}>
                                                             {ev.imageUrl ? (
                                                                 <img src={ev.imageUrl} alt={ev.title || `Event ${i + 1}`} className="w-full h-full object-cover" />
                                                             ) : (
