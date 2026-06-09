@@ -2274,6 +2274,21 @@ body.lp-v3 .welcar__monogram {
 }
 body.lp-v3 .welcar__text { flex: 1 1 0; min-width: 0; }
 body.lp-v3 .welcar__greeting { font-size: clamp(1.5rem, 2.3vw, 2.1rem); margin-bottom: 1.25rem; }
+/* A long welcome message gets its own bounded, auto-scrolling box — short
+   messages stay below the max-height so they look unchanged (no scrollbar). */
+body.lp-v3 .welcar__msg {
+  max-height: clamp(11rem, 42vh, 24rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-right: 0.7rem;
+  scrollbar-width: thin;
+  scrollbar-color: var(--brass) transparent;
+}
+body.lp-v3 .welcar__msg:focus-visible { outline: 2px solid var(--brass); outline-offset: 4px; border-radius: 2px; }
+body.lp-v3 .welcar__msg::-webkit-scrollbar { width: 6px; }
+body.lp-v3 .welcar__msg::-webkit-scrollbar-thumb { background: var(--brass); border-radius: 3px; }
+body.lp-v3 .welcar__msg::-webkit-scrollbar-track { background: transparent; }
+body.lp-v3 .welcar__msg .editorial__para { margin-top: 0; }
 body.lp-v3 .welcar__controls {
   display: flex; align-items: center; justify-content: flex-start;
   gap: 1.1rem; margin-top: 2rem;
@@ -3003,6 +3018,7 @@ html:has(body.lp-v3.modal-open) { overflow: hidden; }
   body.lp-v3 .welcar__text {
     padding: 0 0.5rem;
   }
+  body.lp-v3 .welcar__msg { max-height: clamp(9rem, 48vh, 18rem); }
   body.lp-v3 .book-card {
     padding-left: 1.5rem;
     padding-right: 1.5rem;
