@@ -746,8 +746,8 @@ export default function HomePage() {
               ) : (
                 <>
                   <div className="illuminated">
-                    <div className="illuminated__book">{featured?.series || 'The Epistle to the Romans'}</div>
-                    <div className="illuminated__chapter">{featured?.scripture ? featured.scripture.replace(/[^0-9].*$/, '') || '✦' : 'VIII'}</div>
+                    <div className="illuminated__book">{featured?.series || 'The Preaching of the Word'}</div>
+                    <div className="illuminated__chapter">{featured?.scripture ? featured.scripture.replace(/[^0-9].*$/, '') || '✦' : '✦'}</div>
                     <div className="illuminated__ornament" aria-hidden="true">✦ · ✦</div>
                   </div>
                   <button
@@ -768,12 +768,12 @@ export default function HomePage() {
 
             <div className="sermon__text reveal">
               <div className="sermon__series">
-                <span>Series</span><span className="dot">·</span><span>{featured?.series || 'Romans · The Gospel of Grace'}</span>
+                <span>Series</span><span className="dot">·</span><span>{featured?.series || 'From the General Assembly'}</span>
               </div>
               <h3 className="display display--md">{featured?.title || <>Sermons from the<br /><em>General Assembly.</em></>}</h3>
               <p className="sermon__ref">{featured ? [featured.scripture, featured.speaker, featured.duration].filter(Boolean).join(' · ') : 'Sermons from the General Assembly will appear here.'}</p>
               <p className="sermon__blurb">
-                {featured?.description || 'What does it mean that the Spirit gives life where the law could only condemn? An exposition on the great hinge of the eighth chapter — and what it sets free in the ordinary Christian’s ordinary week.'}
+                {featured?.description || 'Sermons preached at the General Assembly and our member churches will appear here once they are uploaded.'}
               </p>
 
               <div className="hymnal-index">
