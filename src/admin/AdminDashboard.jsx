@@ -44,7 +44,7 @@ export default function AdminDashboard() {
 
     const cards = [
         { id: 'tour-master', label: 'Site Content', value: 'Master', icon: FileText, accent: 'hsl(var(--coral))', link: '/admin/content', desc: 'Unified Narrative Manager' },
-        { id: 'tour-registry', label: 'Church Network', value: stats.churches, icon: Church, accent: 'hsl(var(--accent))', link: '/admin/churches', desc: 'Congregation Registry' },
+        { id: 'tour-registry', label: 'Church Network', value: stats.churches, icon: Church, accent: 'hsl(var(--accent))', link: '/admin/content', desc: 'Congregation Registry · Regional tab' },
         { id: 'tour-media', label: 'Media Archive', value: stats.sermons, icon: Mic2, accent: 'hsl(var(--violet))', link: '/admin/sermons', desc: 'Sermon Catalog' },
         { id: 'tour-donors', label: 'Donor Records', value: 'Database', icon: Diamond, accent: 'hsl(var(--teal))', link: '/admin/donations/donors', desc: 'Historical Stewardship' },
     ];
@@ -131,11 +131,11 @@ export default function AdminDashboard() {
                         </div>
 
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-                            <Link to="/admin/churches" className="p-8 bg-[hsl(var(--admin-surface))] rounded-[2rem] border border-[hsl(var(--admin-border))] hover:border-accent/10 transition-all group shadow-sm hover:shadow-md">
+                            <Link to="/admin/content" className="p-8 bg-[hsl(var(--admin-surface))] rounded-[2rem] border border-[hsl(var(--admin-border))] hover:border-accent/10 transition-all group shadow-sm hover:shadow-md">
                                 <div className="text-accent text-xs font-bold tracking-widest uppercase mb-3 opacity-60 group-hover:opacity-100 transition-opacity flex items-center gap-2">
                                     <Sparkles className="w-3 h-3" /> Registry
                                 </div>
-                                <p className="text-[hsl(var(--admin-text-dim))] text-[11px] leading-relaxed">Update branch network database</p>
+                                <p className="text-[hsl(var(--admin-text-dim))] text-[11px] leading-relaxed">Update the church network in Site Content → Regional</p>
                             </Link>
                             <Link to="/admin/sermons" className="p-8 bg-[hsl(var(--admin-surface))] rounded-[2rem] border border-[hsl(var(--admin-border))] hover:border-violet/10 transition-all group shadow-sm hover:shadow-md">
                                 <div className="text-violet text-xs font-bold tracking-widest uppercase mb-3 opacity-60 group-hover:opacity-100 transition-opacity flex items-center gap-2">

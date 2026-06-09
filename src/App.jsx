@@ -42,7 +42,6 @@ const AdminDashboard = lazyWithRetry(() => import('./admin/AdminDashboard.jsx'))
 const AdminHero = lazyWithRetry(() => import('./admin/AdminHero.jsx'));
 const AdminSermons = lazyWithRetry(() => import('./admin/AdminSermons.jsx'));
 const AdminLibrary = lazyWithRetry(() => import('./admin/AdminLibrary.jsx'));
-const AdminChurches = lazyWithRetry(() => import('./admin/AdminChurches.jsx'));
 const AdminDonations = lazyWithRetry(() => import('./admin/AdminDonations.jsx'));
 const AdminDonors = lazyWithRetry(() => import('./admin/AdminDonors.jsx'));
 const AdminContent = lazyWithRetry(() => import('./admin/AdminContent.jsx'));
@@ -88,7 +87,6 @@ export default function App() {
       <Route path="/admin/hero" element={adminRoute(AdminHero)} />
       <Route path="/admin/sermons" element={adminRoute(AdminSermons)} />
       <Route path="/admin/library" element={adminRoute(AdminLibrary)} />
-      <Route path="/admin/churches" element={adminRoute(AdminChurches)} />
       <Route path="/admin/seminaries" element={adminRoute(AdminSeminaries)} />
       <Route path="/admin/donations" element={adminRoute(AdminDonations)} />
       <Route path="/admin/donations/donors" element={adminRoute(AdminDonors)} />
