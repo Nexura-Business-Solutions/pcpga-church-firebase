@@ -11,6 +11,8 @@ vi.mock('../lib/firestore.js', () => ({
       doc: (id) => ({
         update: (...a) => updateDonationMock(name, id, ...a),
         set: (...a) => setDonorMock(name, id, ...a),
+        // donation lookup carries donorName; existing donor has no createdAt yet
+        get: () => Promise.resolve({ exists: true, data: () => ({ donorName: 'Jane Doe' }) }),
       }),
       add: (...a) => addAuditMock(name, ...a),
     }),
@@ -75,7 +77,11 @@ describe('xenditWebhook', () => {
       expect.objectContaining({ status: 'PAID', method: 'CREDIT_CARD' }),
     );
     const expectedDonorId = crypto.createHash('sha256').update('jane@x.com').digest('hex');
-    expect(setDonorMock).toHaveBeenCalledWith('donors', expectedDonorId, expect.any(Object), { merge: true });
+    expect(setDonorMock).toHaveBeenCalledWith(
+      'donors', expectedDonorId,
+      expect.objectContaining({ name: 'Jane Doe', createdAt: 'TS', lastGiftAt: 'TS' }),
+      { merge: true },
+    );
   });
 
   it('marks EXPIRED on invoice.expired', async () => {

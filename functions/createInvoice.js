@@ -8,7 +8,9 @@ export async function createInvoiceHandler(request) {
     throw new HttpsError('invalid-argument', 'amount must be > 0');
   }
 
-  const secret = process.env.XENDIT_SECRET_KEY;
+  // .trim() guards against a stray trailing newline in the stored secret —
+  // that corrupts the Basic-auth header and makes Xendit return 401.
+  const secret = process.env.XENDIT_SECRET_KEY?.trim();
   if (!secret) throw new HttpsError('failed-precondition', 'XENDIT_SECRET_KEY missing');
 
   const externalId = `donation-${Date.now()}`;

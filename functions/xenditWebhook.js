@@ -12,8 +12,10 @@ function constantTimeEq(a, b) {
 }
 
 export async function handleWebhookRequest(req, res) {
-  const expected = process.env.XENDIT_CALLBACK_TOKEN;
-  const got = req.headers['x-callback-token'];
+  // .trim() guards against a stray trailing newline in the stored secret that
+  // would make every callback token mismatch → all webhooks rejected as 401.
+  const expected = process.env.XENDIT_CALLBACK_TOKEN?.trim();
+  const got = (req.headers['x-callback-token'] || '').trim();
 
   if (!expected || !got || !constantTimeEq(got, expected)) {
     return res.status(401).send('unauthorized');
@@ -34,13 +36,23 @@ export async function handleWebhookRequest(req, res) {
 
   if (status === 'PAID' && body.payer_email) {
     const donorId = crypto.createHash('sha256').update(body.payer_email).digest('hex');
-    await db.collection('donors').doc(donorId).set(
-      {
-        email: body.payer_email,
-        totalGiven: FieldValue.increment(Number(body.amount) || 0),
-        donationCount: FieldValue.increment(1),
-        lastGiftAt: FieldValue.serverTimestamp(),
-      },
+    const donorRef = db.collection('donors').doc(donorId);
+    // Carry the donor's name from the original donation, and ensure `createdAt`
+    // exists — the admin Donors list queries orderBy('createdAt'), which silently
+    // drops any donor doc missing that field (so they'd never show up).
+    const donationSnap = await db.collection('donations').doc(externalId).get();
+    const donorName = donationSnap.exists ? donationSnap.data().donorName || null : null;
+    const existingDonor = await donorRef.get();
+    const donorPatch = {
+      email: body.payer_email,
+      totalGiven: FieldValue.increment(Number(body.amount) || 0),
+      donationCount: FieldValue.increment(1),
+      lastGiftAt: FieldValue.serverTimestamp(),
+    };
+    if (donorName) donorPatch.name = donorName;
+    if (!existingDonor.exists || !existingDonor.data().createdAt) donorPatch.createdAt = FieldValue.serverTimestamp();
+    await donorRef.set(
+      donorPatch,
       { merge: true },
     );
   }
