@@ -92,7 +92,7 @@ export default function AdminDonors() {
                 name: d.name || d.donor_name || d.donorName || 'Anonymous',
                 email: d.email || d.donor_email || d.donorEmail || '',
                 count: Number(d.donationCount || d.donation_count || d.count || 0),
-                total: Number(d.totalDonated || d.total_donated || d.total || 0),
+                total: Number(d.totalGiven || d.totalDonated || d.total_donated || d.total || 0),
                 lastAt: d.lastDonationAt || d.last_donation_at || d.lastGiftAt || d.updatedAt || d.createdAt || null,
             }));
         }
