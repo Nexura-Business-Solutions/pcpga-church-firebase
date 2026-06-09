@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import PhilippinesMap from '../components/PhilippinesMap.jsx';
+import { PRESBYTERY_COLOR } from '../lib/presbyteryMap.js';
 import AnnouncementModal from '../components/AnnouncementModal.jsx';
 import EventsCarousel from '../components/EventsCarousel.jsx';
 import VideoCarousel from '../components/VideoCarousel.jsx';
@@ -949,10 +950,20 @@ export default function HomePage() {
           <div className="presbyteries__layout">
             <aside className="ph-map reveal">
               <div className="ph-map__label">— Map of the Communion —</div>
-              <PhilippinesMap />
-              <div className="ph-map__legend">
-                <span className="pin" />
-                <span>Seat of Presbytery · mga kongregasyon</span>
+              <PhilippinesMap onSelect={(name) => { const i = presbyteries.findIndex((p) => p.name === name); if (i >= 0) openPresbytery(i); }} />
+              <div className="ph-map__hint">Pindutin ang isang lugar o pangalan sa ibaba</div>
+              <div className="ph-map__plegend">
+                {presbyteries.filter((p) => PRESBYTERY_COLOR[p.name]).map((p) => (
+                  <button
+                    type="button"
+                    key={p.name}
+                    className="ph-map__pchip"
+                    onClick={() => { const i = presbyteries.findIndex((x) => x.name === p.name); if (i >= 0) openPresbytery(i); }}
+                  >
+                    <span className="ph-map__pdot" style={{ background: PRESBYTERY_COLOR[p.name] }} />
+                    {p.name.replace('NCR Presbytery - ', 'NCR ').replace(' Presbytery', '')}
+                  </button>
+                ))}
               </div>
             </aside>
 
