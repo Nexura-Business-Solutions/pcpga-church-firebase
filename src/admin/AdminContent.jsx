@@ -1092,7 +1092,7 @@ export default function AdminContent() {
                                                                 </div>
                                                                 <div className="space-y-1">
                                                                     <label className="text-[9px] font-bold uppercase tracking-widest text-coral ml-1">Founded</label>
-                                                                    <input type="text" placeholder="MCMXII" value={p.founded || ''} onChange={e => { const updated = [...presbyteries]; updated[idx] = { ...updated[idx], founded: e.target.value }; setPresbyteries(updated); }} className="w-full bg-[hsl(var(--admin-bg-alt))] p-3 rounded-xl text-[11px] font-bold border border-[hsl(var(--admin-text))]/20 shadow-sm" />
+                                                                    <input type="text" placeholder="e.g. 1987" value={p.founded || ''} onChange={e => { const updated = [...presbyteries]; updated[idx] = { ...updated[idx], founded: e.target.value }; setPresbyteries(updated); }} className="w-full bg-[hsl(var(--admin-bg-alt))] p-3 rounded-xl text-[11px] font-bold border border-[hsl(var(--admin-text))]/20 shadow-sm" />
                                                                 </div>
                                                             </div>
                                                             <div className="space-y-1">
