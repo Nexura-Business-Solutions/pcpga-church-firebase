@@ -18,7 +18,6 @@ import {
     Scroll,
     Footprints,
     Amphora,
-    Cross,
     BarChart3,
     Landmark,
     CircleDollarSign,
@@ -47,7 +46,6 @@ const TABS = [
     { id: 'mission', label: 'Narrative', icon: Scroll },
     { id: 'points', label: 'Mission', icon: Footprints },
     { id: 'commitments', label: 'Spirit', icon: Amphora },
-    { id: 'principles', label: 'Message', icon: Cross },
     { id: 'welcome', label: 'Welcome', icon: Quote },
     { id: 'stats', label: 'Visitor', icon: BarChart3 },
     { id: 'committees', label: 'Governance', icon: Landmark },
@@ -73,7 +71,6 @@ export default function AdminContent() {
 
     const [identity, setIdentity] = useState({});
     const [mission, setMission] = useState({});
-    const [principles, setPrinciples] = useState({});
     const [stats, setStats] = useState({});
     const [committees, setCommittees] = useState([]);
     const [presbyteries, setPresbyteries] = useState([]);
@@ -88,10 +85,9 @@ export default function AdminContent() {
 
     useEffect(() => {
         async function load() {
-            const [id, mv, cp, iv, coms, hr, dn, an] = await Promise.all([
+            const [id, mv, iv, coms, hr, dn, an] = await Promise.all([
                 getSettings('site-identity'),
                 getSettings('mission-vision'),
-                getSettings('core-principles'),
                 getSettings('invitation-stats'),
                 getSettings('standing-committees'),
                 getSettings('hero'),
@@ -106,11 +102,6 @@ export default function AdminContent() {
             });
             const py = await getSettings('presbyteries');
             setPresbyteries(Array.isArray(py) && py.length > 0 ? py : defaultPresbyteries);
-            // 'core-principles' holds the pastoral Message section (title +
-            // paragraphs + signer + role) — the shape MessageSection.jsx reads.
-            setPrinciples(cp && (cp.title || cp.paragraphs)
-                ? { title: '', paragraphs: [''], signer: '', role: '', ...cp }
-                : { title: '', paragraphs: [''], signer: '', role: '' });
             setStats(iv && iv.stats ? iv : {
                 stats: [{ value: '', label: '' }],
                 visitTitle: '', visitSubtitle: '',
@@ -137,7 +128,6 @@ export default function AdminContent() {
             const results = await Promise.all([
                 saveSettings('site-identity', identity),
                 saveSettings('mission-vision', mission),
-                saveSettings('core-principles', principles),
                 saveSettings('invitation-stats', stats),
                 saveSettings('standing-committees', committees),
                 saveSettings('presbyteries', presbyteries),
@@ -734,86 +724,6 @@ export default function AdminContent() {
                                                 + Add Core Commitment
                                             </button>
                                         )}
-                                    </div>
-                                )}
-
-                                {/* PRINCIPLES & QUOTES TAB */}
-                                {activeTab === 'principles' && (
-                                    <div className="space-y-12">
-                                        <div>
-                                            <label className="block text-coral text-[10px] tracking-[0.25em] uppercase mb-4 font-bold">Message Heading</label>
-                                            <textarea
-                                                rows={3}
-                                                value={principles.title || ''}
-                                                onChange={(e) => setPrinciples({ ...principles, title: e.target.value })}
-                                                placeholder="We are a church built on the old foundation…"
-                                                className="w-full bg-[hsl(var(--admin-bg-alt))] border border-[hsl(var(--admin-text))]/20 rounded-2xl p-5 text-lg font-display font-medium leading-relaxed focus:ring-2 focus:ring-coral/20 outline-none transition-all resize-none"
-                                            />
-                                        </div>
-
-                                        <div>
-                                            <label className="block text-coral text-[10px] tracking-[0.25em] uppercase mb-4 font-bold">Pull Quote</label>
-                                            <textarea
-                                                rows={2}
-                                                value={principles.pullQuote || ''}
-                                                onChange={(e) => setPrinciples({ ...principles, pullQuote: e.target.value })}
-                                                placeholder="A short highlighted line pulled from the message…"
-                                                className="w-full bg-[hsl(var(--admin-bg-alt))] border border-[hsl(var(--admin-text))]/20 rounded-2xl p-5 text-sm italic leading-relaxed focus:ring-2 focus:ring-coral/20 outline-none transition-all resize-none"
-                                            />
-                                        </div>
-
-                                        <div className="space-y-6">
-                                            <h3 className="text-[10px] font-bold uppercase tracking-widest text-coral border-b border-[hsl(var(--admin-border))] pb-4">Body Paragraphs</h3>
-                                            <div className="grid grid-cols-1 gap-4">
-                                                {(Array.isArray(principles.paragraphs) ? principles.paragraphs : ['']).map((para, i) => (
-                                                    <div key={i} className="flex gap-3 items-start">
-                                                        <span className="mt-5 text-[10px] font-bold text-[hsl(var(--admin-text-dim))]/40 w-5 text-right">{i + 1}</span>
-                                                        <textarea
-                                                            rows={4}
-                                                            value={para}
-                                                            onChange={(e) => {
-                                                                const paragraphs = [...(principles.paragraphs || [])];
-                                                                paragraphs[i] = e.target.value;
-                                                                setPrinciples({ ...principles, paragraphs });
-                                                            }}
-                                                            placeholder="Write a paragraph of the pastoral message…"
-                                                            className="flex-1 bg-[hsl(var(--admin-bg-alt))] p-5 rounded-2xl text-sm leading-relaxed resize-none focus:ring-2 focus:ring-coral/20 border border-[hsl(var(--admin-text))]/20 outline-none transition-all"
-                                                        />
-                                                        <button
-                                                            onClick={() => removeItem(principles.paragraphs || [''], (l) => setPrinciples({ ...principles, paragraphs: l }), i)}
-                                                            className="mt-3 p-3 text-red-500 hover:bg-red-50 rounded-xl transition-colors"
-                                                        ><Trash2 className="w-4 h-4" /></button>
-                                                    </div>
-                                                ))}
-                                                <button
-                                                    onClick={() => addItem(principles.paragraphs || [], (l) => setPrinciples({ ...principles, paragraphs: l }), '')}
-                                                    className="w-full py-5 rounded-2xl border-2 border-dashed border-[hsl(var(--admin-border))] text-[10px] font-bold uppercase tracking-widest text-coral hover:bg-coral/5 transition-all"
-                                                >
-                                                    + Add Paragraph
-                                                </button>
-                                            </div>
-                                        </div>
-
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-6 border-t border-[hsl(var(--admin-border))]">
-                                            <div>
-                                                <label className="block text-coral text-[10px] tracking-[0.25em] uppercase mb-4 font-bold">Signed By</label>
-                                                <input
-                                                    value={principles.signer || ''}
-                                                    onChange={(e) => setPrinciples({ ...principles, signer: e.target.value })}
-                                                    placeholder="Rev. Edgar P. Adra"
-                                                    className="w-full bg-[hsl(var(--admin-bg-alt))] border border-[hsl(var(--admin-text))]/20 rounded-2xl p-5 text-sm font-medium focus:ring-2 focus:ring-coral/20 outline-none transition-all"
-                                                />
-                                            </div>
-                                            <div>
-                                                <label className="block text-coral text-[10px] tracking-[0.25em] uppercase mb-4 font-bold">Title / Role</label>
-                                                <input
-                                                    value={principles.role || ''}
-                                                    onChange={(e) => setPrinciples({ ...principles, role: e.target.value })}
-                                                    placeholder="Moderator, General Assembly"
-                                                    className="w-full bg-[hsl(var(--admin-bg-alt))] border border-[hsl(var(--admin-text))]/20 rounded-2xl p-5 text-sm font-medium focus:ring-2 focus:ring-coral/20 outline-none transition-all"
-                                                />
-                                            </div>
-                                        </div>
                                     </div>
                                 )}
 
@@ -1937,7 +1847,6 @@ export default function AdminContent() {
                                         hero={hero}
                                         identity={identity}
                                         mission={mission}
-                                        principles={principles}
                                         stats={stats}
                                         committees={committees}
                                         presbyteries={presbyteries}
