@@ -10,8 +10,14 @@ export default function PhilippinesMap({ onSelect = null } = {}) {
   useEffect(() => {
     if (!interactive || !svgRef.current) return undefined;
     svgRef.current.querySelectorAll('.ph-provinces path[id]').forEach((path) => {
+      // Self-style every province so the map looks right even outside the
+      // lp-v3 landing CSS (e.g. on the /churches page, which doesn't set it):
+      // a dark hairline border, and a faint base fill for non-PCP provinces.
+      path.style.stroke = '#2c1810';
+      path.style.strokeWidth = '1';
+      path.style.strokeLinejoin = 'round';
       const pres = PROVINCE_TO_PRESBYTERY[path.id];
-      if (!pres) return;
+      if (!pres) { path.style.fill = 'rgba(184,146,63,0.16)'; return; }
       path.style.fill = PRESBYTERY_COLOR[pres];
       path.style.cursor = 'pointer';
       path.dataset.presbytery = pres;
@@ -35,6 +41,8 @@ export default function PhilippinesMap({ onSelect = null } = {}) {
             viewBox="0 0 702.39001 1209.4381"
             xmlns="http://www.w3.org/2000/svg"
             aria-hidden={interactive ? undefined : true}
+            role={interactive ? 'group' : undefined}
+            aria-label={interactive ? 'Presbytery map of the Philippines — select a province to see its churches' : undefined}
             preserveAspectRatio="xMidYMid meet"
             onClick={interactive ? (e) => pick(e.target) : undefined}
             onKeyDown={interactive ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(e.target); } } : undefined}

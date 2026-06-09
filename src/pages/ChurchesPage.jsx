@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { getChurches } from '../lib/store.js';
+import { getSettings, churchesFromPresbyteries } from '../lib/store.js';
 import { regions } from '../lib/seed-data.js';
 import { Skeleton } from '../components/Skeleton.jsx';
 import Footer from '../components/Footer.jsx';
@@ -19,17 +19,30 @@ export default function ChurchesPage() {
     const [viewMode, setViewMode] = useState('list'); // 'list' or 'map'
     const [mode, setMode] = useState('explore'); // 'explore' (SVG presbytery map) or 'find' (Google-Maps finder)
     const [presbyteryFilter, setPresbyteryFilter] = useState('');
+    const [presbyteries, setPresbyteries] = useState([]); // full roster (settings/presbyteries) for the detail panel
+    const [selectedPresbyteryName, setSelectedPresbyteryName] = useState(null);
     const [footerNear, setFooterNear] = useState(false);
     const footerSentinelRef = useRef(null);
 
     useEffect(() => {
-        const fetchChurches = async () => {
-            const data = await getChurches();
-            setChurches(data);
+        const fetchData = async () => {
+            // settings/presbyteries is the single source — derive the finder list
+            // from it (one Firestore read instead of two).
+            const presbyteryData = await getSettings('presbyteries');
+            const arr = Array.isArray(presbyteryData) ? presbyteryData : [];
+            setPresbyteries(arr);
+            setChurches(churchesFromPresbyteries(arr));
             setLoading(false);
         };
-        fetchChurches();
+        fetchData();
     }, []);
+
+    // Resolve the selected presbytery from live state, so a click made before the
+    // roster finishes loading auto-fills once the data arrives (no stale empty panel).
+    const selectedPresbytery = selectedPresbyteryName
+        ? (presbyteries.find((x) => x.name === selectedPresbyteryName) || { name: selectedPresbyteryName, churches: [] })
+        : null;
+    const openPresbytery = (name) => { setSelectedPresbyteryName(name); setMode('explore'); };
 
     useEffect(() => {
         const onScroll = () => {
@@ -80,13 +93,13 @@ export default function ChurchesPage() {
                         </Link>
                         <div className="flex p-1 bg-black/[0.04] rounded-full">
                             <button
-                                onClick={() => setMode('explore')}
+                                onClick={() => { setMode('explore'); setSelectedPresbyteryName(null); }}
                                 className={`px-3 sm:px-5 min-h-[40px] rounded-full text-[10px] font-bold tracking-widest uppercase transition-all ${mode === 'explore' ? 'bg-accent text-white shadow' : 'text-church-gray hover:text-accent'}`}
                             >
                                 Explore Map
                             </button>
                             <button
-                                onClick={() => setMode('find')}
+                                onClick={() => { setMode('find'); setSelectedPresbyteryName(null); }}
                                 className={`px-3 sm:px-5 min-h-[40px] rounded-full text-[10px] font-bold tracking-widest uppercase transition-all ${mode === 'find' ? 'bg-accent text-white shadow' : 'text-church-gray hover:text-accent'}`}
                             >
                                 Find a Church
@@ -101,24 +114,24 @@ export default function ChurchesPage() {
                     </div>
                 </nav>
 
-                {mode === 'explore' && (
+                {mode === 'explore' && !selectedPresbytery && (
                     <div className="pt-16 min-h-screen flex flex-col items-center px-5 pb-16">
                         <div className="max-w-2xl text-center pt-8 lg:pt-12 pb-6">
                             <p className="text-[10px] lg:text-[11px] font-bold tracking-[0.3em] uppercase text-accent mb-3">Across the Archipelago</p>
                             <h1 className="text-2xl lg:text-4xl font-bold text-church-dark font-display tracking-tight mb-3">Our Churches by Presbytery</h1>
                             <p className="text-[13px] lg:text-sm text-church-gray leading-relaxed">
-                                Pindutin ang isang lugar sa mapa — o isang presbytery sa ibaba — para makita ang mga simbahan doon. O kaya{' '}
-                                <button onClick={() => { setPresbyteryFilter(''); setMode('find'); }} className="text-accent font-bold underline underline-offset-2">maghanap ng simbahan malapit sa&apos;yo →</button>
+                                Pindutin ang isang lugar sa mapa — o isang presbytery sa ibaba — para makita ang mga simbahan at impormasyon nila. O kaya{' '}
+                                <button onClick={() => { setSelectedPresbyteryName(null); setPresbyteryFilter(''); setMode('find'); }} className="text-accent font-bold underline underline-offset-2">maghanap ng simbahan malapit sa&apos;yo →</button>
                             </p>
                         </div>
                         <div className="w-full max-w-[520px]">
-                            <PhilippinesMap onSelect={(name) => { setPresbyteryFilter(name); setSearch(''); setRegionFilter(''); setMode('find'); }} />
+                            <PhilippinesMap onSelect={openPresbytery} />
                         </div>
                         <div className="flex flex-wrap justify-center gap-2 mt-8 max-w-2xl">
                             {Object.keys(PRESBYTERY_COLOR).map((name) => (
                                 <button
                                     key={name}
-                                    onClick={() => { setPresbyteryFilter(name); setSearch(''); setRegionFilter(''); setMode('find'); }}
+                                    onClick={() => openPresbytery(name)}
                                     className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-black/[0.06] bg-white text-[11px] text-church-dark hover:bg-church-dark hover:text-white transition-colors"
                                 >
                                     <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: PRESBYTERY_COLOR[name] }} />
@@ -127,6 +140,16 @@ export default function ChurchesPage() {
                             ))}
                         </div>
                     </div>
+                )}
+
+                {mode === 'explore' && selectedPresbytery && (
+                    <PresbyteryDetail
+                        presbytery={selectedPresbytery}
+                        loading={loading}
+                        accent={PRESBYTERY_COLOR[selectedPresbytery.name]}
+                        onBack={() => setSelectedPresbyteryName(null)}
+                        onFindOnMap={() => { setPresbyteryFilter(selectedPresbytery.name); setSearch(''); setRegionFilter(''); setSelectedPresbyteryName(null); setMode('find'); }}
+                    />
                 )}
 
                 {mode === 'find' && (
@@ -397,5 +420,91 @@ export default function ChurchesPage() {
             <Footer />
             <ChatbotWidget />
         </>
+    );
+}
+
+// Congregation roster for one presbytery — shown when a province/chip is tapped
+// on the Explore map. Tailwind-styled (the /churches page is not the lp-v3
+// landing, so the modal CSS does not apply here). Lists every member church with
+// whatever info exists, including address-less leadership-only rosters.
+function PresbyteryDetail({ presbytery, loading, accent, onBack, onFindOnMap }) {
+    const churches = Array.isArray(presbytery.churches) ? presbytery.churches : [];
+    const officers = Array.isArray(presbytery.officers) ? presbytery.officers : [];
+    const withAddress = churches.filter((c) => c && c.address && c.address.trim()).length;
+    // Move focus to the heading when a presbytery is opened, so keyboard/screen
+    // reader users land on the swapped-in content.
+    const headingRef = useRef(null);
+    useEffect(() => { headingRef.current?.focus(); }, [presbytery.name]);
+    return (
+        <div className="pt-16 min-h-screen">
+            <div className="max-w-5xl mx-auto px-5 lg:px-8 py-8 lg:py-12">
+                <button onClick={onBack} className="text-[11px] font-bold tracking-widest uppercase text-church-gray hover:text-accent transition-colors mb-6 inline-flex items-center gap-2">
+                    ← Back to map
+                </button>
+
+                <div className="flex items-start gap-4 mb-8">
+                    <span className="w-3.5 h-3.5 rounded-full mt-2 shrink-0" style={{ background: accent || '#8b1f24' }} />
+                    <div className="flex-1 min-w-0">
+                        <p className="text-[10px] lg:text-[11px] font-bold tracking-[0.3em] uppercase text-accent mb-1">
+                            Presbytery{presbytery.region ? ` · ${presbytery.region}` : ''}
+                        </p>
+                        <h1 ref={headingRef} tabIndex={-1} className="text-2xl lg:text-4xl font-bold text-church-dark font-display tracking-tight outline-none">{presbytery.name}</h1>
+                        <p className="text-[12px] lg:text-sm text-church-gray mt-2">
+                            {presbytery.seat ? `Seat · ${presbytery.seat} · ` : ''}{churches.length} {churches.length === 1 ? 'congregation' : 'congregations'}
+                        </p>
+                    </div>
+                    {withAddress > 0 && (
+                        <button onClick={onFindOnMap} className="hidden sm:inline-flex items-center gap-2 px-4 min-h-[44px] rounded-xl bg-church-dark text-white text-[10px] font-bold tracking-widest uppercase hover:bg-black transition-colors shrink-0">
+                            📍 Find on map
+                        </button>
+                    )}
+                </div>
+
+                {officers.length > 0 && (
+                    <div className="mb-8">
+                        <h2 className="text-[10px] font-bold text-church-gray/50 tracking-[0.2em] uppercase mb-3">Executive Committee</h2>
+                        <div className="flex flex-wrap gap-2">
+                            {officers.map((o, i) => {
+                                // Officers may be stored as plain strings or as {name, role}
+                                // (AdminContent only upgrades to an object when a photo is set).
+                                const role = typeof o === 'string' ? '' : (o.role || '');
+                                const name = typeof o === 'string' ? o : (o.name || '');
+                                return (
+                                    <div key={`${role}-${name}-${i}`} className="px-3 py-2 rounded-xl bg-white border border-black/[0.04] text-[12px]">
+                                        {role && <span className="text-church-gray">{role}: </span>}
+                                        <span className="font-bold text-church-dark">{name}</span>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                )}
+
+                <h2 className="text-[10px] font-bold text-church-gray/50 tracking-[0.2em] uppercase mb-4">Member Churches ({loading && churches.length === 0 ? '…' : churches.length})</h2>
+                {churches.length === 0 ? (
+                    <p className="text-church-gray text-sm">{loading ? 'Naglo-load ang mga kongregasyon…' : 'Wala pang nakalistang simbahan para sa presbyteryang ito.'}</p>
+                ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {churches.map((c, i) => (
+                            <div key={`${c.name || 'church'}-${i}`} className="bg-white rounded-2xl p-5 border border-black/[0.04] shadow-sm">
+                                <h3 className="text-base font-bold text-church-dark font-display leading-tight mb-1">{c.name}</h3>
+                                {c.subPresbytery && <p className="text-[10px] font-bold uppercase tracking-wider text-accent/70 mb-2">{c.subPresbytery}</p>}
+                                <div className="space-y-1.5 text-[12.5px] text-church-gray mt-2">
+                                    {c.address && <p><span className="text-church-dark/40">📍</span> {c.address}</p>}
+                                    {(c.minister || c.pastor) && <p><span className="text-church-dark/40">👤</span> {c.minister || c.pastor}</p>}
+                                    {c.moderatorInCharge && <p><span className="text-church-dark/40">Moderator:</span> {c.moderatorInCharge}</p>}
+                                    {c.worshipTime && <p><span className="text-church-dark/40">🕐</span> {c.worshipTime}</p>}
+                                    {c.contact && <p><span className="text-church-dark/40">📞</span> {c.contact}</p>}
+                                    {c.email && <p><span className="text-church-dark/40">✉️</span> {c.email}</p>}
+                                    {Array.isArray(c.elders) && c.elders.length > 0 && (
+                                        <p><span className="text-church-dark/40">Elders:</span> {c.elders.join(', ')}</p>
+                                    )}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </div>
+        </div>
     );
 }
