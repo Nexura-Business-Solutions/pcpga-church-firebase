@@ -1,6 +1,44 @@
-export default function PhilippinesMap() {
+import { useEffect, useRef } from 'react';
+import { PRESBYTERY_COLOR, PROVINCE_TO_PRESBYTERY } from '../lib/presbyteryMap.js';
+
+// Each PCP presbytery is shaded on the map by the provinces it gathers (palette
+// + province map live in ../lib/presbyteryMap.js). Tapping a province opens that
+// presbytery; provinces with no PCP congregation keep the faint base fill.
+export default function PhilippinesMap({ onSelect = null } = {}) {
+  const svgRef = useRef(null);
+  const interactive = typeof onSelect === 'function';
+  useEffect(() => {
+    if (!interactive || !svgRef.current) return undefined;
+    svgRef.current.querySelectorAll('.ph-provinces path[id]').forEach((path) => {
+      const pres = PROVINCE_TO_PRESBYTERY[path.id];
+      if (!pres) return;
+      path.style.fill = PRESBYTERY_COLOR[pres];
+      path.style.cursor = 'pointer';
+      path.dataset.presbytery = pres;
+      path.setAttribute('tabindex', '0');
+      path.setAttribute('role', 'button');
+      path.setAttribute('aria-label', pres);
+      let title = path.querySelector('title');
+      if (!title) {
+        title = document.createElementNS('http://www.w3.org/2000/svg', 'title');
+        path.appendChild(title);
+      }
+      title.textContent = pres;
+    });
+    return undefined;
+  }, [interactive]);
+  const pick = (target) => { const pres = target?.dataset?.presbytery; if (pres) onSelect(pres); };
   return (
-          <svg className="ph-map__svg" viewBox="0 0 702.39001 1209.4381" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" preserveAspectRatio="xMidYMid meet">
+          <svg
+            ref={svgRef}
+            className={`ph-map__svg${interactive ? ' is-interactive' : ''}`}
+            viewBox="0 0 702.39001 1209.4381"
+            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden={interactive ? undefined : true}
+            preserveAspectRatio="xMidYMid meet"
+            onClick={interactive ? (e) => pick(e.target) : undefined}
+            onKeyDown={interactive ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(e.target); } } : undefined}
+          >
             {/* Sea backdrop (stippled) */}
             <defs>
               <pattern id="seaStipple" x="0" y="0" width="14" height="14" patternUnits="userSpaceOnUse">

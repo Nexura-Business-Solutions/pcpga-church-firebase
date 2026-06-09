@@ -1141,6 +1141,28 @@ body.lp-v3 .ph-map__svg .ph-provinces path {
 body.lp-v3 .ph-map__svg .ph-provinces path:hover {
   fill: rgba(184,146,63,0.40);
 }
+/* Interactive presbytery map: provinces are filled per-presbytery via inline
+   style (set in JS), so hover/focus emphasis uses filter+stroke, not fill. */
+body.lp-v3 .ph-map__svg.is-interactive .ph-provinces path { transition: filter 180ms ease, stroke-width 180ms ease; }
+body.lp-v3 .ph-map__svg.is-interactive .ph-provinces path[data-presbytery]:hover { filter: brightness(1.18) saturate(1.08); stroke-width: 1.7; }
+body.lp-v3 .ph-map__svg.is-interactive .ph-provinces path[data-presbytery]:focus-visible { outline: none; filter: brightness(1.2); stroke: var(--ink); stroke-width: 2; }
+body.lp-v3 .ph-map__hint {
+  margin-top: 0.85rem; text-align: center;
+  font-family: var(--font-mono); font-size: 8.5px; letter-spacing: 0.18em;
+  text-transform: uppercase; color: var(--ink-mute);
+}
+body.lp-v3 .ph-map__plegend {
+  display: flex; flex-wrap: wrap; gap: 0.4rem;
+  margin-top: 0.9rem; padding-top: 0.9rem; border-top: 1px solid var(--line);
+}
+body.lp-v3 .ph-map__pchip {
+  display: inline-flex; align-items: center; gap: 0.35rem;
+  padding: 0.25rem 0.55rem; border: 1px solid var(--line); border-radius: 999px;
+  background: var(--paper); font-size: 0.7rem; line-height: 1.1; color: var(--ink);
+  cursor: pointer; transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+body.lp-v3 .ph-map__pchip:hover { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+body.lp-v3 .ph-map__pdot { width: 9px; height: 9px; border-radius: 50%; flex: 0 0 auto; box-shadow: 0 0 0 1px rgba(0,0,0,0.12); }
 @media (max-width: 1000px) {
   body.lp-v3 .presbyteries__layout { grid-template-columns: 1fr; }
   body.lp-v3 .ph-map { position: static; max-width: 420px; margin: 0 auto; }
