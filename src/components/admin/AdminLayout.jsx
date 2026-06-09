@@ -5,7 +5,6 @@ import {
     LayoutDashboard,
     FileText,
     Users,
-    Church,
     Mic2,
     Library,
     Sun,
@@ -22,7 +21,6 @@ const navItems = [
     { label: 'Dashboard', href: '/admin', icon: LayoutDashboard },
     { label: 'Site Content', href: '/admin/content', icon: FileText },
     { label: 'Donor Database', href: '/admin/donations/donors', icon: Users },
-    { label: 'Churches', href: '/admin/churches', icon: Church },
     { label: 'Sermon Archive', href: '/admin/sermons', icon: Mic2 },
     { label: 'Digital Library', href: '/admin/library', icon: Library },
 ];

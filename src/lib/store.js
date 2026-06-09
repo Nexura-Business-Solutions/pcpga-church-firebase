@@ -4,15 +4,49 @@
 import {
   listSermons, createSermon, updateSermon as fsUpdateSermon, deleteSermon as fsDeleteSermon,
   listLibrary, createLibraryItem, updateLibraryItem, deleteLibraryItem,
-  listChurches, createChurch, updateChurch as fsUpdateChurch, deleteChurch as fsDeleteChurch,
+  createChurch, updateChurch as fsUpdateChurch, deleteChurch as fsDeleteChurch,
   getSetting, setSetting,
 } from './firestore.js';
 import { defaultPresbyteries, defaultSeminaries } from './seed-data.js';
 
 // ---------- Churches ----------
+// The "Find a Church" finder is DERIVED from settings/presbyteries (the single
+// source of truth, edited in the Content Manager). This keeps the homepage
+// presbytery directory and the finder perfectly in sync — one edit updates both,
+// no separate `churches` collection to drift out of date.
+function _slug(s) {
+  return String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+}
+function _province(addr) {
+  const parts = String(addr || '').split(',').map((s) => s.trim()).filter(Boolean);
+  const last = (parts[parts.length - 1] || '').replace(/\b\d{4}\b/, '').trim();
+  return last || (parts[parts.length - 2] || '');
+}
+export function churchesFromPresbyteries(presbyteries) {
+  const rows = [];
+  for (const p of (Array.isArray(presbyteries) ? presbyteries : [])) {
+    for (const c of (p.churches || [])) {
+      // A finder entry needs a location; address-less roster churches (e.g. a
+      // leadership-only directory) stay in the presbytery section only.
+      if (!c || !c.address || !String(c.address).trim()) continue;
+      rows.push({
+        id: `${_slug(p.name)}--${_slug(c.name)}`, // unique per presbytery+church (no name collisions)
+        name: c.name,
+        address: c.address,
+        region: p.region || '',
+        province: _province(c.address),
+        pastor: c.minister || c.moderatorInCharge || c.pastor || '',
+        serviceTime: c.worshipTime || '',
+        presbytery: p.name,
+        mapLink: c.mapLink || undefined,
+      });
+    }
+  }
+  return rows;
+}
 export async function getChurches() {
   try {
-    return await listChurches();
+    return churchesFromPresbyteries(await getSettings('presbyteries'));
   } catch (e) {
     console.error('getChurches error:', e);
     return [];
