@@ -7,6 +7,8 @@ import { regions } from '../lib/seed-data.js';
 import { Skeleton } from '../components/Skeleton.jsx';
 import Footer from '../components/Footer.jsx';
 import ChatbotWidget from '../components/ChatbotWidget.jsx';
+import PhilippinesMap from '../components/PhilippinesMap.jsx';
+import { PRESBYTERY_COLOR } from '../lib/presbyteryMap.js';
 
 export default function ChurchesPage() {
     const [churches, setChurches] = useState([]);
@@ -15,6 +17,8 @@ export default function ChurchesPage() {
     const [regionFilter, setRegionFilter] = useState('');
     const [selected, setSelected] = useState(null);
     const [viewMode, setViewMode] = useState('list'); // 'list' or 'map'
+    const [mode, setMode] = useState('explore'); // 'explore' (SVG presbytery map) or 'find' (Google-Maps finder)
+    const [presbyteryFilter, setPresbyteryFilter] = useState('');
     const [footerNear, setFooterNear] = useState(false);
     const footerSentinelRef = useRef(null);
 
@@ -52,7 +56,8 @@ export default function ChurchesPage() {
             (c.address || '').toLowerCase().includes(search.toLowerCase()) ||
             (c.province || '').toLowerCase().includes(search.toLowerCase());
         const matchesRegion = !regionFilter || c.region === regionFilter;
-        return matchesSearch && matchesRegion;
+        const matchesPresbytery = !presbyteryFilter || c.presbytery === presbyteryFilter;
+        return matchesSearch && matchesRegion && matchesPresbytery;
     });
 
     return (
@@ -68,20 +73,63 @@ export default function ChurchesPage() {
             <div className="min-h-screen bg-[#f8f7ff] selection:bg-accent/10">
                 {/* Header / Sub-Navbar */}
                 <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-xl border-b border-black/[0.04]">
-                    <div className="max-w-[1400px] mx-auto px-6 h-16 flex items-center justify-between">
-                        <Link to="/" className="flex items-center gap-2 font-bold tracking-tight font-display text-accent">
+                    <div className="max-w-[1400px] mx-auto px-6 h-16 flex items-center justify-between gap-3">
+                        <Link to="/" className="flex items-center gap-2 font-bold tracking-tight font-display text-accent shrink-0">
                             <span className="text-xl">✦</span>
-                            <span className="text-[15px] text-church-dark">PCP Finder</span>
+                            <span className="text-[15px] text-church-dark hidden sm:inline">PCP Finder</span>
                         </Link>
+                        <div className="flex p-1 bg-black/[0.04] rounded-full">
+                            <button
+                                onClick={() => setMode('explore')}
+                                className={`px-3 sm:px-5 min-h-[40px] rounded-full text-[10px] font-bold tracking-widest uppercase transition-all ${mode === 'explore' ? 'bg-accent text-white shadow' : 'text-church-gray hover:text-accent'}`}
+                            >
+                                Explore Map
+                            </button>
+                            <button
+                                onClick={() => setMode('find')}
+                                className={`px-3 sm:px-5 min-h-[40px] rounded-full text-[10px] font-bold tracking-widest uppercase transition-all ${mode === 'find' ? 'bg-accent text-white shadow' : 'text-church-gray hover:text-accent'}`}
+                            >
+                                Find a Church
+                            </button>
+                        </div>
                         <Link
                             to="/"
-                            className="text-[11px] font-bold tracking-widest uppercase text-church-gray hover:text-accent transition-colors flex items-center gap-2 bg-black/[0.03] px-5 min-h-[44px] rounded-xl"
+                            className="text-[11px] font-bold tracking-widest uppercase text-church-gray hover:text-accent transition-colors items-center gap-2 bg-black/[0.03] px-5 min-h-[44px] rounded-xl hidden md:flex shrink-0"
                         >
-                            ← Back to Home
+                            ← Home
                         </Link>
                     </div>
                 </nav>
 
+                {mode === 'explore' && (
+                    <div className="pt-16 min-h-screen flex flex-col items-center px-5 pb-16">
+                        <div className="max-w-2xl text-center pt-8 lg:pt-12 pb-6">
+                            <p className="text-[10px] lg:text-[11px] font-bold tracking-[0.3em] uppercase text-accent mb-3">Across the Archipelago</p>
+                            <h1 className="text-2xl lg:text-4xl font-bold text-church-dark font-display tracking-tight mb-3">Our Churches by Presbytery</h1>
+                            <p className="text-[13px] lg:text-sm text-church-gray leading-relaxed">
+                                Pindutin ang isang lugar sa mapa — o isang presbytery sa ibaba — para makita ang mga simbahan doon. O kaya{' '}
+                                <button onClick={() => { setPresbyteryFilter(''); setMode('find'); }} className="text-accent font-bold underline underline-offset-2">maghanap ng simbahan malapit sa&apos;yo →</button>
+                            </p>
+                        </div>
+                        <div className="w-full max-w-[520px]">
+                            <PhilippinesMap onSelect={(name) => { setPresbyteryFilter(name); setSearch(''); setRegionFilter(''); setMode('find'); }} />
+                        </div>
+                        <div className="flex flex-wrap justify-center gap-2 mt-8 max-w-2xl">
+                            {Object.keys(PRESBYTERY_COLOR).map((name) => (
+                                <button
+                                    key={name}
+                                    onClick={() => { setPresbyteryFilter(name); setSearch(''); setRegionFilter(''); setMode('find'); }}
+                                    className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-black/[0.06] bg-white text-[11px] text-church-dark hover:bg-church-dark hover:text-white transition-colors"
+                                >
+                                    <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: PRESBYTERY_COLOR[name] }} />
+                                    {name.replace('NCR Presbytery - ', 'NCR ').replace(' Presbytery', '')}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {mode === 'find' && (
                 <div className="pt-16 flex flex-col lg:flex-row h-auto lg:h-[100dvh] lg:overflow-hidden relative">
                     {/* ── SEARCH & RESULTS SIDEBAR ── */}
                     <aside className={`w-full lg:w-[420px] xl:w-[480px] bg-white border-b lg:border-r border-black/[0.04] flex flex-col shadow-2xl shadow-black/[0.02] z-10 ${viewMode === 'map' ? 'hidden lg:flex' : 'flex'}`}>
@@ -128,10 +176,18 @@ export default function ChurchesPage() {
 
                         {/* Results List */}
                         <div className="flex-1 lg:overflow-y-auto custom-scrollbar p-4 lg:p-6 bg-church-light/30 lg:max-h-none">
-                            <div className="mb-4 px-2 flex items-center justify-between">
+                            <div className="mb-4 px-2 flex items-center justify-between gap-2">
                                 <h3 className="text-[10px] font-bold text-church-gray/50 tracking-[0.2em] uppercase">
                                     {loading ? 'Scanning MAP...' : `${filtered.length} Congregations Found`}
                                 </h3>
+                                {presbyteryFilter && (
+                                    <button
+                                        onClick={() => setPresbyteryFilter('')}
+                                        className="text-[9px] font-bold uppercase tracking-wider text-accent bg-accent/10 px-2.5 py-1 rounded-full hover:bg-accent/20 whitespace-nowrap shrink-0"
+                                    >
+                                        {presbyteryFilter.replace('NCR Presbytery - ', 'NCR ').replace(' Presbytery', '')} ✕
+                                    </button>
+                                )}
                             </div>
 
                             <div className="space-y-3 lg:space-y-4">
@@ -335,6 +391,7 @@ export default function ChurchesPage() {
                         </div>
                     </div>
                 </div>
+                )}
             </div>
             <div ref={footerSentinelRef} aria-hidden="true" className="lg:hidden h-px" />
             <Footer />
