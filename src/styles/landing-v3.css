@@ -2157,6 +2157,9 @@ body.lp-v3 .evcar__lightbox {
   background: rgba(15,8,4,0.92);
   display: flex; align-items: center; justify-content: center;
   padding: clamp(1rem, 4vw, 3rem); cursor: zoom-out;
+  /* Touch scrolls on the overlay must not chain into the page behind it. */
+  overscroll-behavior: contain;
+  touch-action: none;
 }
 body.lp-v3 .evcar__lightbox img {
   max-width: 100%; max-height: 100%; object-fit: contain;

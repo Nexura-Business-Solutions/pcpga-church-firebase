@@ -389,9 +389,10 @@ em.font-display,
 /* Lock the page behind the shared mobile drawer + the announcement popup. The
    real scroller is <html> (body uses overflow-x:clip), so toggling body overflow
    alone won't hold on iOS — lock <html> via :has(). */
-body.menu-open, body.announce-open { overflow: hidden; }
+body.menu-open, body.announce-open, body.lightbox-open { overflow: hidden; }
 html:has(body.menu-open),
-html:has(body.announce-open) { overflow: hidden; }
+html:has(body.announce-open),
+html:has(body.lightbox-open) { overflow: hidden; }
 
 /* The drawer is paper and full-height (starts at top:0), so the nav sits on top
    of it. Force the nav into its solid/dark state while open so the logo and

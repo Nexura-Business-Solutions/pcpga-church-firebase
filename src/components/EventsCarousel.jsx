@@ -43,6 +43,15 @@ export default function EventsCarousel({ events = [] }) {
         return () => window.removeEventListener('keydown', onKey);
     }, [go, index]);
 
+    // Lock the page scroll while the poster is enlarged. The real scroller is
+    // <html> (body uses overflow-x:clip), so the lock is a body class consumed
+    // by `html:has(body.lightbox-open)` — same pattern as announce/modal.
+    useEffect(() => {
+        if (!lightbox) return undefined;
+        document.body.classList.add('lightbox-open');
+        return () => document.body.classList.remove('lightbox-open');
+    }, [lightbox]);
+
     if (count === 0) return null;
     const ev = slides[index % count];
 
