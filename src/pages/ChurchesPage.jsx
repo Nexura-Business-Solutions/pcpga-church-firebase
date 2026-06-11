@@ -115,7 +115,7 @@ export default function ChurchesPage() {
                 </nav>
 
                 {mode === 'explore' && !selectedPresbytery && (
-                    <div className="pt-16 min-h-screen flex flex-col items-center px-5 pb-16">
+                    <div className="pt-16 min-h-screen flex flex-col items-center px-5 pb-28 lg:pb-16">
                         <div className="max-w-2xl text-center pt-8 lg:pt-12 pb-6">
                             <p className="text-[10px] lg:text-[11px] font-bold tracking-[0.3em] uppercase text-accent mb-3">Across the Archipelago</p>
                             <h1 className="text-2xl lg:text-4xl font-bold text-church-dark font-display tracking-tight mb-3">Our Churches by Presbytery</h1>
@@ -128,16 +128,22 @@ export default function ChurchesPage() {
                             <PhilippinesMap onSelect={openPresbytery} />
                         </div>
                         <div className="flex flex-wrap justify-center gap-2 mt-8 max-w-2xl">
-                            {Object.keys(PRESBYTERY_COLOR).map((name) => (
-                                <button
-                                    key={name}
-                                    onClick={() => openPresbytery(name)}
-                                    className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-black/[0.06] bg-white text-[11px] text-church-dark hover:bg-church-dark hover:text-white transition-colors"
-                                >
-                                    <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: PRESBYTERY_COLOR[name] }} />
-                                    {name.replace('NCR Presbytery - ', 'NCR ').replace(' Presbytery', '')}
-                                </button>
-                            ))}
+                            {Object.keys(PRESBYTERY_COLOR).map((name) => {
+                                const count = (presbyteries.find((x) => x.name === name)?.churches || []).length;
+                                return (
+                                    <button
+                                        key={name}
+                                        onClick={() => openPresbytery(name)}
+                                        className="inline-flex items-center gap-2 pl-3 pr-2 min-h-[40px] rounded-full border border-black/[0.06] bg-white text-[11px] text-church-dark hover:bg-church-dark hover:text-white transition-colors shadow-sm"
+                                    >
+                                        <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: PRESBYTERY_COLOR[name] }} />
+                                        {name.replace('NCR Presbytery - ', 'NCR ').replace(' Presbytery', '')}
+                                        {count > 0 && (
+                                            <span className="text-[9px] font-bold bg-black/[0.05] group-hover:bg-white/20 rounded-full px-1.5 py-0.5 text-church-gray min-w-[1.4rem] text-center">{count}</span>
+                                        )}
+                                    </button>
+                                );
+                            })}
                         </div>
                     </div>
                 )}
@@ -394,7 +400,7 @@ export default function ChurchesPage() {
                     {/* Mobile View Toggle Switch (Glassmorphic Segmented Control) */}
                     <div
                         aria-hidden={footerNear}
-                        className={`lg:hidden fixed bottom-[max(1.5rem,env(safe-area-inset-bottom))] left-1/2 -translate-x-1/2 z-[80] w-auto transition-all duration-300 ${footerNear ? 'opacity-0 translate-y-24 pointer-events-none' : 'opacity-100 translate-y-0'}`}
+                        className={`lg:hidden fixed bottom-[max(1.5rem,env(safe-area-inset-bottom))] left-4 z-[80] w-auto transition-all duration-300 ${footerNear ? 'opacity-0 translate-y-24 pointer-events-none' : 'opacity-100 translate-y-0'}`}
                     >
                         <div className="flex p-1.5 bg-black/40 backdrop-blur-2xl rounded-full border border-white/10 shadow-2xl">
                             <button
@@ -437,12 +443,12 @@ function PresbyteryDetail({ presbytery, loading, accent, onBack, onFindOnMap }) 
     useEffect(() => { headingRef.current?.focus(); }, [presbytery.name]);
     return (
         <div className="pt-16 min-h-screen">
-            <div className="max-w-5xl mx-auto px-5 lg:px-8 py-8 lg:py-12">
-                <button onClick={onBack} className="text-[11px] font-bold tracking-widest uppercase text-church-gray hover:text-accent transition-colors mb-6 inline-flex items-center gap-2">
+            <div className="max-w-5xl mx-auto px-5 lg:px-8 pt-6 lg:pt-12 pb-24 lg:pb-12">
+                <button onClick={onBack} className="text-[11px] font-bold tracking-widest uppercase text-church-gray hover:text-accent transition-colors mb-4 lg:mb-6 inline-flex items-center gap-2 min-h-[44px] -ml-1 px-1">
                     ← Back to map
                 </button>
 
-                <div className="flex items-start gap-4 mb-8">
+                <div className="flex items-start gap-3 lg:gap-4 mb-5 lg:mb-8">
                     <span className="w-3.5 h-3.5 rounded-full mt-2 shrink-0" style={{ background: accent || '#8b1f24' }} />
                     <div className="flex-1 min-w-0">
                         <p className="text-[10px] lg:text-[11px] font-bold tracking-[0.3em] uppercase text-accent mb-1">
@@ -459,6 +465,12 @@ function PresbyteryDetail({ presbytery, loading, accent, onBack, onFindOnMap }) 
                         </button>
                     )}
                 </div>
+
+                {withAddress > 0 && (
+                    <button onClick={onFindOnMap} className="sm:hidden w-full mb-6 inline-flex items-center justify-center gap-2 px-4 min-h-[48px] rounded-2xl bg-church-dark text-white text-[11px] font-bold tracking-widest uppercase active:bg-black transition-colors shadow-lg shadow-black/10">
+                        📍 Hanapin sa mapa
+                    </button>
+                )}
 
                 {officers.length > 0 && (
                     <div className="mb-8">
