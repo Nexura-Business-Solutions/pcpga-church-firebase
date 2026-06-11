@@ -21,9 +21,13 @@ export const PRESBYTERY_COLOR = {
 };
 
 // Which PCP presbytery gathers the churches of each province (by the SVG path id).
+// Only provinces with at least one congregation are listed (audited 2026-06-11
+// against every directory church address). Where two presbyteries share a
+// province (Metro Manila, Rizal, Bulacan, Pampanga, Bataan) the one with the
+// most churches there wins, since the map can only give a province one colour.
 export const PROVINCE_TO_PRESBYTERY = {
   'PH-MNL': 'NCR Presbytery - North Metro',
-  'PH-QUI': 'Northern Luzon Presbytery', 'PH-NUV': 'Northern Luzon Presbytery', 'PH-ISA': 'Northern Luzon Presbytery', 'PH-BEN': 'Northern Luzon Presbytery',
+  'PH-QUI': 'Northern Luzon Presbytery', 'PH-NUV': 'Northern Luzon Presbytery', 'PH-ISA': 'Northern Luzon Presbytery', 'PH-BEN': 'Northern Luzon Presbytery', 'PH-IFU': 'Northern Luzon Presbytery',
   'PH-TAR': 'Central Luzon North Presbytery', 'PH-PAN': 'Central Luzon North Presbytery', 'PH-NUE': 'Central Luzon North Presbytery',
   'PH-PAM': 'Central Luzon Presbytery', 'PH-BAN': 'Central Luzon Presbytery',
   'PH-ZMB': 'Western Luzon Presbytery',
@@ -31,8 +35,8 @@ export const PROVINCE_TO_PRESBYTERY = {
   'PH-RIZ': 'Rizal Presbytery',
   'PH-CAV': 'Cavite Presbytery',
   'PH-LAG': 'Southern Luzon Presbytery', 'PH-QUE': 'Southern Luzon Presbytery', 'PH-BTG': 'Southern Luzon Presbytery', 'PH-MDR': 'Southern Luzon Presbytery', 'PH-PLW': 'Southern Luzon Presbytery',
-  'PH-ALB': 'Bicol Presbytery', 'PH-CAS': 'Bicol Presbytery', 'PH-CAN': 'Bicol Presbytery', 'PH-SOR': 'Bicol Presbytery', 'PH-MAS': 'Bicol Presbytery', 'PH-CAT': 'Bicol Presbytery',
+  'PH-ALB': 'Bicol Presbytery', 'PH-CAS': 'Bicol Presbytery', 'PH-CAN': 'Bicol Presbytery', 'PH-SOR': 'Bicol Presbytery', 'PH-MAS': 'Bicol Presbytery',
   'PH-CEB': 'Visayas Presbytery', 'PH-BOH': 'Visayas Presbytery',
   'PH-NER': 'Southern Visayas Presbytery',
-  'PH-DAS': 'Mindanao Presbytery', 'PH-DAV': 'Mindanao Presbytery', 'PH-DAO': 'Mindanao Presbytery', 'PH-COM': 'Mindanao Presbytery', 'PH-BUK': 'Mindanao Presbytery', 'PH-SUN': 'Mindanao Presbytery', 'PH-SUR': 'Mindanao Presbytery', 'PH-AGN': 'Mindanao Presbytery', 'PH-AGS': 'Mindanao Presbytery', 'PH-NCO': 'Mindanao Presbytery', 'PH-SAR': 'Mindanao Presbytery', 'PH-SCO': 'Mindanao Presbytery', 'PH-SUK': 'Mindanao Presbytery',
+  'PH-DAS': 'Mindanao Presbytery', 'PH-DAV': 'Mindanao Presbytery', 'PH-DAO': 'Mindanao Presbytery', 'PH-COM': 'Mindanao Presbytery', 'PH-BUK': 'Mindanao Presbytery', 'PH-SUN': 'Mindanao Presbytery', 'PH-SUR': 'Mindanao Presbytery', 'PH-AGN': 'Mindanao Presbytery', 'PH-NCO': 'Mindanao Presbytery', 'PH-SAR': 'Mindanao Presbytery', 'PH-SCO': 'Mindanao Presbytery', 'PH-LAN': 'Mindanao Presbytery',
 };

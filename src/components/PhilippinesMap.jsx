@@ -9,13 +9,16 @@ export default function PhilippinesMap({ onSelect = null } = {}) {
   const interactive = typeof onSelect === 'function';
   useEffect(() => {
     if (!interactive || !svgRef.current) return undefined;
-    svgRef.current.querySelectorAll('.ph-provinces path[id]').forEach((path) => {
+    const svg = svgRef.current;
+    const paths = Array.from(svg.querySelectorAll('.ph-provinces path[id]'));
+    paths.forEach((path) => {
       // Self-style every province so the map looks right even outside the
       // lp-v3 landing CSS (e.g. on the /churches page, which doesn't set it):
       // a dark hairline border, and a faint base fill for non-PCP provinces.
       path.style.stroke = '#2c1810';
       path.style.strokeWidth = '1';
       path.style.strokeLinejoin = 'round';
+      path.style.transition = 'filter 160ms ease, opacity 160ms ease, stroke-width 160ms ease';
       const pres = PROVINCE_TO_PRESBYTERY[path.id];
       if (!pres) { path.style.fill = 'rgba(184,146,63,0.16)'; return; }
       path.style.fill = PRESBYTERY_COLOR[pres];
@@ -31,7 +34,37 @@ export default function PhilippinesMap({ onSelect = null } = {}) {
       }
       title.textContent = pres;
     });
-    return undefined;
+
+    // Hovering (or keyboard-focusing) any province lights up EVERY province of
+    // its presbytery, so a multi-province presbytery reads as one region.
+    let current = null;
+    const setGroupHover = (pres) => {
+      if (pres === current) return;
+      current = pres;
+      paths.forEach((path) => {
+        const own = path.dataset.presbytery;
+        if (!own) return; // non-PCP provinces keep the faint base fill
+        const lit = pres !== null && own === pres;
+        path.style.filter = lit ? 'brightness(1.18) saturate(1.12)' : '';
+        path.style.strokeWidth = lit ? '1.7' : '1';
+        path.style.opacity = pres !== null && !lit ? '0.5' : '1';
+      });
+    };
+    const presOf = (target) => target?.closest?.('path[id]')?.dataset?.presbytery || null;
+    const onOver = (e) => setGroupHover(presOf(e.target));
+    const onLeave = () => setGroupHover(null);
+    const onFocusIn = (e) => setGroupHover(presOf(e.target));
+    const onFocusOut = (e) => { if (!svg.contains(e.relatedTarget)) setGroupHover(null); };
+    svg.addEventListener('mouseover', onOver);
+    svg.addEventListener('mouseleave', onLeave);
+    svg.addEventListener('focusin', onFocusIn);
+    svg.addEventListener('focusout', onFocusOut);
+    return () => {
+      svg.removeEventListener('mouseover', onOver);
+      svg.removeEventListener('mouseleave', onLeave);
+      svg.removeEventListener('focusin', onFocusIn);
+      svg.removeEventListener('focusout', onFocusOut);
+    };
   }, [interactive]);
   const pick = (target) => { const pres = target?.dataset?.presbytery; if (pres) onSelect(pres); };
   return (
