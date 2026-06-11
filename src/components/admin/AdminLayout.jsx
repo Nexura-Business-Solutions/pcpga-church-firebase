@@ -9,8 +9,6 @@ import {
     Library,
     GraduationCap,
     HandCoins,
-    Sun,
-    Moon,
     Globe,
     LogOut,
     ShieldCheck,
@@ -34,22 +32,10 @@ export default function AdminLayout({ children }) {
     const location = useLocation();
     const pathname = location.pathname;
     const [sidebarOpen, setSidebarOpen] = useState(false);
-    const [theme, setTheme] = useState(() => {
-        if (typeof window === 'undefined') return 'light';
-        return localStorage.getItem('pcp-admin-theme') || 'light';
-    });
 
     useEffect(() => {
         initStore();
     }, []);
-
-    const toggleTheme = () => {
-        const newTheme = theme === 'dark' ? 'light' : 'dark';
-        setTheme(newTheme);
-        if (typeof window !== 'undefined') {
-            localStorage.setItem('pcp-admin-theme', newTheme);
-        }
-    };
 
     useEffect(() => {
         if (!loading && (!user || !isAdmin)) {
@@ -78,7 +64,7 @@ export default function AdminLayout({ children }) {
     if (!user || !isAdmin) return null;
 
     return (
-        <div data-theme={theme} className="min-h-screen bg-[hsl(var(--admin-bg))] text-[hsl(var(--admin-text))] flex selection:bg-accent/10 transition-colors duration-500">
+        <div data-theme="light" className="min-h-screen bg-[hsl(var(--admin-bg))] text-[hsl(var(--admin-text))] flex selection:bg-accent/10">
             {/* Mobile overlay */}
             <AnimatePresence>
                 {sidebarOpen && (
@@ -127,21 +113,6 @@ export default function AdminLayout({ children }) {
                 {/* Footer Section */}
                 <div className="p-4 mt-auto">
                     <div className="bg-white/[0.03] rounded-3xl p-2 border border-white/5 space-y-1">
-                        <button
-                            onClick={toggleTheme}
-                            className="w-full flex items-center justify-between gap-3 px-4 py-3 rounded-2xl text-[11px] font-bold tracking-widest uppercase text-[hsl(var(--admin-sidebar-text))]/30 hover:text-[hsl(var(--admin-sidebar-text))] hover:bg-white/5 transition-all group"
-                        >
-                            <div className="flex items-center gap-3">
-                                {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-                                {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
-                            </div>
-                            <div className={`w-8 h-4 rounded-full relative transition-colors duration-300 ${theme === 'dark' ? 'bg-accent/20' : 'bg-white/10'}`}>
-                                <motion.div
-                                    animate={{ x: theme === 'dark' ? 16 : 0 }}
-                                    className="absolute top-1 left-1 w-2 h-2 rounded-full bg-accent"
-                                />
-                            </div>
-                        </button>
                         <Link
                             to="/"
                             className="flex items-center gap-3 px-4 py-3 rounded-2xl text-[11px] font-bold tracking-widest uppercase text-[hsl(var(--admin-sidebar-text))]/30 hover:text-[hsl(var(--admin-sidebar-text))] hover:bg-white/5 transition-all"
