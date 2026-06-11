@@ -69,8 +69,8 @@ function ScrollToTop() {
 
 function AdminFallback() {
   return (
-    <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--ink-mute, #888)' }}>
-      Loading…
+    <div style={{ minHeight: '100vh', background: 'hsl(42 76% 95%)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div className="animate-spin w-7 h-7 border-2 border-[#8b1f24] border-t-transparent rounded-full" />
     </div>
   );
 }

@@ -57,19 +57,21 @@ export function sendReset(email) {
   return sendPasswordResetEmail(auth, email);
 }
 
+// Module-level cache of the resolved auth state. Each admin page mounts its own
+// AdminRoute + AdminLayout (both call useAuth), and navigating between admin
+// pages remounts them — without this cache every nav restarted at loading:true
+// and flashed the loading screen ("blink"). Seeding useState from the cache means
+// once auth has resolved, later mounts start already-resolved → clean load.
+let authCache = { user: null, isAdmin: false, role: null, loading: true };
+
 export function useAuth() {
-  const [user, setUser] = useState(null);
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [role, setRole] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [state, setState] = useState(authCache);
 
   useEffect(() => {
+    const apply = (next) => { authCache = next; setState(next); };
     return onAuthStateChanged(auth, async (u) => {
-      setUser(u);
       if (!u) {
-        setIsAdmin(false);
-        setRole(null);
-        setLoading(false);
+        apply({ user: null, isAdmin: false, role: null, loading: false });
         return;
       }
       try {
@@ -78,26 +80,21 @@ export function useAuth() {
         const email = (u.email || '').trim().toLowerCase();
         const snap = await getDoc(doc(db, 'admins', email));
         if (snap.exists()) {
-          setIsAdmin(true);
-          setRole(snap.data().role || 'admin');
+          apply({ user: u, isAdmin: true, role: snap.data().role || 'admin', loading: false });
         } else {
           // Authenticated but not on the allowlist (e.g. a random Google
           // account): drop the session so no non-admin stays signed in.
-          setIsAdmin(false);
-          setRole(null);
+          apply({ user: u, isAdmin: false, role: null, loading: false });
           await signOut(auth);
         }
       } catch (err) {
         // A denied/failed read must not leave the app stuck on "Loading…".
         // Treat any failure as "not an admin" and let routing redirect cleanly.
         console.error('admin check failed:', err);
-        setIsAdmin(false);
-        setRole(null);
-      } finally {
-        setLoading(false);
+        apply({ user: u, isAdmin: false, role: null, loading: false });
       }
     });
   }, []);
 
-  return { user, isAdmin, role, isOwner: role === 'owner', loading };
+  return { user: state.user, isAdmin: state.isAdmin, role: state.role, isOwner: state.role === 'owner', loading: state.loading };
 }
