@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 import { getSettings, saveSettings } from '../lib/store.js';
@@ -65,6 +65,60 @@ const TABS = [
 // so the text wraps and is fully visible instead of scrolling out of a one-line box.
 const FIELD_CLS = 'w-full bg-[hsl(var(--admin-bg-alt))] border border-[hsl(var(--admin-text))]/20 rounded-2xl p-3.5 sm:p-5 text-sm font-medium focus:ring-2 focus:ring-coral/20 outline-none transition-all';
 const FIELD_TEXTAREA_CLS = FIELD_CLS + ' leading-relaxed resize-y min-h-[3.5rem]';
+
+const CH_LABEL = 'text-[9px] font-bold uppercase tracking-widest text-coral ml-1';
+const CH_INPUT = 'w-full bg-[hsl(var(--admin-bg-alt))] p-3 rounded-xl text-sm font-medium border border-[hsl(var(--admin-text))]/20 outline-none focus:ring-2 focus:ring-coral/20';
+const CH_HINT = 'normal-case tracking-normal text-[hsl(var(--admin-text-dim))]';
+
+// One member-church (congregation) editor row. Memoised so editing one church in
+// a big presbytery (Mindanao has 44) re-renders only that card, not all of them.
+const ChurchCard = memo(function ChurchCard({ church: ch, pIdx, cIdx, onChange, onRemove }) {
+    return (
+        // content-visibility:auto lets the browser skip rendering/layout of cards
+        // that are scrolled off-screen, so expanding a 40+ church presbytery is fast.
+        <div style={{ contentVisibility: 'auto', containIntrinsicSize: 'auto 560px' }} className="p-4 sm:p-5 bg-[hsl(var(--admin-bg))] rounded-2xl border border-[hsl(var(--admin-border))] space-y-4 relative">
+            <button onClick={() => { if (window.confirm('Delete this church?')) onRemove(pIdx, cIdx); }} aria-label="Delete church" className="absolute top-3 right-3 w-7 h-7 flex items-center justify-center bg-red-50 text-red-500 rounded-full text-[11px] hover:bg-red-100 transition-colors">✕</button>
+            <div className="space-y-1 pr-8">
+                <label className={CH_LABEL}>Church Name</label>
+                <input value={ch.name || ''} onChange={(e) => onChange(pIdx, cIdx, 'name', e.target.value)} placeholder="e.g. Grace Presbyterian Church" className={CH_INPUT + ' font-semibold'} />
+            </div>
+            <div className="space-y-1">
+                <label className={CH_LABEL}>Address <span className={CH_HINT}>(needed to show on the map)</span></label>
+                <textarea rows={2} value={ch.address || ''} onChange={(e) => onChange(pIdx, cIdx, 'address', e.target.value)} placeholder="Street / Barangay, City, Province" className={CH_INPUT + ' resize-y leading-relaxed'} />
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+                <div className="space-y-1">
+                    <label className={CH_LABEL}>Minister / Pastor</label>
+                    <input value={ch.minister || ''} onChange={(e) => onChange(pIdx, cIdx, 'minister', e.target.value)} placeholder="e.g. Rev. Juan Dela Cruz" className={CH_INPUT} />
+                </div>
+                <div className="space-y-1">
+                    <label className={CH_LABEL}>Moderator-in-charge <span className={CH_HINT}>(optional)</span></label>
+                    <input value={ch.moderatorInCharge || ''} onChange={(e) => onChange(pIdx, cIdx, 'moderatorInCharge', e.target.value)} placeholder="e.g. Elder Johnny Bagiw" className={CH_INPUT} />
+                </div>
+                <div className="space-y-1">
+                    <label className={CH_LABEL}>Worship Time</label>
+                    <input value={ch.worshipTime || ''} onChange={(e) => onChange(pIdx, cIdx, 'worshipTime', e.target.value)} placeholder="e.g. Sunday 9:00 AM" className={CH_INPUT} />
+                </div>
+                <div className="space-y-1">
+                    <label className={CH_LABEL}>Contact</label>
+                    <input value={ch.contact || ''} onChange={(e) => onChange(pIdx, cIdx, 'contact', e.target.value)} placeholder="e.g. 0917-123-4567" className={CH_INPUT} />
+                </div>
+                <div className="space-y-1">
+                    <label className={CH_LABEL}>Email <span className={CH_HINT}>(optional)</span></label>
+                    <input value={ch.email || ''} onChange={(e) => onChange(pIdx, cIdx, 'email', e.target.value)} placeholder="optional" className={CH_INPUT} />
+                </div>
+            </div>
+            <div className="space-y-1">
+                <label className={CH_LABEL}>Elders <span className={CH_HINT}>(separate with commas)</span></label>
+                <textarea rows={2} value={(Array.isArray(ch.elders) ? ch.elders : []).join(', ')} onChange={(e) => onChange(pIdx, cIdx, 'elders', e.target.value.split(',').map((s) => s.trim()))} placeholder="Elder A, Elder B, Elder C" className={CH_INPUT + ' resize-y leading-relaxed'} />
+            </div>
+            <div className="space-y-1">
+                <label className={CH_LABEL}>Sub-presbytery <span className={CH_HINT}>(optional)</span></label>
+                <input value={ch.subPresbytery || ''} onChange={(e) => onChange(pIdx, cIdx, 'subPresbytery', e.target.value)} placeholder="e.g. Quirino Sub-Presbytery" className={CH_INPUT} />
+            </div>
+        </div>
+    );
+});
 
 export default function AdminContent() {
     const [activeTab, setActiveTab] = useState('identity');
@@ -179,24 +233,32 @@ export default function AdminContent() {
     };
 
     // Member-church (congregation) editing inside a presbytery's `churches` array.
-    const EMPTY_CHURCH = { name: '', address: '', minister: '', moderatorInCharge: '', worshipTime: '', contact: '', email: '', elders: [], subPresbytery: '' };
-    const addChurch = (pIdx) => {
-        const updated = [...presbyteries];
-        updated[pIdx] = { ...updated[pIdx], churches: [...(updated[pIdx].churches || []), { ...EMPTY_CHURCH }] };
-        setPresbyteries(updated);
-    };
-    const updateChurch = (pIdx, cIdx, field, value) => {
-        const updated = [...presbyteries];
-        const churches = [...(updated[pIdx].churches || [])];
-        churches[cIdx] = { ...churches[cIdx], [field]: value };
-        updated[pIdx] = { ...updated[pIdx], churches };
-        setPresbyteries(updated);
-    };
-    const removeChurch = (pIdx, cIdx) => {
-        const updated = [...presbyteries];
-        updated[pIdx] = { ...updated[pIdx], churches: (updated[pIdx].churches || []).filter((_, i) => i !== cIdx) };
-        setPresbyteries(updated);
-    };
+    // Functional setState + useCallback keep these stable so the memoised church
+    // cards only re-render the one being edited (not all ~44 in a big presbytery).
+    const addChurch = useCallback((pIdx) => {
+        setPresbyteries((prev) => {
+            const updated = [...prev];
+            const EMPTY_CHURCH = { name: '', address: '', minister: '', moderatorInCharge: '', worshipTime: '', contact: '', email: '', elders: [], subPresbytery: '' };
+            updated[pIdx] = { ...updated[pIdx], churches: [...(updated[pIdx].churches || []), EMPTY_CHURCH] };
+            return updated;
+        });
+    }, []);
+    const updateChurch = useCallback((pIdx, cIdx, field, value) => {
+        setPresbyteries((prev) => {
+            const updated = [...prev];
+            const churches = [...(updated[pIdx].churches || [])];
+            churches[cIdx] = { ...churches[cIdx], [field]: value };
+            updated[pIdx] = { ...updated[pIdx], churches };
+            return updated;
+        });
+    }, []);
+    const removeChurch = useCallback((pIdx, cIdx) => {
+        setPresbyteries((prev) => {
+            const updated = [...prev];
+            updated[pIdx] = { ...updated[pIdx], churches: (updated[pIdx].churches || []).filter((_, i) => i !== cIdx) };
+            return updated;
+        });
+    }, []);
 
     const handleSyncDirectory = () => {
         if (!confirm('Sync the directory from the latest defaults? Officer rosters are refreshed from the latest directory (your uploaded officer photos are kept), and churches are added or updated without removing your existing entries.')) return;
@@ -1123,7 +1185,7 @@ export default function AdminContent() {
                                                 />
                                             )}
                                             {(Array.isArray(presbyteries) ? presbyteries : []).map((p, idx) => (
-                                                <div key={p.id || idx} className="p-5 sm:p-8 bg-[hsl(var(--admin-bg-alt))] rounded-3xl border border-[hsl(var(--admin-border))] space-y-6 relative group">
+                                                <div key={p.id || idx} style={{ contentVisibility: 'auto', containIntrinsicSize: 'auto 720px' }} className="p-5 sm:p-8 bg-[hsl(var(--admin-bg-alt))] rounded-3xl border border-[hsl(var(--admin-border))] space-y-6 relative group">
                                                     <button
                                                         onClick={() => {
                                                             if (window.confirm('Delete this record?')) {
@@ -1248,47 +1310,7 @@ export default function AdminContent() {
                                                         {openChurches[p.id || idx] && (
                                                             <div className="mt-4 space-y-4">
                                                                 {(Array.isArray(p.churches) ? p.churches : []).map((ch, cIdx) => (
-                                                                    <div key={cIdx} className="p-4 sm:p-5 bg-[hsl(var(--admin-bg))] rounded-2xl border border-[hsl(var(--admin-border))] space-y-4 relative">
-                                                                        <button onClick={() => { if (window.confirm('Delete this church?')) removeChurch(idx, cIdx); }} aria-label="Delete church" className="absolute top-3 right-3 w-7 h-7 flex items-center justify-center bg-red-50 text-red-500 rounded-full text-[11px] hover:bg-red-100 transition-colors">✕</button>
-                                                                        <div className="space-y-1 pr-8">
-                                                                            <label className="text-[9px] font-bold uppercase tracking-widest text-coral ml-1">Church Name</label>
-                                                                            <input value={ch.name || ''} onChange={(e) => updateChurch(idx, cIdx, 'name', e.target.value)} placeholder="e.g. Grace Presbyterian Church" className="w-full bg-[hsl(var(--admin-bg-alt))] p-3 rounded-xl text-sm font-semibold border border-[hsl(var(--admin-text))]/20 outline-none focus:ring-2 focus:ring-coral/20" />
-                                                                        </div>
-                                                                        <div className="space-y-1">
-                                                                            <label className="text-[9px] font-bold uppercase tracking-widest text-coral ml-1">Address <span className="normal-case tracking-normal text-[hsl(var(--admin-text-dim))]">(needed to show on the map)</span></label>
-                                                                            <textarea rows={2} value={ch.address || ''} onChange={(e) => updateChurch(idx, cIdx, 'address', e.target.value)} placeholder="Street / Barangay, City, Province" className="w-full bg-[hsl(var(--admin-bg-alt))] p-3 rounded-xl text-sm font-medium border border-[hsl(var(--admin-text))]/20 outline-none focus:ring-2 focus:ring-coral/20 resize-y leading-relaxed" />
-                                                                        </div>
-                                                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
-                                                                            <div className="space-y-1">
-                                                                                <label className="text-[9px] font-bold uppercase tracking-widest text-coral ml-1">Minister / Pastor</label>
-                                                                                <input value={ch.minister || ''} onChange={(e) => updateChurch(idx, cIdx, 'minister', e.target.value)} placeholder="e.g. Rev. Juan Dela Cruz" className="w-full bg-[hsl(var(--admin-bg-alt))] p-3 rounded-xl text-sm font-medium border border-[hsl(var(--admin-text))]/20 outline-none focus:ring-2 focus:ring-coral/20" />
-                                                                            </div>
-                                                                            <div className="space-y-1">
-                                                                                <label className="text-[9px] font-bold uppercase tracking-widest text-coral ml-1">Moderator-in-charge <span className="normal-case tracking-normal text-[hsl(var(--admin-text-dim))]">(optional)</span></label>
-                                                                                <input value={ch.moderatorInCharge || ''} onChange={(e) => updateChurch(idx, cIdx, 'moderatorInCharge', e.target.value)} placeholder="e.g. Elder Johnny Bagiw" className="w-full bg-[hsl(var(--admin-bg-alt))] p-3 rounded-xl text-sm font-medium border border-[hsl(var(--admin-text))]/20 outline-none focus:ring-2 focus:ring-coral/20" />
-                                                                            </div>
-                                                                            <div className="space-y-1">
-                                                                                <label className="text-[9px] font-bold uppercase tracking-widest text-coral ml-1">Worship Time</label>
-                                                                                <input value={ch.worshipTime || ''} onChange={(e) => updateChurch(idx, cIdx, 'worshipTime', e.target.value)} placeholder="e.g. Sunday 9:00 AM" className="w-full bg-[hsl(var(--admin-bg-alt))] p-3 rounded-xl text-sm font-medium border border-[hsl(var(--admin-text))]/20 outline-none focus:ring-2 focus:ring-coral/20" />
-                                                                            </div>
-                                                                            <div className="space-y-1">
-                                                                                <label className="text-[9px] font-bold uppercase tracking-widest text-coral ml-1">Contact</label>
-                                                                                <input value={ch.contact || ''} onChange={(e) => updateChurch(idx, cIdx, 'contact', e.target.value)} placeholder="e.g. 0917-123-4567" className="w-full bg-[hsl(var(--admin-bg-alt))] p-3 rounded-xl text-sm font-medium border border-[hsl(var(--admin-text))]/20 outline-none focus:ring-2 focus:ring-coral/20" />
-                                                                            </div>
-                                                                            <div className="space-y-1">
-                                                                                <label className="text-[9px] font-bold uppercase tracking-widest text-coral ml-1">Email <span className="normal-case tracking-normal text-[hsl(var(--admin-text-dim))]">(optional)</span></label>
-                                                                                <input value={ch.email || ''} onChange={(e) => updateChurch(idx, cIdx, 'email', e.target.value)} placeholder="optional" className="w-full bg-[hsl(var(--admin-bg-alt))] p-3 rounded-xl text-sm font-medium border border-[hsl(var(--admin-text))]/20 outline-none focus:ring-2 focus:ring-coral/20" />
-                                                                            </div>
-                                                                        </div>
-                                                                        <div className="space-y-1">
-                                                                            <label className="text-[9px] font-bold uppercase tracking-widest text-coral ml-1">Elders <span className="normal-case tracking-normal text-[hsl(var(--admin-text-dim))]">(separate with commas)</span></label>
-                                                                            <textarea rows={2} value={(Array.isArray(ch.elders) ? ch.elders : []).join(', ')} onChange={(e) => updateChurch(idx, cIdx, 'elders', e.target.value.split(',').map((s) => s.trim()))} placeholder="Elder A, Elder B, Elder C" className="w-full bg-[hsl(var(--admin-bg-alt))] p-3 rounded-xl text-sm font-medium border border-[hsl(var(--admin-text))]/20 outline-none focus:ring-2 focus:ring-coral/20 resize-y leading-relaxed" />
-                                                                        </div>
-                                                                        <div className="space-y-1">
-                                                                            <label className="text-[9px] font-bold uppercase tracking-widest text-coral ml-1">Sub-presbytery <span className="normal-case tracking-normal text-[hsl(var(--admin-text-dim))]">(optional)</span></label>
-                                                                            <input value={ch.subPresbytery || ''} onChange={(e) => updateChurch(idx, cIdx, 'subPresbytery', e.target.value)} placeholder="e.g. Quirino Sub-Presbytery" className="w-full bg-[hsl(var(--admin-bg-alt))] p-3 rounded-xl text-sm font-medium border border-[hsl(var(--admin-text))]/20 outline-none focus:ring-2 focus:ring-coral/20" />
-                                                                        </div>
-                                                                    </div>
+                                                                    <ChurchCard key={cIdx} church={ch} pIdx={idx} cIdx={cIdx} onChange={updateChurch} onRemove={removeChurch} />
                                                                 ))}
                                                                 <button onClick={() => addChurch(idx)} className="w-full h-12 rounded-2xl border-2 border-dashed border-coral/30 text-[10px] font-bold uppercase tracking-widest text-coral hover:bg-coral/5 hover:border-coral/50 transition-all"> + Add Church </button>
                                                             </div>
