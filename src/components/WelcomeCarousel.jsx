@@ -33,6 +33,8 @@ export default function WelcomeCarousel({ officers = [] }) {
     const slides = (Array.isArray(officers) ? officers : []).filter((o) => o && o.message && String(o.message).trim());
     const [index, setIndex] = useState(0);
     const [paused, setPaused] = useState(false);
+    // A photo URL that 404s falls back to the monogram instead of an empty frame.
+    const [brokenPhotos, setBrokenPhotos] = useState({});
     const msgRef = useRef(null);
 
     const count = slides.length;
@@ -130,8 +132,8 @@ export default function WelcomeCarousel({ officers = [] }) {
                     transition={{ duration: reduce ? 0 : 0.5 }}
                 >
                     <div className="welcar__portrait">
-                        {o.photo
-                            ? <img src={o.photo} alt={o.name} loading="lazy" decoding="async" />
+                        {o.photo && !brokenPhotos[o.photo]
+                            ? <img src={o.photo} alt={o.name} loading="lazy" decoding="async" onError={() => setBrokenPhotos((m) => ({ ...m, [o.photo]: true }))} />
                             : <span className="welcar__monogram" aria-hidden="true">{initials(o.name)}</span>}
                     </div>
                     <div className="welcar__text">

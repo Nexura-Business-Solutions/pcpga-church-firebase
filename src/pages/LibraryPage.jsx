@@ -144,7 +144,7 @@ export default function LibraryPage() {
                                         initial={{ opacity: 0, scale: 0.95 }}
                                         animate={{ opacity: 1, scale: 1 }}
                                         transition={{ delay: i * 0.05 }}
-                                        className="rounded-2xl p-7 transition-all duration-300 flex flex-col justify-between"
+                                        className="relative rounded-2xl p-7 transition-all duration-300 flex flex-col justify-between hover:-translate-y-1 hover:shadow-lg hover:shadow-black/[0.06] group"
                                         style={{ background: 'var(--cream-card)', border: '1px solid var(--line)' }}
                                     >
                                         <div>
@@ -169,7 +169,7 @@ export default function LibraryPage() {
                                                 {item.title}
                                             </h3>
                                             <p className="text-sm leading-relaxed mb-6 line-clamp-3" style={{ color: 'var(--ink-soft)' }}>
-                                                {item.description || 'No description available for this resource.'}
+                                                {item.description || 'A resource from the General Assembly office.'}
                                             </p>
                                         </div>
 
@@ -177,11 +177,13 @@ export default function LibraryPage() {
                                             <span className="text-[10px] font-bold tracking-[0.2em] uppercase" style={{ color: 'var(--ink-mute)' }}>
                                                 {item.fileType} Asset
                                             </span>
+                                            {/* Stretched link: the whole card opens the resource (the 10px
+                                                Download text was the only click target before). */}
                                             <a
                                                 href={safeExternalHref(item.fileUrl)}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest transition-transform hover:translate-x-1"
+                                                className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest transition-transform group-hover:translate-x-1 after:absolute after:inset-0 after:content-['']"
                                                 style={{ color: 'var(--oxblood)' }}
                                             >
                                                 Download

@@ -2084,9 +2084,16 @@ body.lp-v3 .evcar__stage {
   height: clamp(380px, 56vh, 580px);
   border: 1px solid var(--line);
   border-left: 3px solid var(--brass);
-  background: var(--cream-card);
+  /* Soft brass shimmer while the poster loads, so the stage never reads as an
+     empty box; the loaded image fully covers it. */
+  background:
+    linear-gradient(100deg, rgba(184,146,63,0) 38%, rgba(184,146,63,0.12) 50%, rgba(184,146,63,0) 62%) var(--cream-card);
+  background-size: 220% 100%;
+  animation: evcar-shimmer 2.2s ease-in-out infinite;
   overflow: hidden;
 }
+@keyframes evcar-shimmer { from { background-position: 130% 0; } to { background-position: -30% 0; } }
+@media (prefers-reduced-motion: reduce) { body.lp-v3 .evcar__stage { animation: none; } }
 body.lp-v3 .evcar__slide { position: absolute; inset: 0; }
 body.lp-v3 .evcar__fill {
   position: absolute; inset: 0;
@@ -2212,7 +2219,10 @@ body.lp-v3 .vidcar__stage {
   margin: 0 auto;
   border: 1px solid var(--line);
   border-left: 3px solid var(--brass);
-  background: #0b0b0f;
+  /* Warm vignette instead of flat black — portrait videos pillarbox inside the
+     16:9 stage, and pure #0b0b0f side bars looked like a rendering hole in the
+     cream page. */
+  background: radial-gradient(120% 120% at 50% 40%, #2a1d16 0%, #1a110c 55%, #120b07 100%);
   overflow: hidden;
 }
 body.lp-v3 .vidcar__slide { position: absolute; inset: 0; }
@@ -3123,8 +3133,10 @@ body.lp-v3 .to-top { display: none; }
   body.lp-v3 .to-top {
     display: flex; align-items: center; justify-content: center;
     position: fixed;
-    left: max(1.1rem, env(safe-area-inset-left));
-    bottom: max(1.1rem, env(safe-area-inset-bottom));
+    /* Bottom-right, stacked above the chat widget — bottom-left kept landing on
+       top of left-aligned headings and stat labels as the page scrolls. */
+    right: max(1.1rem, env(safe-area-inset-right));
+    bottom: calc(max(1.1rem, env(safe-area-inset-bottom)) + 4.6rem);
     width: 46px; height: 46px;
     border-radius: 50%;
     background: var(--ink);

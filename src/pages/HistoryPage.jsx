@@ -10,6 +10,16 @@ import Navbar from '../components/Navbar.jsx';
 import Footer from '../components/Footer.jsx';
 import ChatbotWidget from '../components/ChatbotWidget.jsx';
 
+// "Rev. Juan Dela Cruz" → "JD", not "R" — every officer carries an honorific,
+// so charAt(0) rendered the same "R" monogram on all six cards.
+function officerInitials(name) {
+    const clean = (name || '').replace(/^(Rev|Dr|Ptr|Pastor|Engr|Eld|Elder|Atty)\.?\s+/i, '').trim();
+    const parts = clean.split(/\s+/).filter(Boolean);
+    const first = parts[0]?.[0] || '·';
+    const last = parts.length > 1 ? parts[parts.length - 1][0] : '';
+    return (first + last).toUpperCase();
+}
+
 export default function HistoryPage() {
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -32,7 +42,7 @@ export default function HistoryPage() {
                 <meta name="description" content="The history of the Presbyterian Church of the Philippines — from Korean Reformed mission work in 1977 to the General Assembly (GAPCP) organized in 1996." />
             </Helmet>
             <Navbar />
-            <div className="min-h-screen bg-[#f8f7ff] selection:bg-accent/10">
+            <div className="min-h-screen bg-[#faf7f0] selection:bg-accent/10">
                 <main className="pt-28 pb-24 px-5 sm:px-8">
                     <div className="max-w-4xl mx-auto">
 
@@ -60,9 +70,11 @@ export default function HistoryPage() {
                             </div>
                         ) : (
                             <>
-                                {/* Narrative */}
+                                {/* Narrative — capped at ~68ch so the line length stays readable
+                                    (full-width ran past 110 characters per line), with an
+                                    editorial serif lead paragraph. */}
                                 {h.paragraphs?.length > 0 && (
-                                    <section className="max-w-none mb-16">
+                                    <section className="max-w-[68ch] mx-auto mb-16">
                                         {h.paragraphs.map((p, i) => (
                                             <motion.p
                                                 key={i}
@@ -70,7 +82,9 @@ export default function HistoryPage() {
                                                 whileInView={{ opacity: 1, y: 0 }}
                                                 viewport={{ once: true }}
                                                 transition={{ delay: i * 0.05 }}
-                                                className="text-church-dark/80 leading-relaxed mb-5 text-[15px] sm:text-base"
+                                                className={i === 0
+                                                    ? 'text-church-dark/85 leading-relaxed mb-6 font-display text-lg sm:text-xl'
+                                                    : 'text-church-dark/80 leading-relaxed mb-5 text-[15px] sm:text-base'}
                                             >
                                                 {p}
                                             </motion.p>
@@ -84,7 +98,7 @@ export default function HistoryPage() {
                                         <h2 className="flex items-center gap-2 text-sm font-bold uppercase tracking-[0.2em] text-church-dark/70 mb-8">
                                             <Milestone className="w-4 h-4 text-accent" /> Milestones
                                         </h2>
-                                        <ol className="relative border-l border-church-dark/15 ml-3">
+                                        <ol className="relative border-l-2 border-accent/25 ml-3">
                                             {h.milestones.map((m, i) => (
                                                 <motion.li
                                                     key={i}
@@ -94,8 +108,8 @@ export default function HistoryPage() {
                                                     transition={{ delay: Math.min(i * 0.03, 0.3) }}
                                                     className="mb-8 ml-6"
                                                 >
-                                                    <span className="absolute -left-[7px] flex items-center justify-center w-3.5 h-3.5 rounded-full bg-accent ring-4 ring-[#f8f7ff]" />
-                                                    <span className="inline-block text-accent text-[11px] font-bold uppercase tracking-[0.18em] mb-1">{m.date}</span>
+                                                    <span className="absolute -left-[8px] flex items-center justify-center w-3.5 h-3.5 rounded-full bg-accent ring-4 ring-[#faf7f0]" />
+                                                    <span className="inline-block text-accent text-[12px] font-bold uppercase tracking-[0.18em] mb-1 font-display">{m.date}</span>
                                                     <p className="text-church-dark/80 leading-relaxed text-[15px]">{m.text}</p>
                                                 </motion.li>
                                             ))}
@@ -118,8 +132,8 @@ export default function HistoryPage() {
                                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                                     {ga.officers.map((o, i) => (
                                                         <div key={i} className="flex items-center gap-4 rounded-2xl border border-church-dark/10 bg-white/60 px-5 py-4">
-                                                            <span className="w-11 h-11 shrink-0 rounded-full bg-accent/10 text-accent flex items-center justify-center font-display font-bold">
-                                                                {(o.name || '·').trim().charAt(0)}
+                                                            <span className="w-11 h-11 shrink-0 rounded-full bg-accent/10 text-accent flex items-center justify-center font-display font-bold text-sm">
+                                                                {officerInitials(o.name)}
                                                             </span>
                                                             <div>
                                                                 <p className="font-bold text-church-dark leading-tight">{o.name}</p>

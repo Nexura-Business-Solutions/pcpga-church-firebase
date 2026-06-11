@@ -310,6 +310,18 @@ export default function HomePage() {
     };
   }, []);
 
+  // Landing on /#message etc. from another page's nav: scroll to the section
+  // once the page has painted.
+  useEffect(() => {
+    const { hash } = window.location;
+    if (!hash) return undefined;
+    const t = setTimeout(() => {
+      const el = document.querySelector(hash);
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    }, 450);
+    return () => clearTimeout(t);
+  }, []);
+
   useEffect(() => {
     document.body.classList.toggle('mobile-open', mobileOpen);
   }, [mobileOpen]);
@@ -751,14 +763,18 @@ export default function HomePage() {
                     <div className="illuminated__chapter">{featured?.scripture ? featured.scripture.replace(/[^0-9].*$/, '') || '✦' : '✦'}</div>
                     <div className="illuminated__ornament" aria-hidden="true">✦ · ✦</div>
                   </div>
-                  <button
-                    className="sermon__play"
-                    aria-label="Play sermon"
-                    type="button"
-                    onClick={() => { if (featuredEmbed) setPlaying(true); else if (featured?.videoUrl) window.open(featured.videoUrl, '_blank', 'noopener'); }}
-                  >
-                    <svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
-                  </button>
+                  {/* The play button only exists when there is something to play — a
+                      dead control on the empty-state plate reads as broken. */}
+                  {(featuredEmbed || featured?.videoUrl) && (
+                    <button
+                      className="sermon__play"
+                      aria-label="Play sermon"
+                      type="button"
+                      onClick={() => { if (featuredEmbed) setPlaying(true); else if (featured?.videoUrl) window.open(featured.videoUrl, '_blank', 'noopener'); }}
+                    >
+                      <svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
+                    </button>
+                  )}
                   <div className="sermon__caption">
                     <span>{featured?.duration || ''}</span>
                     <span className="scripture">{featured?.scripture || ''}</span>
@@ -772,36 +788,38 @@ export default function HomePage() {
                 <span>Series</span><span className="dot">·</span><span>{featured?.series || 'From the General Assembly'}</span>
               </div>
               <h3 className="display display--md">{featured?.title || <>Sermons from the<br /><em>General Assembly.</em></>}</h3>
-              <p className="sermon__ref">{featured ? [featured.scripture, featured.speaker, featured.duration].filter(Boolean).join(' · ') : 'Sermons from the General Assembly will appear here.'}</p>
+              {featured && <p className="sermon__ref">{[featured.scripture, featured.speaker, featured.duration].filter(Boolean).join(' · ')}</p>}
               <p className="sermon__blurb">
                 {featured?.description || 'Sermons preached at the General Assembly and our member churches will appear here once they are uploaded.'}
               </p>
 
-              <div className="hymnal-index">
-                <div className="hymnal-index__head">
-                  <span>No.</span>
-                  <span>Sermon</span>
-                  <span>Reference</span>
+              {/* The index (with its table header) only renders when there are
+                  sermons — an orphaned "No. / Sermon / Reference" head over zero
+                  rows looked unfinished. */}
+              {sermons.length > 0 && (
+                <div className="hymnal-index">
+                  <div className="hymnal-index__head">
+                    <span>No.</span>
+                    <span>Sermon</span>
+                    <span>Reference</span>
+                  </div>
+                  {sermons.slice(0, 5).map((s, i) => ({ n: String(sermons.length - i).padStart(3, '0'), title: s.title || 'Untitled', em: '', ref: s.scripture || s.speaker || '' })).map((row, i) => (
+                    <button
+                      key={row.n + i}
+                      type="button"
+                      className={`hymnal-row${i === activeSermon ? ' is-active' : ''}`}
+                      onClick={() => { setActiveSermon(i); setPlaying(false); }}
+                    >
+                      <span className="hymnal-row__num">{row.n}</span>
+                      <span className="hymnal-row__title">
+                        {row.title} {row.em && <em>{row.em}</em>}
+                        <span className="hymnal-row__leader" />
+                      </span>
+                      <span className="hymnal-row__ref">{row.ref}</span>
+                    </button>
+                  ))}
                 </div>
-                {(sermons.length
-                  ? sermons.slice(0, 5).map((s, i) => ({ n: String(sermons.length - i).padStart(3, '0'), title: s.title || 'Untitled', em: '', ref: s.scripture || s.speaker || '' }))
-                  : []
-                ).map((row, i) => (
-                  <button
-                    key={row.n + i}
-                    type="button"
-                    className={`hymnal-row${i === activeSermon ? ' is-active' : ''}`}
-                    onClick={() => { setActiveSermon(i); setPlaying(false); }}
-                  >
-                    <span className="hymnal-row__num">{row.n}</span>
-                    <span className="hymnal-row__title">
-                      {row.title} {row.em && <em>{row.em}</em>}
-                      <span className="hymnal-row__leader" />
-                    </span>
-                    <span className="hymnal-row__ref">{row.ref}</span>
-                  </button>
-                ))}
-              </div>
+              )}
 
               <Link to="/library" className="btn btn--link" style={{ marginTop: '0.75rem' }}>Sermon archive →</Link>
             </div>

@@ -145,7 +145,7 @@ export default function PhilippinesMap({ onSelect = null } = {}) {
               <text x="60" y="450" fontSize="22">SOUTH CHINA SEA</text>
               <text x="560" y="500" fontSize="22">PHILIPPINE SEA</text>
               <text x="150" y="950" fontSize="22">SULU SEA</text>
-              <text x="400" y="1180" fontSize="22">CELEBES SEA</text>
+              <text x="330" y="1125" fontSize="22">CELEBES SEA</text>
             </g>
 
             {/* Compass rose */}

@@ -83,7 +83,7 @@ export default function ChurchesPage() {
                 NOT also render the global <Navbar/> — two fixed top-0 bars would
                 overlap and the global nav's pre-scroll white links are invisible
                 on the white sub-nav. */}
-            <div className="min-h-screen bg-[#f8f7ff] selection:bg-accent/10">
+            <div className="min-h-screen bg-[#faf7f0] selection:bg-accent/10">
                 {/* Header / Sub-Navbar */}
                 <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-xl border-b border-black/[0.04]">
                     <div className="max-w-[1400px] mx-auto px-6 h-16 flex items-center justify-between gap-3">
@@ -115,35 +115,41 @@ export default function ChurchesPage() {
                 </nav>
 
                 {mode === 'explore' && !selectedPresbytery && (
-                    <div className="pt-16 min-h-screen flex flex-col items-center px-5 pb-28 lg:pb-16">
-                        <div className="max-w-2xl text-center pt-8 lg:pt-12 pb-6">
-                            <p className="text-[10px] lg:text-[11px] font-bold tracking-[0.3em] uppercase text-accent mb-3">Across the Archipelago</p>
-                            <h1 className="text-2xl lg:text-4xl font-bold text-church-dark font-display tracking-tight mb-3">Our Churches by Presbytery</h1>
-                            <p className="text-[13px] lg:text-sm text-church-gray leading-relaxed">
-                                Pindutin ang isang lugar sa mapa — o isang presbytery sa ibaba — para makita ang mga simbahan at impormasyon nila. O kaya{' '}
-                                <button onClick={() => { setSelectedPresbyteryName(null); setPresbyteryFilter(''); setMode('find'); }} className="text-accent font-bold underline underline-offset-2">maghanap ng simbahan malapit sa&apos;yo →</button>
-                            </p>
-                        </div>
-                        <div className="w-full max-w-[520px]">
-                            <PhilippinesMap onSelect={openPresbytery} />
-                        </div>
-                        <div className="flex flex-wrap justify-center gap-2 mt-8 max-w-2xl">
-                            {Object.keys(PRESBYTERY_COLOR).map((name) => {
-                                const count = (presbyteries.find((x) => x.name === name)?.churches || []).length;
-                                return (
-                                    <button
-                                        key={name}
-                                        onClick={() => openPresbytery(name)}
-                                        className="inline-flex items-center gap-2 pl-3 pr-2 min-h-[40px] rounded-full border border-black/[0.06] bg-white text-[11px] text-church-dark hover:bg-church-dark hover:text-white transition-colors shadow-sm"
-                                    >
-                                        <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: PRESBYTERY_COLOR[name] }} />
-                                        {name.replace('NCR Presbytery - ', 'NCR ').replace(' Presbytery', '')}
-                                        {count > 0 && (
-                                            <span className="text-[9px] font-bold bg-black/[0.05] group-hover:bg-white/20 rounded-full px-1.5 py-0.5 text-church-gray min-w-[1.4rem] text-center">{count}</span>
-                                        )}
-                                    </button>
-                                );
-                            })}
+                    <div className="pt-16 min-h-screen px-5 pb-28 lg:pb-16">
+                        {/* Desktop: map on the left (sticky), heading + presbytery index on the
+                            right — fills the wide viewport instead of a lone centered column.
+                            Mobile keeps the heading → map → list flow via explicit grid rows. */}
+                        <div className="max-w-6xl mx-auto lg:grid lg:grid-cols-[minmax(380px,470px)_1fr] lg:gap-x-16 lg:items-start lg:pt-10">
+                            <div className="max-w-2xl mx-auto lg:mx-0 text-center lg:text-left pt-8 lg:pt-0 pb-6 lg:col-start-2 lg:row-start-1">
+                                <p className="text-[10px] lg:text-[11px] font-bold tracking-[0.3em] uppercase text-accent mb-3">Across the Archipelago</p>
+                                <h1 className="text-2xl lg:text-4xl font-bold text-church-dark font-display tracking-tight mb-3">Our Churches by Presbytery</h1>
+                                <p className="text-[13px] lg:text-sm text-church-gray leading-relaxed">
+                                    Pindutin ang isang lugar sa mapa — o isang presbytery — para makita ang mga simbahan at impormasyon nila. O kaya{' '}
+                                    <button onClick={() => { setSelectedPresbyteryName(null); setPresbyteryFilter(''); setMode('find'); }} className="text-accent font-bold underline underline-offset-2">maghanap ng simbahan malapit sa&apos;yo →</button>
+                                </p>
+                            </div>
+                            <div className="w-full max-w-[520px] mx-auto lg:mx-0 lg:col-start-1 lg:row-start-1 lg:row-span-2 lg:sticky lg:top-20">
+                                <PhilippinesMap onSelect={openPresbytery} />
+                            </div>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-8 lg:mt-0 max-w-2xl mx-auto lg:mx-0 lg:col-start-2 lg:row-start-2 w-full">
+                                {Object.keys(PRESBYTERY_COLOR).map((name) => {
+                                    const count = (presbyteries.find((x) => x.name === name)?.churches || []).length;
+                                    return (
+                                        <button
+                                            key={name}
+                                            onClick={() => openPresbytery(name)}
+                                            className="group flex items-center gap-2.5 pl-3.5 pr-3 min-h-[48px] rounded-xl border border-black/[0.06] bg-white text-[12px] text-church-dark hover:border-accent/40 hover:shadow-md transition-all text-left"
+                                        >
+                                            <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: PRESBYTERY_COLOR[name] }} />
+                                            <span className="flex-1 min-w-0 truncate font-semibold">{name.replace('NCR Presbytery - ', 'NCR ').replace(' Presbytery', '')}</span>
+                                            {count > 0 && (
+                                                <span className="text-[9px] font-bold bg-black/[0.05] rounded-full px-1.5 py-0.5 text-church-gray min-w-[1.4rem] text-center shrink-0">{count}</span>
+                                            )}
+                                            <span className="text-church-gray/30 group-hover:text-accent group-hover:translate-x-0.5 transition-all shrink-0" aria-hidden="true">→</span>
+                                        </button>
+                                    );
+                                })}
+                            </div>
                         </div>
                     </div>
                 )}
@@ -310,7 +316,7 @@ export default function ChurchesPage() {
                                     style={{ border: 0, filter: 'grayscale(0.2) contrast(1.1)' }}
                                     src={selected
                                         ? `https://maps.google.com/maps?q=${encodeURIComponent(selected.address + ' ' + selected.name)}&t=&z=16&ie=UTF8&iwloc=&output=embed`
-                                        : `https://maps.google.com/maps?q=Presbyterian%20Church%20Philippines&t=&z=6&ie=UTF8&iwloc=&output=embed`
+                                        : 'https://maps.google.com/maps?ll=12.6,122.0&z=6&t=&ie=UTF8&iwloc=&output=embed'
                                     }
                                     allowFullScreen
                                 ></iframe>
@@ -342,7 +348,7 @@ export default function ChurchesPage() {
                                                     <div className="grid grid-cols-1 gap-3 lg:gap-4 mb-8">
                                                         {selected.address && (
                                                             <div className="flex items-center gap-4 p-4 bg-black/[0.03] rounded-2xl">
-                                                                <div className="text-lg lg:text-xl">📍</div>
+                                                                <div className="text-church-dark/40"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" /></svg></div>
                                                                 <div>
                                                                     <p className="text-[9px] uppercase tracking-widest text-church-gray font-bold mb-0.5 opacity-50">Address</p>
                                                                     <p className="text-xs lg:text-[13px] font-bold text-church-dark">{selected.address}</p>
@@ -351,7 +357,7 @@ export default function ChurchesPage() {
                                                         )}
                                                         {selected.pastor && (
                                                             <div className="flex items-center gap-4 p-4 bg-black/[0.03] rounded-2xl">
-                                                                <div className="text-lg lg:text-xl">👤</div>
+                                                                <div className="text-church-dark/40"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg></div>
                                                                 <div>
                                                                     <p className="text-[9px] uppercase tracking-widest text-church-gray font-bold mb-0.5 opacity-50">Pastor</p>
                                                                     <p className="text-xs lg:text-[13px] font-bold text-church-dark">{selected.pastor}</p>
@@ -360,7 +366,7 @@ export default function ChurchesPage() {
                                                         )}
                                                         {selected.serviceTime && (
                                                             <div className="flex items-center gap-4 p-4 bg-black/[0.03] rounded-2xl">
-                                                                <div className="text-lg lg:text-xl">🕐</div>
+                                                                <div className="text-church-dark/40"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg></div>
                                                                 <div>
                                                                     <p className="text-[9px] uppercase tracking-widest text-church-gray font-bold mb-0.5 opacity-50">Sunday Service</p>
                                                                     <p className="text-xs lg:text-[13px] font-bold text-church-dark">{selected.serviceTime}</p>
@@ -461,14 +467,14 @@ function PresbyteryDetail({ presbytery, loading, accent, onBack, onFindOnMap }) 
                     </div>
                     {withAddress > 0 && (
                         <button onClick={onFindOnMap} className="hidden sm:inline-flex items-center gap-2 px-4 min-h-[44px] rounded-xl bg-church-dark text-white text-[10px] font-bold tracking-widest uppercase hover:bg-black transition-colors shrink-0">
-                            📍 Find on map
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" /></svg> Find on map
                         </button>
                     )}
                 </div>
 
                 {withAddress > 0 && (
                     <button onClick={onFindOnMap} className="sm:hidden w-full mb-6 inline-flex items-center justify-center gap-2 px-4 min-h-[48px] rounded-2xl bg-church-dark text-white text-[11px] font-bold tracking-widest uppercase active:bg-black transition-colors shadow-lg shadow-black/10">
-                        📍 Hanapin sa mapa
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" /></svg> Hanapin sa mapa
                     </button>
                 )}
 
@@ -502,14 +508,14 @@ function PresbyteryDetail({ presbytery, loading, accent, onBack, onFindOnMap }) 
                                 <h3 className="text-base font-bold text-church-dark font-display leading-tight mb-1">{c.name}</h3>
                                 {c.subPresbytery && <p className="text-[10px] font-bold uppercase tracking-wider text-accent/70 mb-2">{c.subPresbytery}</p>}
                                 <div className="space-y-1.5 text-[12.5px] text-church-gray mt-2">
-                                    {c.address && <p><span className="text-church-dark/40">📍</span> {c.address}</p>}
-                                    {(c.minister || c.pastor) && <p><span className="text-church-dark/40">👤</span> {c.minister || c.pastor}</p>}
-                                    {c.moderatorInCharge && <p><span className="text-church-dark/40">Moderator:</span> {c.moderatorInCharge}</p>}
-                                    {c.worshipTime && <p><span className="text-church-dark/40">🕐</span> {c.worshipTime}</p>}
-                                    {c.contact && <p><span className="text-church-dark/40">📞</span> {c.contact}</p>}
-                                    {c.email && <p><span className="text-church-dark/40">✉️</span> {c.email}</p>}
+                                    {c.address && <DetailRow icon="pin">{c.address}</DetailRow>}
+                                    {(c.minister || c.pastor) && <DetailRow icon="user">{c.minister || c.pastor}</DetailRow>}
+                                    {c.moderatorInCharge && <DetailRow label="Moderator">{c.moderatorInCharge}</DetailRow>}
+                                    {c.worshipTime && <DetailRow icon="clock">{c.worshipTime}</DetailRow>}
+                                    {c.contact && <DetailRow icon="phone">{c.contact}</DetailRow>}
+                                    {c.email && <DetailRow icon="mail">{c.email}</DetailRow>}
                                     {Array.isArray(c.elders) && c.elders.length > 0 && (
-                                        <p><span className="text-church-dark/40">Elders:</span> {c.elders.join(', ')}</p>
+                                        <DetailRow label="Elders">{c.elders.join(', ')}</DetailRow>
                                     )}
                                 </div>
                             </div>
@@ -518,5 +524,30 @@ function PresbyteryDetail({ presbytery, loading, accent, onBack, onFindOnMap }) 
                 )}
             </div>
         </div>
+    );
+}
+
+// Quiet stroke icons (match the finder's SVG style) — the emoji glyphs they
+// replace clashed with the refined serif aesthetic.
+const DETAIL_ICONS = {
+    pin: <><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" /></>,
+    user: <><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></>,
+    clock: <><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></>,
+    phone: <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z" />,
+    mail: <><rect x="2" y="4" width="20" height="16" rx="2" /><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" /></>,
+};
+function DetailIcon({ name }) {
+    return (
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mt-[2px] shrink-0" aria-hidden="true">
+            {DETAIL_ICONS[name]}
+        </svg>
+    );
+}
+function DetailRow({ icon, label, children }) {
+    return (
+        <p className="flex items-start gap-1.5">
+            {icon ? <span className="text-church-dark/35"><DetailIcon name={icon} /></span> : <span className="text-church-dark/40 shrink-0">{label}:</span>}
+            <span className="min-w-0">{children}</span>
+        </p>
     );
 }
