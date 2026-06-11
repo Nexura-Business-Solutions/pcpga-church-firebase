@@ -187,18 +187,11 @@ export default function AdminLayout({ children }) {
                     <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-accent/20 to-transparent" />
                 </header>
 
+                {/* Render the routed page directly — the previous per-route
+                    fade-out/fade-in (AnimatePresence mode="wait") flashed/"blinked"
+                    on every navigation. */}
                 <main className="flex-1 p-4 sm:p-8 lg:p-12 overflow-x-hidden">
-                    <AnimatePresence mode="wait">
-                        <motion.div
-                            key={pathname}
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -10 }}
-                            transition={{ duration: 0.3, ease: 'easeOut' }}
-                        >
-                            {children}
-                        </motion.div>
-                    </AnimatePresence>
+                    {children}
                 </main>
             </div>
         </div>
