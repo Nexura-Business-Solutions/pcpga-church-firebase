@@ -40,18 +40,21 @@ import {
     X
 } from 'lucide-react';
 
+// Labels name the public site section each tab edits (the old one-word metaphor
+// labels were mislabelled too: id 'mission' read "Narrative", id 'points' read
+// "Mission"). IDs are unchanged so saved data + section logic are untouched.
 const TABS = [
-    { id: 'hero', label: 'Hero', icon: Home },
-    { id: 'identity', label: 'Identity', icon: Palette },
-    { id: 'mission', label: 'Narrative', icon: Scroll },
-    { id: 'points', label: 'Mission', icon: Footprints },
-    { id: 'commitments', label: 'Spirit', icon: Amphora },
-    { id: 'welcome', label: 'Welcome', icon: Quote },
-    { id: 'stats', label: 'Visitor', icon: BarChart3 },
-    { id: 'committees', label: 'Governance', icon: Landmark },
-    { id: 'presbyteries', label: 'Regional', icon: Globe },
+    { id: 'hero', label: 'Homepage Banner', icon: Home },
+    { id: 'identity', label: 'Name & Footer', icon: Palette },
+    { id: 'mission', label: 'Mission & Vision', icon: Scroll },
+    { id: 'points', label: 'Mission Points', icon: Footprints },
+    { id: 'commitments', label: 'Commitments', icon: Amphora },
+    { id: 'welcome', label: 'Welcome Messages', icon: Quote },
+    { id: 'stats', label: 'Stats & Visit Info', icon: BarChart3 },
+    { id: 'committees', label: 'Standing Committees', icon: Landmark },
+    { id: 'presbyteries', label: 'Church Directory', icon: Globe },
     { id: 'donations', label: 'Giving', icon: CircleDollarSign },
-    { id: 'announcement', label: 'Announcement', icon: Bell },
+    { id: 'announcement', label: 'Announcement Popup', icon: Bell },
     { id: 'events', label: 'Upcoming Events', icon: CalendarDays },
     { id: 'videos', label: 'Video Greetings', icon: Film }
 ];
@@ -401,38 +404,34 @@ export default function AdminContent() {
 
     return (
         <AdminLayout>
-            <div className="min-h-screen bg-[hsl(var(--admin-bg))] p-4 sm:p-8 lg:p-12 pb-32">
+            <div className="min-h-screen bg-[hsl(var(--admin-bg))] p-4 sm:p-8 lg:p-12 pb-44">
                 <div className="max-w-7xl mx-auto">
                     {/* Header */}
-                    <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8 md:mb-16">
+                    <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6 md:mb-8">
                         <div>
-                            <div className="flex items-center gap-3 mb-4">
-                                <Globe className="w-5 h-5 text-coral" />
-                                <span className="text-coral text-[10px] font-bold uppercase tracking-[0.4em]">Global Management</span>
-                            </div>
-                            <h1 id="tour-fields-header" className="text-4xl md:text-5xl font-bold text-[hsl(var(--admin-text))] font-display tracking-tight leading-none mb-4">
-                                Master <span className="opacity-40">Content Manager</span>
+                            <h1 id="tour-fields-header" className="text-3xl md:text-4xl font-bold text-[hsl(var(--admin-text))] font-display tracking-tight leading-none mb-2">
+                                Website Content
                             </h1>
                             <p className="text-[hsl(var(--admin-text-dim))] text-sm max-w-lg">
-                                Control every narrative, principle, and identity marker across the entire website from one unified dashboard.
+                                Pick a section below to edit it, then press <span className="font-semibold text-[hsl(var(--admin-text))]">Save changes</span>.
                             </p>
                         </div>
-                        <div className="flex gap-4">
+                        <div className="flex gap-3">
                             <button
                                 onClick={() => setIsTourActive(true)}
-                                className="px-6 py-3 bg-[hsl(var(--admin-bg-alt))] border border-[hsl(var(--admin-border))] rounded-2xl text-[10px] font-bold uppercase tracking-widest text-coral hover:bg-coral/5 transition-all shadow-sm hover:scale-105 active:scale-95 flex items-center gap-2"
+                                className="px-5 py-2.5 bg-[hsl(var(--admin-bg-alt))] border border-[hsl(var(--admin-border))] rounded-2xl text-[10px] font-bold uppercase tracking-widest text-coral hover:bg-coral/5 transition-all shadow-sm flex items-center gap-2"
                             >
-                                <Sparkles className="w-3 h-3" /> Take a Tour
+                                <Sparkles className="w-3 h-3" /> Take a tour
                             </button>
-                            <a href="/" target="_blank" rel="noreferrer" className="flex items-center gap-3 px-8 py-3 bg-[hsl(var(--admin-surface))] rounded-2xl border border-[hsl(var(--admin-border))] hover:bg-accent/5 transition-all group hover:scale-105 active:scale-95">
-                                <Eye className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                                <span className="text-[10px] font-bold text-[hsl(var(--admin-text))] uppercase tracking-widest">Live Site</span>
+                            <a href="/" target="_blank" rel="noreferrer" className="flex items-center gap-2.5 px-6 py-2.5 bg-[hsl(var(--admin-surface))] rounded-2xl border border-[hsl(var(--admin-border))] hover:bg-accent/5 transition-all group">
+                                <Eye className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                                <span className="text-[10px] font-bold text-[hsl(var(--admin-text))] uppercase tracking-widest">View live site</span>
                             </a>
                         </div>
                     </div>
 
-                    {/* Tabs */}
-                    <div id="tour-tabs" className="flex flex-wrap gap-2 p-2 bg-[hsl(var(--admin-bg-alt))] rounded-3xl border border-[hsl(var(--admin-border))] mb-8 md:mb-12 self-start inline-flex">
+                    {/* Tabs — sticky so switching sections doesn't require scrolling back up */}
+                    <div id="tour-tabs" className="flex flex-wrap gap-2 p-2 bg-[hsl(var(--admin-bg-alt))]/95 backdrop-blur rounded-3xl border border-[hsl(var(--admin-border))] mb-8 md:mb-12 sticky top-20 z-20">
                         {TABS.map(tab => (
                             <button
                                 key={tab.id}
@@ -562,7 +561,6 @@ export default function AdminContent() {
                                                 <div key={field} className="space-y-4">
                                                     <div className="flex justify-between items-center">
                                                         <label className="text-[10px] font-bold uppercase tracking-widest text-coral ml-1 capitalize">{field}</label>
-                                                        <span className="text-[8px] opacity-30 font-bold uppercase">Dynamic Link</span>
                                                     </div>
                                                     <input
                                                         type="text"
@@ -1038,11 +1036,12 @@ export default function AdminContent() {
                                 {/* PRESBYTERIES TAB */}
                                 {activeTab === 'presbyteries' && (
                                     <div className="space-y-12">
-                                        <h3 className="text-[10px] font-bold uppercase tracking-widest text-coral border-b border-[hsl(var(--admin-border))] pb-4">Regional Governance</h3>
-                                        <div className="mb-6 flex justify-end">
+                                        <h3 className="text-[10px] font-bold uppercase tracking-widest text-coral border-b border-[hsl(var(--admin-border))] pb-4">The church directory — presbyteries &amp; their churches</h3>
+                                        <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                                            <p className="text-[hsl(var(--admin-text-dim))] text-xs max-w-md">Restore any presbyteries or churches that came built-in but are missing here. This only adds — it never overwrites what you&apos;ve edited.</p>
                                             <button type="button" onClick={handleSyncDirectory}
-                                                className="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-accent/10 text-accent text-[11px] font-bold uppercase tracking-widest border border-accent/20 hover:bg-accent hover:text-white transition-all">
-                                                Sync directory from latest
+                                                className="shrink-0 inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-accent/10 text-accent text-[11px] font-bold uppercase tracking-widest border border-accent/20 hover:bg-accent hover:text-white transition-all">
+                                                Restore built-in directory
                                             </button>
                                         </div>
                                         <div className="grid grid-cols-1 gap-8">
@@ -1857,25 +1856,27 @@ export default function AdminContent() {
                             </AnimatePresence>
                         </div>
 
-                        {/* Feedback & Save Bar */}
-                        <div className="fixed bottom-0 left-0 right-0 p-4 sm:p-8 flex flex-col items-center pointer-events-none z-[100]">
-                            <div className="w-full max-w-7xl mx-auto flex justify-center">
+                        {/* Save bar — a docked footer with a fade backdrop so content
+                            scrolls cleanly beneath it (the page reserves matching bottom
+                            padding so no field is ever hidden behind it). */}
+                        <div className="fixed bottom-0 left-0 right-0 px-4 sm:px-8 pt-12 pb-4 sm:pb-6 flex flex-col items-center pointer-events-none z-[100] bg-gradient-to-t from-[hsl(var(--admin-bg))] via-[hsl(var(--admin-bg))] to-transparent">
+                            <div className="w-full max-w-7xl mx-auto flex justify-center sm:justify-end">
                                 <button
                                     id="tour-save"
                                     onClick={handleSave}
                                     disabled={saving}
-                                    className={`h-16 sm:h-18 w-full sm:w-auto px-8 sm:px-24 rounded-2xl text-[11px] font-bold uppercase tracking-[0.3em] shadow-2xl transition-all duration-500 pointer-events-auto hover:scale-105 active:scale-95 ${saving
+                                    className={`h-14 w-full sm:w-auto px-8 sm:px-16 rounded-2xl text-[11px] font-bold uppercase tracking-[0.25em] shadow-2xl transition-all duration-300 pointer-events-auto active:scale-95 ${saving
                                         ? 'bg-[hsl(var(--admin-border))] text-[hsl(var(--admin-text-dim))]'
                                         : 'bg-coral text-white hover:shadow-coral/30'
                                         }`}
                                 >
                                     {saving ? (
-                                        <div className="flex items-center gap-4">
+                                        <div className="flex items-center justify-center gap-3">
                                             <div className="w-4 h-4 rounded-full border-2 border-white border-t-transparent animate-spin" />
-                                            Updating Cloud Experience...
+                                            Saving…
                                         </div>
                                     ) : (
-                                        'Update Live Narrative ✦'
+                                        'Save changes'
                                     )}
                                 </button>
                             </div>

@@ -29,7 +29,7 @@ const Empty = ({ label }) => (
     <Frame>
         <div className="py-24 px-8 text-center">
             <Lucide.Eye className="w-8 h-8 mx-auto mb-3 opacity-20" />
-            <p className="text-[11px] uppercase tracking-[0.3em] opacity-40">{label}</p>
+            <p className="text-xs leading-relaxed opacity-50 max-w-xs mx-auto">{label}</p>
         </div>
     </Frame>
 );
@@ -249,6 +249,8 @@ export default function ContentPreview({ tab, hero, identity, mission, principle
         case 'presbyteries': return <ListPreview items={presbyteries} label="presbyteries" />;
         case 'donations': return <Donations donations={donations} />;
         case 'announcement': return <Announcement announcement={announcement} />;
-        default: return <Empty label="Select a section" />;
+        // welcome / events / videos have rich editors but no inline preview yet —
+        // say so instead of the misleading "Select a section".
+        default: return <Empty label="No preview for this section — edit on the left, then check the live site." />;
     }
 }

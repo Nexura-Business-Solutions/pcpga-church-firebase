@@ -1,5 +1,5 @@
 import { lazy, Suspense, useLayoutEffect } from 'react';
-import { Routes, Route, useLocation } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import AdminRoute from './components/AdminRoute.jsx';
 import ChatbotWidget from './components/ChatbotWidget.jsx';
 import HomePage from './pages/HomePage.jsx';
@@ -39,7 +39,6 @@ function lazyWithRetry(factory) {
 }
 
 const AdminDashboard = lazyWithRetry(() => import('./admin/AdminDashboard.jsx'));
-const AdminHero = lazyWithRetry(() => import('./admin/AdminHero.jsx'));
 const AdminSermons = lazyWithRetry(() => import('./admin/AdminSermons.jsx'));
 const AdminLibrary = lazyWithRetry(() => import('./admin/AdminLibrary.jsx'));
 const AdminDonations = lazyWithRetry(() => import('./admin/AdminDonations.jsx'));
@@ -105,7 +104,10 @@ export default function App() {
       <Route path="/login" element={<LoginPage />} />
 
       <Route path="/admin" element={adminRoute(AdminDashboard)} />
-      <Route path="/admin/hero" element={adminRoute(AdminHero)} />
+      {/* The standalone hero editor saved stale field names (subtitle/ctaText)
+          the landing no longer reads and duplicated the Content Manager's
+          Homepage Banner tab — redirect to the single correct editor. */}
+      <Route path="/admin/hero" element={<Navigate to="/admin/content" replace />} />
       <Route path="/admin/sermons" element={adminRoute(AdminSermons)} />
       <Route path="/admin/library" element={adminRoute(AdminLibrary)} />
       <Route path="/admin/seminaries" element={adminRoute(AdminSeminaries)} />

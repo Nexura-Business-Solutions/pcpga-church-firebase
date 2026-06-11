@@ -215,8 +215,8 @@ export default function AdminDonors() {
 
                 <div className="screen-only flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8 md:mb-16 px-2">
                     <div>
-                        <h1 className="text-4xl font-bold text-[hsl(var(--admin-text))] tracking-tighter font-display mb-3">Donor Database</h1>
-                        <p className="text-[hsl(var(--admin-text-dim))] text-[11px] font-bold tracking-[0.3em] uppercase">Historical Stewardship Records</p>
+                        <h1 className="text-4xl font-bold text-[hsl(var(--admin-text))] tracking-tight font-display mb-2">Donors</h1>
+                        <p className="text-[hsl(var(--admin-text-dim))] text-sm">Everyone who has given, with their total giving and last gift.</p>
                     </div>
                     <div className="flex flex-wrap items-center gap-3 no-print">
                         <button
@@ -311,7 +311,7 @@ export default function AdminDonors() {
                             </div>
                             <div className="flex items-center gap-2 px-4 py-2 bg-teal/5 rounded-xl border border-teal/10 self-start sm:self-auto">
                                 <div className="w-2 h-2 rounded-full bg-teal animate-pulse" />
-                                <span className="text-[10px] font-bold uppercase tracking-widest text-teal">{filteredDonors.length} {rangeActive ? `in ${rangeLabel}` : 'Donors'}</span>
+                                <span className="text-[10px] font-bold uppercase tracking-widest text-teal">{filteredDonors.length} {rangeActive ? `in ${rangeLabel}` : (filteredDonors.length === 1 ? 'Donor' : 'Donors')}</span>
                             </div>
                         </div>
                     </div>
@@ -333,7 +333,7 @@ export default function AdminDonors() {
                                         </div>
                                     </div>
                                     <div className="flex items-center justify-between">
-                                        <span className="px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-widest border bg-[hsl(var(--admin-text))]/5 border-[hsl(var(--admin-border))] text-[hsl(var(--admin-text-dim))]">{d.count} gifts</span>
+                                        <span className="px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-widest border bg-[hsl(var(--admin-text))]/5 border-[hsl(var(--admin-border))] text-[hsl(var(--admin-text-dim))]">{d.count} {d.count === 1 ? 'gift' : 'gifts'}</span>
                                         <span className="text-sm font-bold text-teal font-display">₱{d.total.toLocaleString()}</span>
                                     </div>
                                     <p className="text-[10px] font-bold text-[hsl(var(--admin-text-dim))] opacity-40 tracking-widest uppercase mt-2">Last gift · {toDateLabel(d.lastAt)}</p>

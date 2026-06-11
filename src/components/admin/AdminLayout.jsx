@@ -7,6 +7,8 @@ import {
     Users,
     Mic2,
     Library,
+    GraduationCap,
+    HandCoins,
     Sun,
     Moon,
     Globe,
@@ -16,13 +18,14 @@ import {
 import { logout, useAuth } from '../../lib/auth.js';
 import { initStore } from '../../lib/store.js';
 
-// Force Sync: Unified Console v2.1.1
 const navItems = [
     { label: 'Dashboard', href: '/admin', icon: LayoutDashboard },
-    { label: 'Site Content', href: '/admin/content', icon: FileText },
-    { label: 'Donor Database', href: '/admin/donations/donors', icon: Users },
-    { label: 'Sermon Archive', href: '/admin/sermons', icon: Mic2 },
-    { label: 'Digital Library', href: '/admin/library', icon: Library },
+    { label: 'Website Content', href: '/admin/content', icon: FileText },
+    { label: 'Sermons', href: '/admin/sermons', icon: Mic2 },
+    { label: 'Library', href: '/admin/library', icon: Library },
+    { label: 'Seminaries', href: '/admin/seminaries', icon: GraduationCap },
+    { label: 'Donations', href: '/admin/donations', icon: HandCoins },
+    { label: 'Donors', href: '/admin/donations/donors', icon: Users },
 ];
 
 export default function AdminLayout({ children }) {
@@ -97,9 +100,9 @@ export default function AdminLayout({ children }) {
                 <div className="px-8 py-8">
                     <div className="flex items-center gap-3 mb-1">
                         <img src="/logo.png" alt="Logo" className="h-8 w-auto brightness-0 invert opacity-80" />
-                        <h1 className="text-lg font-bold text-[hsl(var(--admin-sidebar-text))] tracking-tighter font-display uppercase italic">PCP Console</h1>
+                        <h1 className="text-lg font-bold text-[hsl(var(--admin-sidebar-text))] tracking-tight font-display">PCP Admin</h1>
                     </div>
-                    <p className="text-[hsl(var(--admin-sidebar-text))]/15 text-[10px] tracking-[0.2em] font-bold uppercase pl-11 font-display">Admin Portal v2</p>
+                    <p className="text-[hsl(var(--admin-sidebar-text))]/25 text-[10px] tracking-[0.2em] font-bold uppercase pl-11 font-display">Website Manager</p>
                 </div>
 
                 {/* Navigation */}
@@ -165,25 +168,19 @@ export default function AdminLayout({ children }) {
                         <button
                             onClick={() => setSidebarOpen(true)}
                             className="lg:hidden w-10 h-10 flex items-center justify-center bg-[hsl(var(--admin-text))]/5 rounded-xl text-[hsl(var(--admin-text))]/40 hover:text-[hsl(var(--admin-text))]"
+                            aria-label="Open menu"
                         >
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="18" x2="21" y2="18" /></svg>
                         </button>
-
-                        <div className="flex items-center gap-2 px-3 py-1.5 bg-accent/5 rounded-lg border border-accent/10">
-                            <div className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse shadow-[0_0_8px_rgba(100,255,100,0.5)]" />
-                            <span className="text-[9px] font-bold uppercase tracking-[0.15em] text-[hsl(var(--admin-text))]/40 whitespace-nowrap">Online</span>
-                        </div>
+                        <span className="lg:hidden text-sm font-bold text-[hsl(var(--admin-text))]/70 font-display">PCP Admin</span>
                     </div>
 
                     <div className="hidden sm:flex items-center gap-4">
                         {user?.email && (
                             <div className="px-4 py-2 bg-[hsl(var(--admin-text))]/5 rounded-xl border border-[hsl(var(--admin-border))]">
-                                <span className="text-[10px] font-bold text-[hsl(var(--admin-text))]/40 tracking-widest uppercase">{user.email}</span>
+                                <span className="text-[11px] font-bold text-[hsl(var(--admin-text))]/50 normal-case">Signed in as {user.email}</span>
                             </div>
                         )}
-                        <div className="px-4 py-2 bg-[hsl(var(--admin-text))]/5 rounded-xl border border-[hsl(var(--admin-border))]">
-                            <span className="text-[10px] font-bold text-[hsl(var(--admin-text))]/40 tracking-widest uppercase">Admin v2.1.0</span>
-                        </div>
                     </div>
 
                     {/* Shimmer line at bottom */}

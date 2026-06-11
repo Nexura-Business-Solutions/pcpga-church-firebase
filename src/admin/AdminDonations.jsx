@@ -55,8 +55,8 @@ export default function AdminDonations() {
             <div className="max-w-6xl mx-auto selection:bg-teal/10">
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8 md:mb-16 px-2">
                     <div>
-                        <h1 className="text-4xl font-bold text-[hsl(var(--admin-text))] tracking-tighter font-display mb-3">Donations</h1>
-                        <p className="text-[hsl(var(--admin-text-dim))] text-[11px] font-bold tracking-[0.3em] uppercase">Read-only Contribution Log</p>
+                        <h1 className="text-4xl font-bold text-[hsl(var(--admin-text))] tracking-tight font-display mb-2">Donations</h1>
+                        <p className="text-[hsl(var(--admin-text-dim))] text-sm">Every gift received (view only). For totals per person, see Donors.</p>
                     </div>
                     <div className="flex items-center gap-6 no-print">
                         <button
@@ -67,7 +67,7 @@ export default function AdminDonations() {
                             Print Report
                         </button>
                         <div className="bg-[hsl(var(--admin-surface))] border border-[hsl(var(--admin-border))] px-6 py-3 rounded-2xl">
-                            <p className="text-[10px] text-[hsl(var(--admin-text-dim))] font-bold uppercase tracking-widest mb-1 opacity-40">Total Collections</p>
+                            <p className="text-[10px] text-[hsl(var(--admin-text-dim))] font-bold uppercase tracking-widest mb-1 opacity-40">Total received</p>
                             <p className="text-xl font-bold text-teal font-display">₱{totalDonated.toLocaleString()}</p>
                         </div>
                     </div>
