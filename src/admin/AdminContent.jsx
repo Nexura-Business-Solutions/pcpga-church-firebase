@@ -476,10 +476,10 @@ export default function AdminContent() {
                         ))}
                     </div>
 
-                    {/* Editor content — full width. The live preview is a toggled
-                        slide-over panel (see below), not a permanent side column, so the
-                        fields get the whole width and don't feel cramped. */}
-                    <div className="max-w-4xl">
+                    {/* Editor content — full width (same as the tab bar above). The live
+                        preview is a toggled slide-over panel (see below), not a permanent
+                        side column, so the fields use the whole width and breathe. */}
+                    <div className="w-full">
                         <AnimatePresence mode="wait">
                             <motion.div
                                 key={activeTab}
@@ -528,7 +528,7 @@ export default function AdminContent() {
                                             </div>
                                         </div>
 
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-8">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-7 md:gap-x-12 md:gap-y-9">
                                             {[
                                                 { key: 'editionText', label: 'Edition Line', placeholder: 'A Communion of Reformed Churches', long: true },
                                                 { key: 'heading', label: 'Headline (English)', placeholder: 'Welcome home.' },
@@ -565,7 +565,7 @@ export default function AdminContent() {
                                 {/* IDENTITY TAB */}
                                 {activeTab === 'identity' && (
                                     <div className="space-y-10">
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-9">
                                             <div className="space-y-4">
                                                 <label className="text-[10px] font-bold uppercase tracking-widest text-coral ml-1">Church Name</label>
                                                 <input
@@ -597,7 +597,7 @@ export default function AdminContent() {
                                                 placeholder="The short narrative at the bottom of the site..."
                                             />
                                         </div>
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-6 border-t border-[hsl(var(--admin-border))]">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-9 pt-6 border-t border-[hsl(var(--admin-border))]">
                                             {['facebook', 'youtube', 'instagram', 'email'].map(field => (
                                                 <div key={field} className="space-y-4">
                                                     <div className="flex justify-between items-center">
@@ -958,7 +958,7 @@ export default function AdminContent() {
                                                         />
                                                     </div>
 
-                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-9">
                                                         <div className="space-y-3">
                                                             <div className="flex justify-between items-center mb-1">
                                                                 <label className="text-[9px] font-bold uppercase tracking-widest opacity-30 ml-1">Key Duties / Rules</label>
@@ -1109,7 +1109,7 @@ export default function AdminContent() {
                                                     >Delete Record</button>
                                                     <div className="flex flex-col md:flex-row gap-8">
                                                         <div className="flex-1 space-y-4">
-                                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
                                                                 <div className="space-y-1">
                                                                     <label className="text-[9px] font-bold uppercase tracking-widest text-coral ml-1">Presbytery Name</label>
                                                                     <input type="text" value={p.name} onChange={e => { const updated = [...presbyteries]; updated[idx] = { ...updated[idx], name: e.target.value }; setPresbyteries(updated); }} className="w-full bg-[hsl(var(--admin-bg-alt))] p-3.5 rounded-xl text-sm font-semibold border border-[hsl(var(--admin-text))]/20 shadow-sm" />
@@ -1218,7 +1218,7 @@ export default function AdminContent() {
                                 {/* GIVING PORTAL TAB */}
                                 {activeTab === 'donations' && (
                                     <div className="space-y-12">
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-8">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-7 md:gap-x-12 md:gap-y-9">
                                             {[
                                                 { key: 'heading', label: 'Primary Heading', placeholder: 'Give Generously.', long: true },
                                                 { key: 'contactEmail', label: 'Management Email', placeholder: 'give@pcp.org' },
@@ -1444,7 +1444,7 @@ export default function AdminContent() {
                                                 <h4 className="text-[hsl(var(--admin-text))] text-xs font-bold uppercase tracking-widest">Call-to-Action Button</h4>
                                                 <span className="text-[9px] font-bold uppercase tracking-widest text-[hsl(var(--admin-text-dim))] px-2 py-0.5 rounded-full bg-[hsl(var(--admin-bg-alt))]">Optional</span>
                                             </div>
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-7">
                                                 <div>
                                                     <label className="block text-accent text-[10px] tracking-[0.25em] uppercase mb-4 font-bold">Button Text</label>
                                                     <input
@@ -1599,7 +1599,7 @@ export default function AdminContent() {
                                                                     className="w-full bg-[hsl(var(--admin-bg))] border border-[hsl(var(--admin-text))]/20 rounded-2xl p-4 text-sm font-semibold focus:ring-2 focus:ring-coral/20 outline-none transition-all"
                                                                 />
                                                             </div>
-                                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
                                                                 <div>
                                                                     <label className="block text-coral text-[9px] tracking-[0.25em] uppercase mb-2 font-bold">Date</label>
                                                                     <input
@@ -1679,7 +1679,7 @@ export default function AdminContent() {
                                                             </div>
                                                         </div>
 
-                                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-7">
                                                             {/* Video + poster (left column) */}
                                                             <div className="space-y-3">
                                                             <div className="relative aspect-video rounded-2xl overflow-hidden border-2 border-dashed border-coral/20 bg-[hsl(var(--admin-bg))] group/vid" onDragOver={allowDrop} onDrop={(e) => handleDrop(e, `vg-video-${i}`)}>
@@ -1819,7 +1819,7 @@ export default function AdminContent() {
 
                                                             {/* Fields */}
                                                             <div className="space-y-3">
-                                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
                                                                     <div>
                                                                         <label className="block text-coral text-[9px] tracking-[0.25em] uppercase mb-2 font-bold">Name</label>
                                                                         <input
