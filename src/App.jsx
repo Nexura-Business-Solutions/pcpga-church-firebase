@@ -1,4 +1,4 @@
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useLayoutEffect } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import AdminRoute from './components/AdminRoute.jsx';
 import ChatbotWidget from './components/ChatbotWidget.jsx';
@@ -48,6 +48,26 @@ const AdminContent = lazyWithRetry(() => import('./admin/AdminContent.jsx'));
 const AdminAdmins = lazyWithRetry(() => import('./admin/AdminAdmins.jsx'));
 const AdminSeminaries = lazyWithRetry(() => import('./admin/AdminSeminaries.jsx'));
 
+// SPA route changes keep the window scroll where it was, so arriving on (or
+// returning to) a page landed mid/bottom of it. Reset to top on every pathname
+// change — useLayoutEffect so the new page never paints at the old offset.
+// Hash navigations (e.g. /#message from another page's nav) are left alone:
+// their target section handles the scroll. scrollRestoration stays 'manual' so
+// the browser's own back/forward restore doesn't fight this.
+function ScrollToTop() {
+  const { pathname, hash } = useLocation();
+  useLayoutEffect(() => {
+    if ('scrollRestoration' in window.history) window.history.scrollRestoration = 'manual';
+  }, []);
+  useLayoutEffect(() => {
+    if (hash) return;
+    window.scrollTo(0, 0);
+    // The real scroller is <html> (body uses overflow-x:clip) — set it directly too.
+    document.documentElement.scrollTop = 0;
+  }, [pathname, hash]);
+  return null;
+}
+
 function AdminFallback() {
   return (
     <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--ink-mute, #888)' }}>
@@ -73,6 +93,7 @@ export default function App() {
   const showChat = !pathname.startsWith('/admin') && pathname !== '/login';
   return (
     <>
+    <ScrollToTop />
     <Routes>
       <Route path="/" element={<HomePage />} />
       <Route path="/library" element={<LibraryPage />} />
