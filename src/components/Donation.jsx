@@ -153,6 +153,10 @@ export default function Donation() {
                         {generating ? 'Redirecting to secure checkout…' : 'Donate Now'}
                     </button>
 
+                    <p className="give-form__contact" style={{ marginTop: '1.1rem' }}>
+                        Secure checkout powered by Xendit — cards, GCash, Maya, and online banking. You will be redirected to complete your gift.
+                    </p>
+
                     {content.contactEmail && (
                         <p className="give-form__contact">
                             Questions? Write to <a href={`mailto:${content.contactEmail}`}>{content.contactEmail}</a>

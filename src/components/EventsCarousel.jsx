@@ -76,7 +76,9 @@ export default function EventsCarousel({ events = [] }) {
                             onClick={() => setLightbox(true)}
                             aria-label={`Enlarge: ${ev.title || 'event poster'}`}
                         >
-                            <img className="evcar__img" src={ev.imageUrl} alt={ev.title || 'Upcoming event'} loading="lazy" decoding="async" />
+                            {/* The visible slide loads eagerly — lazy left the stage as a
+                                big blank box until the poster arrived. */}
+                            <img className="evcar__img" src={ev.imageUrl} alt={ev.title || 'Upcoming event'} loading="eager" fetchPriority="high" decoding="async" />
                         </button>
 
                     </motion.div>

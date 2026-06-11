@@ -16,8 +16,9 @@ export default function DonationPage() {
         <meta property="og:title" content="Give Generously | Presbyterian Church of the Philippines" />
         <meta property="og:description" content="Support the mission through secure online giving." />
       </Helmet>
-      <Navbar />
+      <Navbar darkHero />
       <main id="main-content">
+        <h1 className="sr-only">Give — Presbyterian Church of the Philippines</h1>
         <Donation />
       </main>
       <Footer />

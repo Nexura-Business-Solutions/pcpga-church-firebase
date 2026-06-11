@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { getSettings } from '../lib/store.js';
 
 const navLinks = [
@@ -12,10 +12,15 @@ const navLinks = [
     { name: 'Give', href: '/donation' },
 ];
 
-export default function Navbar() {
+// darkHero: pages whose top section is full-bleed dark (e.g. /donation) get the
+// paper-on-dark pre-scroll treatment and a dark scrolled bar. Light pages keep
+// ink-on-paper from scroll position 0 (the old default made the nav invisible
+// on light pages like /history and /library).
+export default function Navbar({ darkHero = false }) {
     const [scrolled, setScrolled] = useState(false);
     const [mobileOpen, setMobileOpen] = useState(false);
     const [identity, setIdentity] = useState({ name: 'Presbyterian Church', sub: 'of the Philippines' });
+    const { pathname } = useLocation();
 
     useEffect(() => {
         (async () => {
@@ -45,9 +50,14 @@ export default function Navbar() {
         }
     };
 
+    // Off the homepage, '#message'/'#sermons' have no target — route home with
+    // the hash instead (HomePage scrolls to it on mount).
+    const resolveHref = (href) => (href.startsWith('#') && pathname !== '/' ? `/${href}` : href);
+    const isActive = (href) => !href.startsWith('#') && pathname === href;
+
     return (
         <>
-            <header className={`nav ${scrolled ? 'nav--scrolled' : ''}`}>
+            <header className={`nav ${scrolled ? 'nav--scrolled' : ''} ${darkHero ? 'nav--on-dark' : ''}`}>
                 <div className="nav__inner">
                     <Link to="/" className="nav__brand" onClick={() => setMobileOpen(false)}>
                         <img src="/logo.png" alt="" className="nav__logo" />
@@ -59,7 +69,7 @@ export default function Navbar() {
 
                     <nav className="nav__links">
                         {navLinks.map((l) => (
-                            l.href.startsWith('#') ? (
+                            l.href.startsWith('#') && pathname === '/' ? (
                                 <a
                                     key={l.name}
                                     href={l.href}
@@ -71,9 +81,10 @@ export default function Navbar() {
                             ) : (
                                 <Link
                                     key={l.name}
-                                    to={l.href}
+                                    to={resolveHref(l.href)}
                                     onClick={() => setMobileOpen(false)}
-                                    className="nav__link"
+                                    className={`nav__link${isActive(l.href) ? ' nav__link--active' : ''}`}
+                                    aria-current={isActive(l.href) ? 'page' : undefined}
                                 >
                                     {l.name}
                                 </Link>
@@ -97,7 +108,7 @@ export default function Navbar() {
             {mobileOpen && (
                 <div className="mobile-menu">
                     {navLinks.map((l) => (
-                        l.href.startsWith('#') ? (
+                        l.href.startsWith('#') && pathname === '/' ? (
                             <a
                                 key={l.name}
                                 href={l.href}
@@ -109,7 +120,7 @@ export default function Navbar() {
                         ) : (
                             <Link
                                 key={l.name}
-                                to={l.href}
+                                to={resolveHref(l.href)}
                                 onClick={() => setMobileOpen(false)}
                                 className="mobile-menu__link"
                             >

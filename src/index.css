@@ -232,8 +232,9 @@ em.font-display,
 .btn--primary:hover { background: #6b1719; border-color: #6b1719; }
 .btn--ghost { border-color: var(--line); color: var(--ink); }
 .btn--ghost:hover { background: var(--paper-2); border-color: var(--ink); }
-.btn--on-dark.btn--primary { background: var(--brass); color: #fff; border-color: var(--brass); }
-.btn--on-dark.btn--primary:hover { background: #967530; border-color: #967530; }
+/* Ink on brass (≈5.8:1) — white on brass was ~2.9:1 and failed AA. */
+.btn--on-dark.btn--primary { background: var(--brass); color: var(--ink); border-color: var(--brass); }
+.btn--on-dark.btn--primary:hover { background: #cca54f; border-color: #cca54f; color: var(--ink); }
 .btn--on-dark.btn--ghost { border-color: rgba(255,255,255,0.3); color: var(--paper); }
 .btn--on-dark.btn--ghost:hover { background: rgba(255,255,255,0.08); border-color: #fff; }
 .btn--small { padding: 0.6rem 1.1rem; font-size: 13px; }
@@ -332,16 +333,24 @@ em.font-display,
 }
 .nav__burger span { display: block; width: 22px; height: 1.5px; background: var(--ink); transition: all 0.3s; }
 
-/* When hero is full-bleed dark, show the pre-scroll nav in paper on dark.
-   Scoped to non-landing pages: the lp-v3 landing has an always-cream nav and
-   never gets `.nav--scrolled`, so these light colors would make its nav text
-   and burger invisible (white on cream). */
-body:not(.lp-v3) .nav:not(.nav--scrolled) .nav__name,
-body:not(.lp-v3) .nav:not(.nav--scrolled) .nav__link { color: rgba(245,240,230,0.9); }
-body:not(.lp-v3) .nav:not(.nav--scrolled) .nav__sub { color: rgba(245,240,230,0.6); }
-body:not(.lp-v3) .nav:not(.nav--scrolled) .nav__link:hover { color: #fff; }
-body:not(.lp-v3) .nav:not(.nav--scrolled) .nav__burger span { background: var(--paper); }
-body:not(.lp-v3) .nav:not(.nav--scrolled) .nav__link--active::after { background: #cca54f; }
+/* Pages with a full-bleed dark top (e.g. /donation) opt in via `nav--on-dark`
+   (Navbar's darkHero prop): paper-on-dark text before scroll, and a DARK bar
+   once scrolled (a cream bar over an all-dark page reads as a glitch). Light
+   pages keep the default ink-on-paper from scroll position 0 — the old
+   default light-on-dark treatment made the nav invisible on /history /library. */
+.nav--on-dark:not(.nav--scrolled) .nav__name,
+.nav--on-dark:not(.nav--scrolled) .nav__link { color: rgba(245,240,230,0.9); }
+.nav--on-dark:not(.nav--scrolled) .nav__sub { color: rgba(245,240,230,0.6); }
+.nav--on-dark:not(.nav--scrolled) .nav__link:hover { color: #fff; }
+.nav--on-dark:not(.nav--scrolled) .nav__burger span { background: var(--paper); }
+.nav--on-dark:not(.nav--scrolled) .nav__link--active::after { background: #cca54f; }
+.nav--on-dark.nav--scrolled { background: #241813; border-bottom-color: rgba(245,240,230,0.12); }
+.nav--on-dark.nav--scrolled .nav__name,
+.nav--on-dark.nav--scrolled .nav__link { color: rgba(245,240,230,0.9); }
+.nav--on-dark.nav--scrolled .nav__sub { color: rgba(245,240,230,0.6); }
+.nav--on-dark.nav--scrolled .nav__link:hover { color: #fff; }
+.nav--on-dark.nav--scrolled .nav__burger span { background: var(--paper); }
+.nav--on-dark.nav--scrolled .nav__link--active::after { background: #cca54f; }
 
 @media (max-width: 880px) {
   .nav__links, .nav__actions { display: none; }
@@ -1339,8 +1348,9 @@ body:not(.lp-v3).menu-open .nav:not(.nav--scrolled) .nav__burger span { backgrou
 .give-form__chip:hover { border-color: rgba(245, 240, 230, 0.5); }
 .give-form__chip--active {
   background: var(--brass);
-  color: #fff;
+  color: var(--ink);
   border-color: var(--brass);
+  font-weight: 600;
 }
 .give-form__field { margin-bottom: 1.5rem; }
 .give-form__field:last-of-type { margin-bottom: 2rem; }

@@ -166,7 +166,7 @@ export default function SeminariesPage() {
                 <meta name="description" content="Reformed, Christ-centered theological education at the seminaries of the Presbyterian Church of the Philippines." />
             </Helmet>
             <Navbar />
-            <div className="min-h-screen bg-[#f8f7ff] selection:bg-accent/10">
+            <div className="min-h-screen bg-[#faf7f0] selection:bg-accent/10">
                 <main className="pt-28 pb-24 px-5 sm:px-8">
                     <div className="max-w-5xl mx-auto">
                         <AnimatePresence mode="wait">
@@ -193,7 +193,7 @@ export default function SeminariesPage() {
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                             {seminaries.map((s) => (
                                                 <button key={s.id} onClick={() => setSelected(s)}
-                                                    className="text-left rounded-3xl border border-church-dark/10 bg-white/70 p-7 hover:border-accent/30 hover:shadow-xl hover:shadow-accent/5 transition-all group">
+                                                    className="text-left rounded-3xl border border-church-dark/10 bg-white/70 p-7 hover:border-accent/30 hover:shadow-xl hover:shadow-accent/5 hover:-translate-y-0.5 transition-all group flex flex-col">
                                                     <div className="flex items-center gap-3 mb-3">
                                                         <span className="w-11 h-11 rounded-2xl bg-accent/10 flex items-center justify-center">
                                                             <GraduationCap className="w-5 h-5 text-accent" />
@@ -204,11 +204,16 @@ export default function SeminariesPage() {
                                                     </div>
                                                     <h2 className="text-xl font-bold text-church-dark font-display group-hover:text-accent transition-colors mb-1">{s.name}</h2>
                                                     {s.tagline && <p className="text-church-dark/60 text-sm mb-3">{s.tagline}</p>}
-                                                    {s.location && (
-                                                        <p className="flex items-start gap-1.5 text-church-dark/50 text-xs">
-                                                            <MapPin className="w-3.5 h-3.5 mt-0.5 shrink-0" /> {s.location}
-                                                        </p>
-                                                    )}
+                                                    {s.about && <p className="text-church-dark/55 text-[13px] leading-relaxed line-clamp-3 mb-4">{s.about}</p>}
+                                                    <div className="mt-auto pt-2 flex items-center justify-between gap-3">
+                                                        <span className="flex items-start gap-1.5 text-church-dark/50 text-xs min-w-0">
+                                                            {s.location && <><MapPin className="w-3.5 h-3.5 mt-0.5 shrink-0" /> <span className="truncate">{s.location}</span></>}
+                                                            {!s.location && s.programs?.length > 0 && <span>{s.programs.length} program{s.programs.length === 1 ? '' : 's'} offered</span>}
+                                                        </span>
+                                                        <span className="inline-flex items-center gap-1.5 text-accent text-xs font-bold uppercase tracking-wider shrink-0 group-hover:gap-2.5 transition-all">
+                                                            View details <span aria-hidden="true">→</span>
+                                                        </span>
+                                                    </div>
                                                 </button>
                                             ))}
                                         </div>
