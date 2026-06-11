@@ -66,13 +66,11 @@ export default function AdminLayout({ children }) {
     }
 
     if (loading) {
+        // Warm ivory (the admin light bg) — not black — so the first auth check
+        // doesn't flash a dark screen.
         return (
-            <div className="min-h-screen bg-[#07070a] flex items-center justify-center">
-                <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="animate-spin w-8 h-8 border-2 border-accent border-t-transparent rounded-full"
-                />
+            <div className="min-h-screen flex items-center justify-center" style={{ background: 'hsl(42 76% 95%)' }}>
+                <div className="animate-spin w-8 h-8 border-2 border-accent border-t-transparent rounded-full" />
             </div>
         );
     }

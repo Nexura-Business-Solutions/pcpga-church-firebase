@@ -6,7 +6,11 @@ export default function AdminRoute({ children, ownerOnly = false }) {
   const location = useLocation();
 
   if (loading) {
-    return <div className="flex items-center justify-center min-h-screen">Loading…</div>;
+    return (
+      <div className="flex items-center justify-center min-h-screen" style={{ background: 'hsl(42 76% 95%)' }}>
+        <div className="animate-spin w-7 h-7 border-2 border-[#8b1f24] border-t-transparent rounded-full" />
+      </div>
+    );
   }
   if (!user || !isAdmin) {
     return <Navigate to="/login" state={{ from: location }} replace />;
