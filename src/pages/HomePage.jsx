@@ -578,23 +578,29 @@ export default function HomePage() {
         </div>
       </header>
 
-      {/* Mobile menu overlay */}
-      <div className="mobile-menu" aria-hidden={!mobileOpen}>
-        {NAV_LINKS.map((l) => (
-          <a
-            key={l.href}
-            href={l.href}
-            className="mobile-menu__link"
-            onClick={() => setMobileOpen(false)}
-          >
-            {l.label} <em>{l.roman}</em>
-          </a>
-        ))}
-        <span className="mobile-menu__divider" />
-        <Link to="/churches" className="btn btn--primary" onClick={() => setMobileOpen(false)}>
-          Find a Church
-        </Link>
-      </div>
+      {/* Mobile menu overlay — only mounted while open. It used to stay in the
+          DOM hidden by lp-v3 CSS, but the first style recalc on load (forced by
+          observers/motion reads before the body class settles) captured it at
+          opacity 1, and the 360ms opacity transition then animated 1→0: a ghost
+          of the menu links faded over the hero on every hard refresh. */}
+      {mobileOpen && (
+        <div className="mobile-menu">
+          {NAV_LINKS.map((l) => (
+            <a
+              key={l.href}
+              href={l.href}
+              className="mobile-menu__link"
+              onClick={() => setMobileOpen(false)}
+            >
+              {l.label} <em>{l.roman}</em>
+            </a>
+          ))}
+          <span className="mobile-menu__divider" />
+          <Link to="/churches" className="btn btn--primary" onClick={() => setMobileOpen(false)}>
+            Find a Church
+          </Link>
+        </div>
+      )}
 
       {/* HERO */}
       <section className="hero" id="hero" aria-label="Welcome">
