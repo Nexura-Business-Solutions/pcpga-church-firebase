@@ -582,11 +582,11 @@ export default function AdminContent() {
                                                     <div className="flex justify-between items-center">
                                                         <label className="text-[10px] font-bold uppercase tracking-widest text-coral ml-1 capitalize">{field}</label>
                                                     </div>
-                                                    <input
-                                                        type="text"
+                                                    <textarea
+                                                        rows={2}
                                                         value={identity.social?.[field] || ''}
                                                         onChange={e => setIdentity({ ...identity, social: { ...identity.social, [field]: e.target.value } })}
-                                                        className="w-full bg-[hsl(var(--admin-bg-alt))] border border-[hsl(var(--admin-text))]/20 rounded-2xl p-3.5 sm:p-5 text-sm focus:ring-2 focus:ring-coral/20 transition-all font-medium"
+                                                        className="w-full bg-[hsl(var(--admin-bg-alt))] border border-[hsl(var(--admin-text))]/20 rounded-2xl p-3.5 sm:p-5 text-sm focus:ring-2 focus:ring-coral/20 transition-all font-medium resize-y leading-relaxed break-all outline-none"
                                                         placeholder={`Link or address for ${field}`}
                                                     />
                                                 </div>
@@ -659,19 +659,19 @@ export default function AdminContent() {
                                                             p[i].title = e.target.value;
                                                             setMission({ ...mission, missionPoints: p });
                                                         }}
-                                                        className="flex-1 bg-[hsl(var(--admin-bg-alt))] border border-[hsl(var(--admin-text))]/20 rounded-2xl p-4 text-sm font-bold focus:ring-2 focus:ring-coral/20"
+                                                        className="flex-1 min-w-0 bg-[hsl(var(--admin-bg-alt))] border border-[hsl(var(--admin-text))]/20 rounded-2xl p-3.5 sm:p-4 text-sm font-bold focus:ring-2 focus:ring-coral/20 outline-none"
                                                     />
-                                                    <button onClick={() => removeItem(mission.missionPoints, (l) => setMission({ ...mission, missionPoints: l }), i)} className="p-3 text-red-500 hover:bg-red-50 rounded-xl transition-colors"><Trash2 className="w-4 h-4" /></button>
+                                                    <button onClick={() => removeItem(mission.missionPoints, (l) => setMission({ ...mission, missionPoints: l }), i)} className="shrink-0 p-3 text-red-500 hover:bg-red-50 rounded-xl transition-colors"><Trash2 className="w-4 h-4" /></button>
                                                 </div>
                                                 <textarea
-                                                    rows={2}
+                                                    rows={3}
                                                     value={point.sub}
                                                     onChange={e => {
                                                         const p = [...mission.missionPoints];
                                                         p[i].sub = e.target.value;
                                                         setMission({ ...mission, missionPoints: p });
                                                     }}
-                                                    className="w-full bg-[hsl(var(--admin-bg-alt))] border border-[hsl(var(--admin-text))]/20 rounded-2xl p-3.5 sm:p-5 text-sm resize-none focus:ring-2 focus:ring-coral/20 font-medium opacity-70"
+                                                    className="w-full bg-[hsl(var(--admin-bg-alt))] border border-[hsl(var(--admin-text))]/20 rounded-2xl p-3.5 sm:p-5 text-sm resize-y focus:ring-2 focus:ring-coral/20 font-medium leading-relaxed"
                                                 />
                                             </div>
                                         ))}
@@ -783,7 +783,7 @@ export default function AdminContent() {
                                                                 s[i].label = e.target.value;
                                                                 setStats({ ...stats, stats: s });
                                                             }}
-                                                            className="w-full bg-[hsl(var(--admin-bg-alt))] p-2.5 rounded-xl text-[10px] font-bold uppercase tracking-wide text-center border border-[hsl(var(--admin-text))]/20 shadow-sm"
+                                                            className="w-full bg-[hsl(var(--admin-bg-alt))] p-3 rounded-xl text-sm font-bold uppercase tracking-wide text-center border border-[hsl(var(--admin-text))]/20 shadow-sm"
                                                         />
                                                     </div>
                                                 ))}
@@ -833,7 +833,7 @@ export default function AdminContent() {
                                                     )}
                                                     {(Array.isArray(stats.serviceTimes) ? stats.serviceTimes : []).map((item, i) => (
                                                         <div key={i} className="p-6 bg-[hsl(var(--admin-bg-alt))] rounded-3xl border border-[hsl(var(--admin-border))] space-y-3 relative group">
-                                                            <button onClick={() => removeItem(stats.serviceTimes, (l) => setStats({ ...stats, serviceTimes: l }), i)} className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-[10px] opacity-0 group-hover:opacity-100 transition-opacity shadow-lg">✕</button>
+                                                            <button onClick={() => removeItem(stats.serviceTimes, (l) => setStats({ ...stats, serviceTimes: l }), i)} aria-label="Remove" className="absolute -top-2 -right-2 w-7 h-7 bg-red-500 text-white rounded-full flex items-center justify-center text-[11px] shadow-lg hover:bg-red-600 transition-colors">✕</button>
                                                             <input
                                                                 type="text"
                                                                 value={item.label}
@@ -842,7 +842,7 @@ export default function AdminContent() {
                                                                     times[i].label = e.target.value;
                                                                     setStats({ ...stats, serviceTimes: times });
                                                                 }}
-                                                                className="w-full bg-[hsl(var(--admin-bg-alt))] p-2 rounded-xl text-[9px] font-bold uppercase tracking-widest border border-[hsl(var(--admin-text))]/20 shadow-sm"
+                                                                className="w-full bg-[hsl(var(--admin-bg-alt))] p-3 rounded-xl text-sm font-bold uppercase tracking-widest border border-[hsl(var(--admin-text))]/20 shadow-sm"
                                                             />
                                                             <input
                                                                 type="text"
@@ -852,7 +852,7 @@ export default function AdminContent() {
                                                                     times[i].value = e.target.value;
                                                                     setStats({ ...stats, serviceTimes: times });
                                                                 }}
-                                                                className="w-full bg-[hsl(var(--admin-bg-alt))] p-3 rounded-xl text-xs font-bold border border-[hsl(var(--admin-text))]/20 shadow-sm"
+                                                                className="w-full bg-[hsl(var(--admin-bg-alt))] p-3.5 rounded-xl text-sm font-semibold border border-[hsl(var(--admin-text))]/20 shadow-sm"
                                                             />
                                                         </div>
                                                     ))}
@@ -886,7 +886,7 @@ export default function AdminContent() {
                                             )}
                                             {(Array.isArray(committees) ? committees : []).map((com, i) => (
                                                 <div key={i} className="p-5 sm:p-8 bg-[hsl(var(--admin-bg-alt))] rounded-3xl border border-[hsl(var(--admin-border))] space-y-6 relative group">
-                                                    <button onClick={() => removeItem(committees, setCommittees, i)} className="absolute top-8 right-8 px-4 py-2 bg-red-50 text-red-500 rounded-xl text-[9px] font-bold uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">Delete Committee</button>
+                                                    <button onClick={() => removeItem(committees, setCommittees, i)} className="absolute top-8 right-8 px-4 py-2 bg-red-50 text-red-500 rounded-xl text-[9px] font-bold uppercase tracking-widest opacity-70 hover:opacity-100 transition-opacity">Delete Committee</button>
                                                     <div className="flex items-center gap-4">
                                                         <IconPicker
                                                             value={com.icon}
@@ -961,7 +961,7 @@ export default function AdminContent() {
                                                                                 newComs[i].details[di] = e.target.value;
                                                                                 setCommittees(newComs);
                                                                             }}
-                                                                            className="flex-1 bg-[hsl(var(--admin-bg-alt))] p-3 rounded-xl text-xs border border-[hsl(var(--admin-text))]/20 shadow-sm"
+                                                                            className="flex-1 bg-[hsl(var(--admin-bg-alt))] p-3.5 rounded-xl text-sm border border-[hsl(var(--admin-text))]/20 shadow-sm"
                                                                         />
                                                                         <button
                                                                             onClick={() => {
@@ -1012,7 +1012,7 @@ export default function AdminContent() {
                                                                                     newComs[i].officers[oi].name = e.target.value;
                                                                                     setCommittees(newComs);
                                                                                 }}
-                                                                                className="w-full bg-[hsl(var(--admin-bg))] p-2.5 rounded-xl text-[11px] font-bold border border-[hsl(var(--admin-text))]/20"
+                                                                                className="w-full bg-[hsl(var(--admin-bg))] p-3 rounded-xl text-sm font-semibold border border-[hsl(var(--admin-text))]/20"
                                                                             />
                                                                             <input
                                                                                 type="text"
@@ -1023,7 +1023,7 @@ export default function AdminContent() {
                                                                                     newComs[i].officers[oi].role = e.target.value;
                                                                                     setCommittees(newComs);
                                                                                 }}
-                                                                                className="w-full bg-[hsl(var(--admin-bg))] p-2.5 rounded-xl text-[10px] border border-[hsl(var(--admin-text))]/20 text-coral/60"
+                                                                                className="w-full bg-[hsl(var(--admin-bg))] p-3 rounded-xl text-sm border border-[hsl(var(--admin-text))]/20 text-coral/60"
                                                                             />
                                                                         </div>
                                                                         <button
@@ -1032,7 +1032,7 @@ export default function AdminContent() {
                                                                                 newComs[i].officers.splice(oi, 1);
                                                                                 setCommittees(newComs);
                                                                             }}
-                                                                            className="text-xs opacity-20 hover:opacity-100 hover:text-red-500 transition-all shrink-0"
+                                                                            className="text-sm opacity-50 hover:opacity-100 hover:text-red-500 transition-all shrink-0"
                                                                         >✕</button>
                                                                     </div>
                                                                 ))}
@@ -1084,18 +1084,18 @@ export default function AdminContent() {
                                                                 setPresbyteries(updated);
                                                             }
                                                         }}
-                                                        className="absolute top-8 right-8 px-4 py-2 bg-red-50 text-red-500 rounded-xl text-[9px] font-bold uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity"
+                                                        className="absolute top-8 right-8 px-4 py-2 bg-red-50 text-red-500 rounded-xl text-[9px] font-bold uppercase tracking-widest opacity-70 hover:opacity-100 transition-opacity"
                                                     >Delete Record</button>
                                                     <div className="flex flex-col md:flex-row gap-8">
                                                         <div className="flex-1 space-y-4">
                                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                                 <div className="space-y-1">
                                                                     <label className="text-[9px] font-bold uppercase tracking-widest text-coral ml-1">Presbytery Name</label>
-                                                                    <input type="text" value={p.name} onChange={e => { const updated = [...presbyteries]; updated[idx] = { ...updated[idx], name: e.target.value }; setPresbyteries(updated); }} className="w-full bg-[hsl(var(--admin-bg-alt))] p-3 rounded-xl text-xs font-bold border border-[hsl(var(--admin-text))]/20 shadow-sm" />
+                                                                    <input type="text" value={p.name} onChange={e => { const updated = [...presbyteries]; updated[idx] = { ...updated[idx], name: e.target.value }; setPresbyteries(updated); }} className="w-full bg-[hsl(var(--admin-bg-alt))] p-3.5 rounded-xl text-sm font-semibold border border-[hsl(var(--admin-text))]/20 shadow-sm" />
                                                                 </div>
                                                                 <div className="space-y-1">
                                                                     <label className="text-[9px] font-bold uppercase tracking-widest text-coral ml-1">Region</label>
-                                                                    <select value={p.region} onChange={e => { const updated = [...presbyteries]; updated[idx] = { ...updated[idx], region: e.target.value }; setPresbyteries(updated); }} className="w-full bg-[hsl(var(--admin-bg-alt))] p-3 rounded-xl text-xs font-bold border border-[hsl(var(--admin-text))]/20 shadow-sm">
+                                                                    <select value={p.region} onChange={e => { const updated = [...presbyteries]; updated[idx] = { ...updated[idx], region: e.target.value }; setPresbyteries(updated); }} className="w-full bg-[hsl(var(--admin-bg-alt))] p-3.5 rounded-xl text-sm font-semibold border border-[hsl(var(--admin-text))]/20 shadow-sm">
                                                                         {['NCR', 'Luzon', 'Visayas', 'Mindanao', 'CAR'].map(r => (<option key={r} value={r}>{r}</option>))}
                                                                     </select>
                                                                 </div>
@@ -1103,24 +1103,24 @@ export default function AdminContent() {
                                                             <div className="grid grid-cols-3 gap-3">
                                                                 <div className="space-y-1">
                                                                     <label className="text-[9px] font-bold uppercase tracking-widest text-coral ml-1">Seat</label>
-                                                                    <input type="text" placeholder="Laoag City" value={p.seat || ''} onChange={e => { const updated = [...presbyteries]; updated[idx] = { ...updated[idx], seat: e.target.value }; setPresbyteries(updated); }} className="w-full bg-[hsl(var(--admin-bg-alt))] p-3 rounded-xl text-[11px] font-bold border border-[hsl(var(--admin-text))]/20 shadow-sm" />
+                                                                    <input type="text" placeholder="Laoag City" value={p.seat || ''} onChange={e => { const updated = [...presbyteries]; updated[idx] = { ...updated[idx], seat: e.target.value }; setPresbyteries(updated); }} className="w-full bg-[hsl(var(--admin-bg-alt))] p-3.5 rounded-xl text-sm font-semibold border border-[hsl(var(--admin-text))]/20 shadow-sm" />
                                                                 </div>
                                                                 <div className="space-y-1">
                                                                     <label className="text-[9px] font-bold uppercase tracking-widest text-coral ml-1">Congregations</label>
-                                                                    <input type="text" placeholder="24" value={p.congregations || ''} onChange={e => { const updated = [...presbyteries]; updated[idx] = { ...updated[idx], congregations: e.target.value }; setPresbyteries(updated); }} className="w-full bg-[hsl(var(--admin-bg-alt))] p-3 rounded-xl text-[11px] font-bold border border-[hsl(var(--admin-text))]/20 shadow-sm" />
+                                                                    <input type="text" placeholder="24" value={p.congregations || ''} onChange={e => { const updated = [...presbyteries]; updated[idx] = { ...updated[idx], congregations: e.target.value }; setPresbyteries(updated); }} className="w-full bg-[hsl(var(--admin-bg-alt))] p-3.5 rounded-xl text-sm font-semibold border border-[hsl(var(--admin-text))]/20 shadow-sm" />
                                                                 </div>
                                                                 <div className="space-y-1">
                                                                     <label className="text-[9px] font-bold uppercase tracking-widest text-coral ml-1">Founded</label>
-                                                                    <input type="text" placeholder="e.g. 1987" value={p.founded || ''} onChange={e => { const updated = [...presbyteries]; updated[idx] = { ...updated[idx], founded: e.target.value }; setPresbyteries(updated); }} className="w-full bg-[hsl(var(--admin-bg-alt))] p-3 rounded-xl text-[11px] font-bold border border-[hsl(var(--admin-text))]/20 shadow-sm" />
+                                                                    <input type="text" placeholder="e.g. 1987" value={p.founded || ''} onChange={e => { const updated = [...presbyteries]; updated[idx] = { ...updated[idx], founded: e.target.value }; setPresbyteries(updated); }} className="w-full bg-[hsl(var(--admin-bg-alt))] p-3.5 rounded-xl text-sm font-semibold border border-[hsl(var(--admin-text))]/20 shadow-sm" />
                                                                 </div>
                                                             </div>
                                                             <div className="space-y-1">
                                                                 <label className="text-[9px] font-bold uppercase tracking-widest text-coral ml-1">Regional Narrative / Description</label>
-                                                                <textarea value={p.description} onChange={e => { const updated = [...presbyteries]; updated[idx] = { ...updated[idx], description: e.target.value }; setPresbyteries(updated); }} rows={2} className="w-full bg-[hsl(var(--admin-bg-alt))] p-4 rounded-xl text-sm border border-[hsl(var(--admin-text))]/20 shadow-sm resize-none font-medium" />
+                                                                <textarea value={p.description} onChange={e => { const updated = [...presbyteries]; updated[idx] = { ...updated[idx], description: e.target.value }; setPresbyteries(updated); }} rows={4} className="w-full bg-[hsl(var(--admin-bg-alt))] p-3.5 rounded-xl text-sm border border-[hsl(var(--admin-text))]/20 shadow-sm resize-y font-medium leading-relaxed outline-none focus:ring-2 focus:ring-coral/20" />
                                                             </div>
                                                             <div className="space-y-1">
                                                                 <label className="text-[9px] font-bold uppercase tracking-widest text-coral ml-1">Official Website URL</label>
-                                                                <input type="text" placeholder="https://..." value={p.website || ''} onChange={e => { const updated = [...presbyteries]; updated[idx] = { ...updated[idx], website: e.target.value }; setPresbyteries(updated); }} className="w-full bg-[hsl(var(--admin-bg-alt))] p-3 rounded-xl text-[10px] font-bold border border-[hsl(var(--admin-text))]/20 shadow-sm" />
+                                                                <input type="text" placeholder="https://..." value={p.website || ''} onChange={e => { const updated = [...presbyteries]; updated[idx] = { ...updated[idx], website: e.target.value }; setPresbyteries(updated); }} className="w-full bg-[hsl(var(--admin-bg-alt))] p-3.5 rounded-xl text-sm font-semibold border border-[hsl(var(--admin-text))]/20 shadow-sm" />
                                                             </div>
                                                             <div className="space-y-3">
                                                                 <div className="flex justify-between items-center mb-1">
@@ -1159,7 +1159,7 @@ export default function AdminContent() {
                                                                                             }
                                                                                             setPresbyteries(updated);
                                                                                         }}
-                                                                                        className="w-full bg-[hsl(var(--admin-bg))] p-2.5 rounded-xl text-[11px] font-bold border border-[hsl(var(--admin-text))]/20"
+                                                                                        className="w-full bg-[hsl(var(--admin-bg))] p-3 rounded-xl text-sm font-semibold border border-[hsl(var(--admin-text))]/20"
                                                                                     />
                                                                                     <input
                                                                                         type="text"
@@ -1174,10 +1174,10 @@ export default function AdminContent() {
                                                                                             }
                                                                                             setPresbyteries(updated);
                                                                                         }}
-                                                                                        className="w-full bg-[hsl(var(--admin-bg))] p-2.5 rounded-xl text-[10px] border border-[hsl(var(--admin-text))]/20 text-coral/60"
+                                                                                        className="w-full bg-[hsl(var(--admin-bg))] p-3 rounded-xl text-sm border border-[hsl(var(--admin-text))]/20 text-coral/60"
                                                                                     />
                                                                                 </div>
-                                                                                <button onClick={() => { const updated = [...presbyteries]; updated[idx].officers.splice(oIdx, 1); setPresbyteries(updated); }} className="text-xs opacity-20 hover:opacity-100 hover:text-red-500 transition-all shrink-0">✕</button>
+                                                                                <button onClick={() => { const updated = [...presbyteries]; updated[idx].officers.splice(oIdx, 1); setPresbyteries(updated); }} className="text-sm opacity-50 hover:opacity-100 hover:text-red-500 transition-all shrink-0">✕</button>
                                                                             </div>
                                                                         );
                                                                     })}
@@ -1590,11 +1590,12 @@ export default function AdminContent() {
                                                                 </div>
                                                                 <div>
                                                                     <label className="block text-coral text-[9px] tracking-[0.25em] uppercase mb-2 font-bold">Venue</label>
-                                                                    <input
+                                                                    <textarea
+                                                                        rows={2}
                                                                         value={ev.venue || ''}
                                                                         onChange={(e) => updateEvent(i, { venue: e.target.value })}
                                                                         placeholder="e.g. Cogon Cruz Presbyterian Church, Danao City, Cebu"
-                                                                        className="w-full bg-[hsl(var(--admin-bg))] border border-[hsl(var(--admin-text))]/20 rounded-2xl p-4 text-sm font-medium focus:ring-2 focus:ring-coral/20 outline-none transition-all"
+                                                                        className="w-full bg-[hsl(var(--admin-bg))] border border-[hsl(var(--admin-text))]/20 rounded-2xl p-3.5 text-sm font-medium focus:ring-2 focus:ring-coral/20 outline-none transition-all resize-y leading-relaxed"
                                                                     />
                                                                 </div>
                                                             </div>
