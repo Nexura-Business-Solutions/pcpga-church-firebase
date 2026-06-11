@@ -1927,7 +1927,11 @@ export default function AdminContent() {
                         {/* Save bar — a docked footer with a fade backdrop so content
                             scrolls cleanly beneath it (the page reserves matching bottom
                             padding so no field is ever hidden behind it). */}
-                        <div className="fixed bottom-0 left-0 right-0 px-4 sm:px-8 pt-12 pb-4 sm:pb-6 flex flex-col items-center pointer-events-none z-[100] bg-gradient-to-t from-[hsl(var(--admin-bg))] via-[hsl(var(--admin-bg))] to-transparent">
+                        {/* Starts at the sidebar's right edge on desktop (lg:left-72) so the
+                            fade/save bar never covers the sidebar's Dark Mode / Live Website /
+                            Sign Out controls in the bottom-left. Full width on mobile (the
+                            sidebar is an off-canvas overlay there). */}
+                        <div className="fixed bottom-0 left-0 lg:left-72 right-0 px-4 sm:px-8 pt-12 pb-4 sm:pb-6 flex flex-col items-center pointer-events-none z-[100] bg-gradient-to-t from-[hsl(var(--admin-bg))] via-[hsl(var(--admin-bg))] to-transparent">
                             <div className="w-full max-w-7xl mx-auto flex justify-center sm:justify-end">
                                 <button
                                     id="tour-save"
