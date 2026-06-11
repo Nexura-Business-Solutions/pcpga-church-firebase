@@ -117,10 +117,10 @@ export default function AdminAdmins() {
                 {/* Header */}
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8 md:mb-12 px-2">
                     <div>
-                        <h1 className="text-4xl font-bold text-[hsl(var(--admin-text))] tracking-tighter font-display mb-3 flex items-center gap-3">
-                            <ShieldCheck className="w-8 h-8 text-accent" /> Access Control
+                        <h1 className="text-4xl font-bold text-[hsl(var(--admin-text))] tracking-tight font-display mb-2 flex items-center gap-3">
+                            <ShieldCheck className="w-8 h-8 text-accent" /> Admins
                         </h1>
-                        <p className="text-[hsl(var(--admin-text-dim))] text-[11px] font-bold tracking-[0.3em] uppercase">Who can sign in to the console</p>
+                        <p className="text-[hsl(var(--admin-text-dim))] text-sm">Who can sign in and manage this site. <span className="text-[hsl(var(--admin-text))]/70">Owner</span> &amp; <span className="text-[hsl(var(--admin-text))]/70">Admin</span> can edit everything; only the Owner can add or remove admins.</p>
                     </div>
                     <div className="flex items-center gap-2 px-4 py-2 bg-accent/5 rounded-xl border border-accent/10">
                         <div className="w-2 h-2 rounded-full bg-accent animate-pulse" />

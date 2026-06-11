@@ -197,14 +197,14 @@ export default function AdminSeminaries() {
     return (
         <AdminLayout>
             <div className="max-w-5xl mx-auto">
-                <div className="flex items-end justify-between gap-8 mb-12">
+                <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 sm:gap-8 mb-12">
                     <div>
-                        <h1 className="text-4xl font-bold text-[hsl(var(--admin-text))] tracking-tighter font-display mb-2">Seminaries</h1>
-                        <p className="text-[hsl(var(--admin-text-dim))] text-[11px] font-bold tracking-[0.3em] uppercase">Theological Schools</p>
+                        <h1 className="text-4xl font-bold text-[hsl(var(--admin-text))] tracking-tight font-display mb-2">Seminaries</h1>
+                        <p className="text-[hsl(var(--admin-text-dim))] text-sm">The theological schools shown on the public site.</p>
                     </div>
                     <button onClick={openNew}
-                        className="h-14 px-7 bg-accent text-white text-[11px] font-bold tracking-[0.2em] uppercase rounded-2xl hover:shadow-2xl hover:shadow-accent/30 transition-all active:scale-95">
-                        + Add Seminary
+                        className="shrink-0 h-14 px-7 bg-accent text-white text-[11px] font-bold tracking-[0.2em] uppercase rounded-2xl hover:shadow-2xl hover:shadow-accent/30 transition-all active:scale-95">
+                        + Add seminary
                     </button>
                 </div>
 

@@ -149,14 +149,14 @@ export default function AdminSermons() {
 
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-16 px-2">
                     <div>
-                        <h1 className="text-4xl font-bold text-[hsl(var(--admin-text))] tracking-tighter font-display mb-3">Archive</h1>
-                        <p className="text-[hsl(var(--admin-text-dim))] text-[11px] font-bold tracking-[0.3em] uppercase">Spiritual Media Management</p>
+                        <h1 className="text-4xl font-bold text-[hsl(var(--admin-text))] tracking-tight font-display mb-2">Sermons</h1>
+                        <p className="text-[hsl(var(--admin-text-dim))] text-sm">Recordings shown in the sermon archive on the public site.</p>
                     </div>
                     <button
                         onClick={() => { setEditing(null); setForm(emptySermon); setShowForm(true); }}
                         className="h-14 px-8 bg-violet text-white text-[11px] font-bold tracking-[0.2em] uppercase rounded-2xl hover:shadow-2xl hover:shadow-violet/30 transition-all duration-300 active:scale-95 font-display"
                     >
-                        + New Media Entry
+                        + Add sermon
                     </button>
                 </div>
 
