@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import PhilippinesMap from '../components/PhilippinesMap.jsx';
@@ -302,8 +302,12 @@ export default function HomePage() {
     });
   })();
 
-  // body class management
-  useEffect(() => {
+  // body class management. useLayoutEffect (not useEffect): the landing CSS is
+  // scoped under body.lp-v3, and the mobile menu / modal chrome are always in
+  // the DOM, hidden only by lp-v3 rules. With useEffect the class lands AFTER
+  // first paint, so a refresh flashed the unstyled mobile drawer (index.css's
+  // global .mobile-menu is a visible full-screen panel) until effects ran.
+  useLayoutEffect(() => {
     document.body.classList.add('lp-v3');
     return () => {
       document.body.classList.remove('lp-v3', 'mobile-open', 'modal-open', 'lang-tl', 'nav-compact');
