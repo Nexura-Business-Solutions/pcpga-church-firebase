@@ -95,6 +95,7 @@ export default function AdminContent() {
     const [stats, setStats] = useState({});
     const [committees, setCommittees] = useState([]);
     const [presbyteries, setPresbyteries] = useState([]);
+    const [openChurches, setOpenChurches] = useState({}); // presbytery id -> member-church editor expanded?
     const [hero, setHero] = useState({});
     const [donations, setDonations] = useState({});
     const [announcement, setAnnouncement] = useState({});
@@ -151,7 +152,13 @@ export default function AdminContent() {
                 saveSettings('mission-vision', mission),
                 saveSettings('invitation-stats', stats),
                 saveSettings('standing-committees', committees),
-                saveSettings('presbyteries', presbyteries),
+                // Normalise member-church elders (drop blank entries from the
+                // comma-separated editor) before persisting.
+                saveSettings('presbyteries', presbyteries.map((pr) => (
+                    Array.isArray(pr.churches)
+                        ? { ...pr, churches: pr.churches.map((ch) => ({ ...ch, elders: Array.isArray(ch.elders) ? ch.elders.map((s) => String(s).trim()).filter(Boolean) : ch.elders })) }
+                        : pr
+                ))),
                 saveSettings('hero', hero),
                 saveSettings('donations', donations),
                 saveSettings('announcement', { ...announcement, updatedAt: Date.now() }),
@@ -169,6 +176,26 @@ export default function AdminContent() {
         } finally {
             setSaving(false);
         }
+    };
+
+    // Member-church (congregation) editing inside a presbytery's `churches` array.
+    const EMPTY_CHURCH = { name: '', address: '', minister: '', moderatorInCharge: '', worshipTime: '', contact: '', email: '', elders: [], subPresbytery: '' };
+    const addChurch = (pIdx) => {
+        const updated = [...presbyteries];
+        updated[pIdx] = { ...updated[pIdx], churches: [...(updated[pIdx].churches || []), { ...EMPTY_CHURCH }] };
+        setPresbyteries(updated);
+    };
+    const updateChurch = (pIdx, cIdx, field, value) => {
+        const updated = [...presbyteries];
+        const churches = [...(updated[pIdx].churches || [])];
+        churches[cIdx] = { ...churches[cIdx], [field]: value };
+        updated[pIdx] = { ...updated[pIdx], churches };
+        setPresbyteries(updated);
+    };
+    const removeChurch = (pIdx, cIdx) => {
+        const updated = [...presbyteries];
+        updated[pIdx] = { ...updated[pIdx], churches: (updated[pIdx].churches || []).filter((_, i) => i !== cIdx) };
+        setPresbyteries(updated);
     };
 
     const handleSyncDirectory = () => {
@@ -1092,7 +1119,7 @@ export default function AdminContent() {
                                                     description="Organize your regional church councils and rosters."
                                                     icon={<Globe className="w-12 h-12 text-coral/20" />}
                                                     actionText="Add Regional Presbytery"
-                                                    onAction={() => setPresbyteries([{ id: Date.now().toString(), name: 'New Presbytery', region: 'NCR', officers: [], description: '', photo: '', website: '' }])}
+                                                    onAction={() => setPresbyteries([{ id: Date.now().toString(), name: 'New Presbytery', region: 'NCR', officers: [], churches: [], description: '', photo: '', website: '' }])}
                                                 />
                                             )}
                                             {(Array.isArray(presbyteries) ? presbyteries : []).map((p, idx) => (
@@ -1206,11 +1233,72 @@ export default function AdminContent() {
                                                             </div>
                                                         </div>
                                                     </div>
+
+                                                    {/* MEMBER CHURCHES (congregations) editor — the per-church records
+                                                        that power the Find-a-Church finder + the presbytery roster. */}
+                                                    <div className="pt-4 border-t border-[hsl(var(--admin-border))]">
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => setOpenChurches((o) => ({ ...o, [p.id || idx]: !o[p.id || idx] }))}
+                                                            className="w-full flex items-center justify-between gap-3 px-4 py-3 rounded-2xl bg-coral/5 border border-coral/15 text-coral text-[11px] font-bold uppercase tracking-widest hover:bg-coral/10 transition-all"
+                                                        >
+                                                            <span>Member Churches ({(p.churches || []).length})</span>
+                                                            <span>{openChurches[p.id || idx] ? '▲  Hide' : '▼  Edit congregations'}</span>
+                                                        </button>
+                                                        {openChurches[p.id || idx] && (
+                                                            <div className="mt-4 space-y-4">
+                                                                {(Array.isArray(p.churches) ? p.churches : []).map((ch, cIdx) => (
+                                                                    <div key={cIdx} className="p-4 sm:p-5 bg-[hsl(var(--admin-bg))] rounded-2xl border border-[hsl(var(--admin-border))] space-y-4 relative">
+                                                                        <button onClick={() => { if (window.confirm('Delete this church?')) removeChurch(idx, cIdx); }} aria-label="Delete church" className="absolute top-3 right-3 w-7 h-7 flex items-center justify-center bg-red-50 text-red-500 rounded-full text-[11px] hover:bg-red-100 transition-colors">✕</button>
+                                                                        <div className="space-y-1 pr-8">
+                                                                            <label className="text-[9px] font-bold uppercase tracking-widest text-coral ml-1">Church Name</label>
+                                                                            <input value={ch.name || ''} onChange={(e) => updateChurch(idx, cIdx, 'name', e.target.value)} placeholder="e.g. Grace Presbyterian Church" className="w-full bg-[hsl(var(--admin-bg-alt))] p-3 rounded-xl text-sm font-semibold border border-[hsl(var(--admin-text))]/20 outline-none focus:ring-2 focus:ring-coral/20" />
+                                                                        </div>
+                                                                        <div className="space-y-1">
+                                                                            <label className="text-[9px] font-bold uppercase tracking-widest text-coral ml-1">Address <span className="normal-case tracking-normal text-[hsl(var(--admin-text-dim))]">(needed to show on the map)</span></label>
+                                                                            <textarea rows={2} value={ch.address || ''} onChange={(e) => updateChurch(idx, cIdx, 'address', e.target.value)} placeholder="Street / Barangay, City, Province" className="w-full bg-[hsl(var(--admin-bg-alt))] p-3 rounded-xl text-sm font-medium border border-[hsl(var(--admin-text))]/20 outline-none focus:ring-2 focus:ring-coral/20 resize-y leading-relaxed" />
+                                                                        </div>
+                                                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+                                                                            <div className="space-y-1">
+                                                                                <label className="text-[9px] font-bold uppercase tracking-widest text-coral ml-1">Minister / Pastor</label>
+                                                                                <input value={ch.minister || ''} onChange={(e) => updateChurch(idx, cIdx, 'minister', e.target.value)} placeholder="e.g. Rev. Juan Dela Cruz" className="w-full bg-[hsl(var(--admin-bg-alt))] p-3 rounded-xl text-sm font-medium border border-[hsl(var(--admin-text))]/20 outline-none focus:ring-2 focus:ring-coral/20" />
+                                                                            </div>
+                                                                            <div className="space-y-1">
+                                                                                <label className="text-[9px] font-bold uppercase tracking-widest text-coral ml-1">Moderator-in-charge <span className="normal-case tracking-normal text-[hsl(var(--admin-text-dim))]">(optional)</span></label>
+                                                                                <input value={ch.moderatorInCharge || ''} onChange={(e) => updateChurch(idx, cIdx, 'moderatorInCharge', e.target.value)} placeholder="e.g. Elder Johnny Bagiw" className="w-full bg-[hsl(var(--admin-bg-alt))] p-3 rounded-xl text-sm font-medium border border-[hsl(var(--admin-text))]/20 outline-none focus:ring-2 focus:ring-coral/20" />
+                                                                            </div>
+                                                                            <div className="space-y-1">
+                                                                                <label className="text-[9px] font-bold uppercase tracking-widest text-coral ml-1">Worship Time</label>
+                                                                                <input value={ch.worshipTime || ''} onChange={(e) => updateChurch(idx, cIdx, 'worshipTime', e.target.value)} placeholder="e.g. Sunday 9:00 AM" className="w-full bg-[hsl(var(--admin-bg-alt))] p-3 rounded-xl text-sm font-medium border border-[hsl(var(--admin-text))]/20 outline-none focus:ring-2 focus:ring-coral/20" />
+                                                                            </div>
+                                                                            <div className="space-y-1">
+                                                                                <label className="text-[9px] font-bold uppercase tracking-widest text-coral ml-1">Contact</label>
+                                                                                <input value={ch.contact || ''} onChange={(e) => updateChurch(idx, cIdx, 'contact', e.target.value)} placeholder="e.g. 0917-123-4567" className="w-full bg-[hsl(var(--admin-bg-alt))] p-3 rounded-xl text-sm font-medium border border-[hsl(var(--admin-text))]/20 outline-none focus:ring-2 focus:ring-coral/20" />
+                                                                            </div>
+                                                                            <div className="space-y-1">
+                                                                                <label className="text-[9px] font-bold uppercase tracking-widest text-coral ml-1">Email <span className="normal-case tracking-normal text-[hsl(var(--admin-text-dim))]">(optional)</span></label>
+                                                                                <input value={ch.email || ''} onChange={(e) => updateChurch(idx, cIdx, 'email', e.target.value)} placeholder="optional" className="w-full bg-[hsl(var(--admin-bg-alt))] p-3 rounded-xl text-sm font-medium border border-[hsl(var(--admin-text))]/20 outline-none focus:ring-2 focus:ring-coral/20" />
+                                                                            </div>
+                                                                        </div>
+                                                                        <div className="space-y-1">
+                                                                            <label className="text-[9px] font-bold uppercase tracking-widest text-coral ml-1">Elders <span className="normal-case tracking-normal text-[hsl(var(--admin-text-dim))]">(separate with commas)</span></label>
+                                                                            <textarea rows={2} value={(Array.isArray(ch.elders) ? ch.elders : []).join(', ')} onChange={(e) => updateChurch(idx, cIdx, 'elders', e.target.value.split(',').map((s) => s.trim()))} placeholder="Elder A, Elder B, Elder C" className="w-full bg-[hsl(var(--admin-bg-alt))] p-3 rounded-xl text-sm font-medium border border-[hsl(var(--admin-text))]/20 outline-none focus:ring-2 focus:ring-coral/20 resize-y leading-relaxed" />
+                                                                        </div>
+                                                                        <div className="space-y-1">
+                                                                            <label className="text-[9px] font-bold uppercase tracking-widest text-coral ml-1">Sub-presbytery <span className="normal-case tracking-normal text-[hsl(var(--admin-text-dim))]">(optional)</span></label>
+                                                                            <input value={ch.subPresbytery || ''} onChange={(e) => updateChurch(idx, cIdx, 'subPresbytery', e.target.value)} placeholder="e.g. Quirino Sub-Presbytery" className="w-full bg-[hsl(var(--admin-bg-alt))] p-3 rounded-xl text-sm font-medium border border-[hsl(var(--admin-text))]/20 outline-none focus:ring-2 focus:ring-coral/20" />
+                                                                        </div>
+                                                                    </div>
+                                                                ))}
+                                                                <button onClick={() => addChurch(idx)} className="w-full h-12 rounded-2xl border-2 border-dashed border-coral/30 text-[10px] font-bold uppercase tracking-widest text-coral hover:bg-coral/5 hover:border-coral/50 transition-all"> + Add Church </button>
+                                                            </div>
+                                                        )}
+                                                    </div>
                                                 </div>
                                             ))}
                                         </div>
                                         {presbyteries?.length > 0 && (
-                                            <button onClick={() => setPresbyteries([...presbyteries, { id: Date.now().toString(), name: 'New Presbytery', region: 'NCR', officers: [], description: '', photo: '', website: '' }])} className="w-full h-16 rounded-2xl border-2 border-dashed border-[hsl(var(--admin-border))] text-[10px] font-bold uppercase tracking-widest text-coral hover:bg-coral/5 hover:border-coral/20 transition-all font-display"> + Add New Presbytery </button>
+                                            <button onClick={() => setPresbyteries([...presbyteries, { id: Date.now().toString(), name: 'New Presbytery', region: 'NCR', officers: [], churches: [], description: '', photo: '', website: '' }])} className="w-full h-16 rounded-2xl border-2 border-dashed border-[hsl(var(--admin-border))] text-[10px] font-bold uppercase tracking-widest text-coral hover:bg-coral/5 hover:border-coral/20 transition-all font-display"> + Add New Presbytery </button>
                                         )}
                                     </div>
                                 )}
