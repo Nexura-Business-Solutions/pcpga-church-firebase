@@ -59,6 +59,12 @@ const TABS = [
     { id: 'videos', label: 'Video Greetings', icon: Film }
 ];
 
+// Shared field styles. Padding is responsive (smaller on phones) so long values
+// aren't clipped on narrow screens. Long-content fields use the textarea variant
+// so the text wraps and is fully visible instead of scrolling out of a one-line box.
+const FIELD_CLS = 'w-full bg-[hsl(var(--admin-bg-alt))] border border-[hsl(var(--admin-text))]/20 rounded-2xl p-3.5 sm:p-5 text-sm font-medium focus:ring-2 focus:ring-coral/20 outline-none transition-all';
+const FIELD_TEXTAREA_CLS = FIELD_CLS + ' leading-relaxed resize-y min-h-[3.5rem]';
+
 export default function AdminContent() {
     const [activeTab, setActiveTab] = useState('identity');
     const [loading, setLoading] = useState(true);
@@ -430,19 +436,23 @@ export default function AdminContent() {
                         </div>
                     </div>
 
-                    {/* Tabs — sticky so switching sections doesn't require scrolling back up */}
-                    <div id="tour-tabs" className="flex flex-wrap gap-2 p-2 bg-[hsl(var(--admin-bg-alt))]/95 backdrop-blur rounded-3xl border border-[hsl(var(--admin-border))] mb-8 md:mb-12 sticky top-20 z-20">
+                    {/* Tabs. Wrapped (every tab visible + tappable, no hidden off-screen
+                        ones) but compact on phones — smaller chips so the 13 sections fit a
+                        few short rows instead of filling the whole screen. Not sticky: the
+                        AdminLayout wraps page content in a framer-motion transform, which
+                        breaks position:sticky. */}
+                    <div id="tour-tabs" className="flex flex-wrap gap-1.5 sm:gap-2 p-1.5 sm:p-2 bg-[hsl(var(--admin-bg-alt))] rounded-2xl sm:rounded-3xl border border-[hsl(var(--admin-border))] mb-6 md:mb-10">
                         {TABS.map(tab => (
                             <button
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id)}
-                                className={`flex items-center gap-3 px-6 py-3 rounded-2xl text-[11px] font-bold uppercase tracking-widest transition-all duration-300 ${activeTab === tab.id
+                                className={`flex items-center gap-2 px-3 py-2 sm:px-5 sm:py-3 rounded-xl sm:rounded-2xl text-[10px] sm:text-[11px] font-bold uppercase tracking-wide sm:tracking-widest transition-all duration-300 ${activeTab === tab.id
                                     ? 'bg-[hsl(var(--admin-surface))] text-coral shadow-lg'
                                     : 'text-[hsl(var(--admin-text-dim))] hover:bg-[hsl(var(--admin-surface))]/60 hover:text-coral/70'
                                     }`}
                             >
-                                <tab.icon className="w-4 h-4" />
-                                {tab.label}
+                                <tab.icon className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+                                <span>{tab.label}</span>
                             </button>
                         ))}
                     </div>
@@ -497,24 +507,34 @@ export default function AdminContent() {
                                             </div>
                                         </div>
 
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-8">
                                             {[
-                                                { key: 'editionText', label: 'Edition Line', placeholder: 'A Communion of Reformed Churches' },
+                                                { key: 'editionText', label: 'Edition Line', placeholder: 'A Communion of Reformed Churches', long: true },
                                                 { key: 'heading', label: 'Headline (English)', placeholder: 'Welcome home.' },
                                                 { key: 'headingTl', label: 'Headline (Tagalog)', placeholder: 'Maligayang pagdating.' },
-                                                { key: 'lede', label: 'Intro Paragraph', placeholder: 'A communion of Reformed congregations…' },
+                                                { key: 'lede', label: 'Intro Paragraph', placeholder: 'A communion of Reformed congregations…', long: true, rows: 3 },
                                                 { key: 'ctaPrimary', label: 'Primary Button', placeholder: 'Find a Church' },
                                                 { key: 'ctaSecondary', label: 'Secondary Button', placeholder: 'Watch the Sermon' },
-                                                { key: 'times', label: 'Service Times Banner', placeholder: 'Sunday Worship · 9:00 & 11:00 AM · Metro Manila' },
+                                                { key: 'times', label: 'Service Times Banner', placeholder: 'Sunday Worship · 9:00 & 11:00 AM · Metro Manila', long: true },
                                             ].map((field) => (
-                                                <div key={field.key} className={field.key === 'lede' || field.key === 'editionText' || field.key === 'times' ? 'md:col-span-2' : ''}>
-                                                    <label className="block text-coral text-[10px] tracking-[0.25em] uppercase mb-4 font-bold">{field.label}</label>
-                                                    <input
-                                                        value={hero[field.key] || ''}
-                                                        onChange={(e) => setHero({ ...hero, [field.key]: e.target.value })}
-                                                        placeholder={field.placeholder}
-                                                        className="w-full bg-[hsl(var(--admin-bg-alt))] border border-[hsl(var(--admin-text))]/20 rounded-2xl p-5 text-sm font-medium focus:ring-2 focus:ring-coral/20 outline-none transition-all"
-                                                    />
+                                                <div key={field.key} className={field.long ? 'md:col-span-2' : ''}>
+                                                    <label className="block text-coral text-[10px] tracking-[0.25em] uppercase mb-3 font-bold">{field.label}</label>
+                                                    {field.long ? (
+                                                        <textarea
+                                                            value={hero[field.key] || ''}
+                                                            onChange={(e) => setHero({ ...hero, [field.key]: e.target.value })}
+                                                            placeholder={field.placeholder}
+                                                            rows={field.rows || 2}
+                                                            className={FIELD_TEXTAREA_CLS}
+                                                        />
+                                                    ) : (
+                                                        <input
+                                                            value={hero[field.key] || ''}
+                                                            onChange={(e) => setHero({ ...hero, [field.key]: e.target.value })}
+                                                            placeholder={field.placeholder}
+                                                            className={FIELD_CLS}
+                                                        />
+                                                    )}
                                                 </div>
                                             ))}
                                         </div>
@@ -531,17 +551,17 @@ export default function AdminContent() {
                                                     type="text"
                                                     value={identity.name || ''}
                                                     onChange={e => setIdentity({ ...identity, name: e.target.value })}
-                                                    className="w-full bg-[hsl(var(--admin-bg-alt))] border border-[hsl(var(--admin-text))]/20 rounded-2xl p-5 text-sm focus:ring-2 focus:ring-coral/20 transition-all font-medium"
+                                                    className="w-full bg-[hsl(var(--admin-bg-alt))] border border-[hsl(var(--admin-text))]/20 rounded-2xl p-3.5 sm:p-5 text-sm focus:ring-2 focus:ring-coral/20 transition-all font-medium"
                                                     placeholder="e.g. Presbyterian Church"
                                                 />
                                             </div>
                                             <div className="space-y-4">
-                                                <label className="text-[10px] font-bold uppercase tracking-widest text-coral ml-1">Suffix/Location</label>
+                                                <label className="text-[10px] font-bold uppercase tracking-widest text-coral ml-1">Subtitle (under the name)</label>
                                                 <input
                                                     type="text"
                                                     value={identity.sub || ''}
                                                     onChange={e => setIdentity({ ...identity, sub: e.target.value })}
-                                                    className="w-full bg-[hsl(var(--admin-bg-alt))] border border-[hsl(var(--admin-text))]/20 rounded-2xl p-5 text-sm focus:ring-2 focus:ring-coral/20 transition-all font-medium"
+                                                    className="w-full bg-[hsl(var(--admin-bg-alt))] border border-[hsl(var(--admin-text))]/20 rounded-2xl p-3.5 sm:p-5 text-sm focus:ring-2 focus:ring-coral/20 transition-all font-medium"
                                                     placeholder="e.g. Philippines"
                                                 />
                                             </div>
@@ -552,7 +572,7 @@ export default function AdminContent() {
                                                 rows={4}
                                                 value={identity.footerDesc || ''}
                                                 onChange={e => setIdentity({ ...identity, footerDesc: e.target.value })}
-                                                className="w-full bg-[hsl(var(--admin-bg-alt))] border border-[hsl(var(--admin-text))]/20 rounded-2xl p-5 text-sm focus:ring-2 focus:ring-coral/20 transition-all font-medium resize-none"
+                                                className="w-full bg-[hsl(var(--admin-bg-alt))] border border-[hsl(var(--admin-text))]/20 rounded-2xl p-3.5 sm:p-5 text-sm focus:ring-2 focus:ring-coral/20 transition-all font-medium resize-none"
                                                 placeholder="The short narrative at the bottom of the site..."
                                             />
                                         </div>
@@ -566,7 +586,7 @@ export default function AdminContent() {
                                                         type="text"
                                                         value={identity.social?.[field] || ''}
                                                         onChange={e => setIdentity({ ...identity, social: { ...identity.social, [field]: e.target.value } })}
-                                                        className="w-full bg-[hsl(var(--admin-bg-alt))] border border-[hsl(var(--admin-text))]/20 rounded-2xl p-5 text-sm focus:ring-2 focus:ring-coral/20 transition-all font-medium"
+                                                        className="w-full bg-[hsl(var(--admin-bg-alt))] border border-[hsl(var(--admin-text))]/20 rounded-2xl p-3.5 sm:p-5 text-sm focus:ring-2 focus:ring-coral/20 transition-all font-medium"
                                                         placeholder={`Link or address for ${field}`}
                                                     />
                                                 </div>
@@ -580,11 +600,11 @@ export default function AdminContent() {
                                     <div className="space-y-10">
                                         <div className="space-y-4">
                                             <label className="text-[10px] font-bold uppercase tracking-widest text-coral ml-1">Ministry Motto</label>
-                                            <input
-                                                type="text"
+                                            <textarea
+                                                rows={2}
                                                 value={mission.motto || ''}
                                                 onChange={e => setMission({ ...mission, motto: e.target.value })}
-                                                className="w-full bg-[hsl(var(--admin-bg-alt))] border border-[hsl(var(--admin-text))]/20 rounded-2xl p-5 text-lg font-bold text-coral focus:ring-2 focus:ring-coral/20 transition-all"
+                                                className="w-full bg-[hsl(var(--admin-bg-alt))] border border-[hsl(var(--admin-text))]/20 rounded-2xl p-3.5 sm:p-5 text-lg font-bold text-coral focus:ring-2 focus:ring-coral/20 transition-all leading-snug resize-y"
                                             />
                                         </div>
                                         <div className="space-y-4">
@@ -593,7 +613,7 @@ export default function AdminContent() {
                                                 rows={5}
                                                 value={mission.vision || ''}
                                                 onChange={e => setMission({ ...mission, vision: e.target.value })}
-                                                className="w-full bg-[hsl(var(--admin-bg-alt))] border border-[hsl(var(--admin-text))]/20 rounded-2xl p-5 text-sm focus:ring-2 focus:ring-coral/20 transition-all font-medium leading-relaxed resize-none"
+                                                className="w-full bg-[hsl(var(--admin-bg-alt))] border border-[hsl(var(--admin-text))]/20 rounded-2xl p-3.5 sm:p-5 text-sm focus:ring-2 focus:ring-coral/20 transition-all font-medium leading-relaxed resize-none"
                                             />
                                         </div>
                                         <div className="space-y-4 pt-6 border-t border-[hsl(var(--admin-border))]">
@@ -602,7 +622,7 @@ export default function AdminContent() {
                                                 rows={4}
                                                 value={mission.summary || ''}
                                                 onChange={e => setMission({ ...mission, summary: e.target.value })}
-                                                className="w-full bg-[hsl(var(--admin-bg-alt))] border border-[hsl(var(--admin-text))]/20 rounded-2xl p-5 text-sm italic focus:ring-2 focus:ring-coral/20 transition-all font-medium leading-relaxed resize-none"
+                                                className="w-full bg-[hsl(var(--admin-bg-alt))] border border-[hsl(var(--admin-text))]/20 rounded-2xl p-3.5 sm:p-5 text-sm italic focus:ring-2 focus:ring-coral/20 transition-all font-medium leading-relaxed resize-none"
                                             />
                                         </div>
                                     </div>
@@ -651,7 +671,7 @@ export default function AdminContent() {
                                                         p[i].sub = e.target.value;
                                                         setMission({ ...mission, missionPoints: p });
                                                     }}
-                                                    className="w-full bg-[hsl(var(--admin-bg-alt))] border border-[hsl(var(--admin-text))]/20 rounded-2xl p-5 text-sm resize-none focus:ring-2 focus:ring-coral/20 font-medium opacity-70"
+                                                    className="w-full bg-[hsl(var(--admin-bg-alt))] border border-[hsl(var(--admin-text))]/20 rounded-2xl p-3.5 sm:p-5 text-sm resize-none focus:ring-2 focus:ring-coral/20 font-medium opacity-70"
                                                 />
                                             </div>
                                         ))}
@@ -710,7 +730,7 @@ export default function AdminContent() {
                                                         c[i].sub = e.target.value;
                                                         setMission({ ...mission, commitments: c });
                                                     }}
-                                                    className="w-full bg-white/5 border border-white/15 rounded-2xl p-5 text-sm resize-none focus:ring-2 focus:ring-coral/40 font-medium text-white/50"
+                                                    className="w-full bg-white/5 border border-white/15 rounded-2xl p-3.5 sm:p-5 text-sm resize-none focus:ring-2 focus:ring-coral/40 font-medium text-white/50"
                                                 />
                                             </div>
                                         ))}
@@ -730,9 +750,9 @@ export default function AdminContent() {
                                     <div className="space-y-16">
                                         <div className="space-y-8">
                                             <h3 className="text-[10px] font-bold uppercase tracking-widest text-coral border-b border-[hsl(var(--admin-border))] pb-4">Denominational Statistics</h3>
-                                            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
                                                 {(!stats.stats || stats.stats.length === 0) && (
-                                                    <div className="col-span-2 lg:col-span-4">
+                                                    <div className="col-span-1 sm:col-span-2 lg:col-span-4">
                                                         <AdminEmptyState
                                                             title="No Statistics"
                                                             description="Showcase key numbers about your denomination."
@@ -744,7 +764,7 @@ export default function AdminContent() {
                                                 )}
                                                 {(Array.isArray(stats.stats) ? stats.stats : []).map((stat, i) => (
                                                     <div key={i} className="p-6 bg-[hsl(var(--admin-bg-alt))] rounded-3xl border border-[hsl(var(--admin-border))] space-y-3 relative group">
-                                                        <button onClick={() => removeItem(stats.stats, (l) => setStats({ ...stats, stats: l }), i)} className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-[10px] opacity-0 group-hover:opacity-100 transition-opacity shadow-lg">✕</button>
+                                                        <button onClick={() => removeItem(stats.stats, (l) => setStats({ ...stats, stats: l }), i)} aria-label="Remove stat" className="absolute -top-2 -right-2 w-7 h-7 bg-red-500 text-white rounded-full flex items-center justify-center text-[11px] shadow-lg hover:bg-red-600 transition-colors">✕</button>
                                                         <input
                                                             type="text"
                                                             value={stat.value}
@@ -763,7 +783,7 @@ export default function AdminContent() {
                                                                 s[i].label = e.target.value;
                                                                 setStats({ ...stats, stats: s });
                                                             }}
-                                                            className="w-full bg-[hsl(var(--admin-bg-alt))] p-2 rounded-xl text-[9px] font-bold uppercase tracking-tighter text-center border border-[hsl(var(--admin-text))]/20 shadow-sm"
+                                                            className="w-full bg-[hsl(var(--admin-bg-alt))] p-2.5 rounded-xl text-[10px] font-bold uppercase tracking-wide text-center border border-[hsl(var(--admin-text))]/20 shadow-sm"
                                                         />
                                                     </div>
                                                 ))}
@@ -1177,20 +1197,30 @@ export default function AdminContent() {
                                 {/* GIVING PORTAL TAB */}
                                 {activeTab === 'donations' && (
                                     <div className="space-y-12">
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-8">
                                             {[
-                                                { key: 'heading', label: 'Primary Heading', placeholder: 'Give Generously.' },
+                                                { key: 'heading', label: 'Primary Heading', placeholder: 'Give Generously.', long: true },
                                                 { key: 'contactEmail', label: 'Management Email', placeholder: 'give@pcp.org' },
-                                                { key: 'subtitle', label: 'Portal Subtitle', placeholder: 'Your generosity helps...' },
+                                                { key: 'subtitle', label: 'Portal Subtitle', placeholder: 'Your generosity helps...', long: true, rows: 3 },
                                             ].map((field) => (
-                                                <div key={field.key} className={field.key === 'subtitle' ? 'md:col-span-2' : ''}>
-                                                    <label className="block text-coral text-[10px] tracking-[0.25em] uppercase mb-4 font-bold">{field.label}</label>
-                                                    <input
-                                                        value={donations[field.key] || ''}
-                                                        onChange={(e) => setDonations({ ...donations, [field.key]: e.target.value })}
-                                                        placeholder={field.placeholder}
-                                                        className="w-full bg-[hsl(var(--admin-bg-alt))] border border-[hsl(var(--admin-text))]/20 rounded-2xl p-5 text-sm font-medium focus:ring-2 focus:ring-coral/20 outline-none transition-all"
-                                                    />
+                                                <div key={field.key} className={field.long ? 'md:col-span-2' : ''}>
+                                                    <label className="block text-coral text-[10px] tracking-[0.25em] uppercase mb-3 font-bold">{field.label}</label>
+                                                    {field.long ? (
+                                                        <textarea
+                                                            value={donations[field.key] || ''}
+                                                            onChange={(e) => setDonations({ ...donations, [field.key]: e.target.value })}
+                                                            placeholder={field.placeholder}
+                                                            rows={field.rows || 2}
+                                                            className={FIELD_TEXTAREA_CLS}
+                                                        />
+                                                    ) : (
+                                                        <input
+                                                            value={donations[field.key] || ''}
+                                                            onChange={(e) => setDonations({ ...donations, [field.key]: e.target.value })}
+                                                            placeholder={field.placeholder}
+                                                            className={FIELD_CLS}
+                                                        />
+                                                    )}
                                                 </div>
                                             ))}
                                         </div>
@@ -1201,7 +1231,7 @@ export default function AdminContent() {
                                                 <input
                                                     value={donations.scriptureRef || ''}
                                                     onChange={(e) => setDonations({ ...donations, scriptureRef: e.target.value })}
-                                                    className="w-full bg-[hsl(var(--admin-bg-alt))] border border-[hsl(var(--admin-text))]/20 rounded-2xl p-5 text-sm font-medium focus:ring-2 focus:ring-coral/20 outline-none transition-all"
+                                                    className="w-full bg-[hsl(var(--admin-bg-alt))] border border-[hsl(var(--admin-text))]/20 rounded-2xl p-3.5 sm:p-5 text-sm font-medium focus:ring-2 focus:ring-coral/20 outline-none transition-all"
                                                 />
                                             </div>
                                         </div>
@@ -1296,7 +1326,7 @@ export default function AdminContent() {
                                                     onChange={(e) => setAnnouncement({ ...announcement, title: e.target.value })}
                                                     placeholder="e.g. Special Sunday Service"
                                                     maxLength={80}
-                                                    className="w-full bg-[hsl(var(--admin-bg-alt))] border border-[hsl(var(--admin-text))]/20 rounded-2xl p-5 text-base font-semibold focus:ring-2 focus:ring-accent/20 outline-none transition-all"
+                                                    className="w-full bg-[hsl(var(--admin-bg-alt))] border border-[hsl(var(--admin-text))]/20 rounded-2xl p-3.5 sm:p-5 text-base font-semibold focus:ring-2 focus:ring-accent/20 outline-none transition-all"
                                                 />
                                                 <div className="mt-2 text-right text-[9px] text-[hsl(var(--admin-text-dim))]">
                                                     {(announcement.title || '').length} / 80
@@ -1311,7 +1341,7 @@ export default function AdminContent() {
                                                     placeholder="Write the full announcement message here. You can use multiple lines."
                                                     rows={5}
                                                     maxLength={500}
-                                                    className="w-full bg-[hsl(var(--admin-bg-alt))] border border-[hsl(var(--admin-text))]/20 rounded-2xl p-5 text-sm font-medium focus:ring-2 focus:ring-accent/20 outline-none transition-all resize-none"
+                                                    className="w-full bg-[hsl(var(--admin-bg-alt))] border border-[hsl(var(--admin-text))]/20 rounded-2xl p-3.5 sm:p-5 text-sm font-medium focus:ring-2 focus:ring-accent/20 outline-none transition-all resize-none"
                                                 />
                                                 <div className="mt-2 text-right text-[9px] text-[hsl(var(--admin-text-dim))]">
                                                     {(announcement.message || '').length} / 500
@@ -1401,7 +1431,7 @@ export default function AdminContent() {
                                                         onChange={(e) => setAnnouncement({ ...announcement, buttonText: e.target.value })}
                                                         placeholder="e.g. Learn More"
                                                         maxLength={30}
-                                                        className="w-full bg-[hsl(var(--admin-bg-alt))] border border-[hsl(var(--admin-text))]/20 rounded-2xl p-5 text-sm font-medium focus:ring-2 focus:ring-accent/20 outline-none transition-all"
+                                                        className="w-full bg-[hsl(var(--admin-bg-alt))] border border-[hsl(var(--admin-text))]/20 rounded-2xl p-3.5 sm:p-5 text-sm font-medium focus:ring-2 focus:ring-accent/20 outline-none transition-all"
                                                     />
                                                 </div>
                                                 <div>
@@ -1410,7 +1440,7 @@ export default function AdminContent() {
                                                         value={announcement.buttonLink || ''}
                                                         onChange={(e) => setAnnouncement({ ...announcement, buttonLink: e.target.value })}
                                                         placeholder="e.g. /churches or https://..."
-                                                        className="w-full bg-[hsl(var(--admin-bg-alt))] border border-[hsl(var(--admin-text))]/20 rounded-2xl p-5 text-sm font-medium focus:ring-2 focus:ring-accent/20 outline-none transition-all"
+                                                        className="w-full bg-[hsl(var(--admin-bg-alt))] border border-[hsl(var(--admin-text))]/20 rounded-2xl p-3.5 sm:p-5 text-sm font-medium focus:ring-2 focus:ring-accent/20 outline-none transition-all"
                                                     />
                                                 </div>
                                             </div>
