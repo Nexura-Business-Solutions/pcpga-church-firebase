@@ -1143,9 +1143,9 @@ body.lp-v3 .ph-map__svg .ph-provinces path:hover {
 }
 /* Interactive presbytery map: provinces are filled per-presbytery via inline
    style (set in JS), so hover/focus emphasis uses filter+stroke, not fill. */
-body.lp-v3 .ph-map__svg.is-interactive .ph-provinces path { transition: filter 180ms ease, stroke-width 180ms ease; }
-body.lp-v3 .ph-map__svg.is-interactive .ph-provinces path[data-presbytery]:hover { filter: brightness(1.18) saturate(1.08); stroke-width: 1.7; }
-body.lp-v3 .ph-map__svg.is-interactive .ph-provinces path[data-presbytery]:focus-visible { outline: none; filter: brightness(1.2); stroke: var(--ink); stroke-width: 2; }
+/* Interactive hover/focus styling now lives in PhilippinesMap.jsx (JS group-hover
+   lights the whole presbytery); keep only the focus outline suppression here. */
+body.lp-v3 .ph-map__svg.is-interactive .ph-provinces path[data-presbytery]:focus-visible { outline: none; }
 body.lp-v3 .ph-map__hint {
   margin-top: 0.85rem; text-align: center;
   font-family: var(--font-mono); font-size: 8.5px; letter-spacing: 0.18em;
