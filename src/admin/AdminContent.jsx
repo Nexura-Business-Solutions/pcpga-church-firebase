@@ -37,7 +37,8 @@ import {
     Film,
     Quote,
     Trash2,
-    X
+    X,
+    ExternalLink
 } from 'lucide-react';
 
 // Labels name the public site section each tab edits (the old one-word metaphor
@@ -70,6 +71,17 @@ export default function AdminContent() {
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [isTourActive, setIsTourActive] = useState(false);
+    // Live preview opens as a slide-over panel (toggle) instead of a permanent
+    // side column, so the editor fields get the full width and don't feel cramped.
+    const [showPreview, setShowPreview] = useState(false);
+
+    // Esc closes the live-preview panel.
+    useEffect(() => {
+        if (!showPreview) return undefined;
+        const onKey = (e) => { if (e.key === 'Escape') setShowPreview(false); };
+        window.addEventListener('keydown', onKey);
+        return () => window.removeEventListener('keydown', onKey);
+    }, [showPreview]);
 
     const tourSteps = [
         { selector: '#tour-tabs', title: 'Content Categories', message: 'Switch between different sections like Identity, Mission, and Governance using these tabs.' },
@@ -422,15 +434,22 @@ export default function AdminContent() {
                                 Pick a section below to edit it, then press <span className="font-semibold text-[hsl(var(--admin-text))]">Save changes</span>.
                             </p>
                         </div>
-                        <div className="flex gap-3">
+                        <div className="flex flex-wrap gap-3">
                             <button
                                 onClick={() => setIsTourActive(true)}
                                 className="px-5 py-2.5 bg-[hsl(var(--admin-bg-alt))] border border-[hsl(var(--admin-border))] rounded-2xl text-[10px] font-bold uppercase tracking-widest text-coral hover:bg-coral/5 transition-all shadow-sm flex items-center gap-2"
                             >
                                 <Sparkles className="w-3 h-3" /> Take a tour
                             </button>
+                            <button
+                                onClick={() => setShowPreview(true)}
+                                className="flex items-center gap-2.5 px-6 py-2.5 bg-[hsl(var(--admin-surface))] rounded-2xl border border-[hsl(var(--admin-border))] hover:bg-accent/5 transition-all"
+                            >
+                                <Eye className="w-4 h-4" />
+                                <span className="text-[10px] font-bold text-[hsl(var(--admin-text))] uppercase tracking-widest">Live preview</span>
+                            </button>
                             <a href="/" target="_blank" rel="noreferrer" className="flex items-center gap-2.5 px-6 py-2.5 bg-[hsl(var(--admin-surface))] rounded-2xl border border-[hsl(var(--admin-border))] hover:bg-accent/5 transition-all group">
-                                <Eye className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                                <ExternalLink className="w-4 h-4 group-hover:scale-110 transition-transform" />
                                 <span className="text-[10px] font-bold text-[hsl(var(--admin-text))] uppercase tracking-widest">View live site</span>
                             </a>
                         </div>
@@ -457,8 +476,10 @@ export default function AdminContent() {
                         ))}
                     </div>
 
-                    {/* Editor Content — form (left) + live preview (right on xl) */}
-                    <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 items-start">
+                    {/* Editor content — full width. The live preview is a toggled
+                        slide-over panel (see below), not a permanent side column, so the
+                        fields get the whole width and don't feel cramped. */}
+                    <div className="max-w-4xl">
                         <AnimatePresence mode="wait">
                             <motion.div
                                 key={activeTab}
@@ -1857,35 +1878,51 @@ export default function AdminContent() {
                             </motion.div>
                         </AnimatePresence>
 
-                        {/* Live preview column (desktop) */}
-                        <div className="hidden xl:block xl:sticky xl:top-24">
-                            <div className="flex items-center gap-2 mb-3 px-1">
-                                <span className="w-2 h-2 rounded-full bg-accent animate-pulse" />
-                                <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-[hsl(var(--admin-text-dim))]">Live Preview</span>
-                                <span className="text-[10px] text-[hsl(var(--admin-text-dim))]/40 tracking-wide ml-1">— how this section looks on the site</span>
-                            </div>
-                            <AnimatePresence mode="wait">
-                                <motion.div
-                                    key={activeTab}
-                                    initial={{ opacity: 0, scale: 0.98 }}
-                                    animate={{ opacity: 1, scale: 1 }}
-                                    exit={{ opacity: 0, scale: 0.98 }}
-                                    transition={{ duration: 0.25 }}
-                                >
-                                    <ContentPreview
-                                        tab={activeTab}
-                                        hero={hero}
-                                        identity={identity}
-                                        mission={mission}
-                                        stats={stats}
-                                        committees={committees}
-                                        presbyteries={presbyteries}
-                                        donations={donations}
-                                        announcement={announcement}
+                        {/* Live preview — a slide-over panel toggled from the header, so
+                            the editor keeps the full width and the two never crowd each
+                            other. Backdrop click or ✕ closes it. */}
+                        <AnimatePresence>
+                            {showPreview && (
+                                <>
+                                    <motion.div
+                                        initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                                        className="fixed inset-0 bg-black/40 z-[55]"
+                                        onClick={() => setShowPreview(false)}
+                                        aria-hidden="true"
                                     />
-                                </motion.div>
-                            </AnimatePresence>
-                        </div>
+                                    <motion.aside
+                                        initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }}
+                                        transition={{ type: 'tween', duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
+                                        className="fixed top-0 right-0 h-full w-full sm:w-[460px] bg-[hsl(var(--admin-bg))] border-l border-[hsl(var(--admin-border))] shadow-2xl z-[60] flex flex-col"
+                                        role="dialog" aria-label="Live preview"
+                                    >
+                                        <div className="flex items-center justify-between px-5 h-16 border-b border-[hsl(var(--admin-border))] shrink-0">
+                                            <div className="flex items-center gap-2">
+                                                <span className="w-2 h-2 rounded-full bg-accent animate-pulse" />
+                                                <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-[hsl(var(--admin-text-dim))]">Live Preview</span>
+                                            </div>
+                                            <button onClick={() => setShowPreview(false)} aria-label="Close preview" className="w-9 h-9 flex items-center justify-center rounded-xl bg-[hsl(var(--admin-text))]/5 text-[hsl(var(--admin-text))]/50 hover:text-[hsl(var(--admin-text))] hover:bg-[hsl(var(--admin-text))]/10 transition-colors">
+                                                <X className="w-4 h-4" />
+                                            </button>
+                                        </div>
+                                        <div className="flex-1 overflow-y-auto p-5 custom-scrollbar">
+                                            <p className="text-[11px] text-[hsl(var(--admin-text-dim))]/70 mb-4">How this section looks on the live site — it updates as you edit.</p>
+                                            <ContentPreview
+                                                tab={activeTab}
+                                                hero={hero}
+                                                identity={identity}
+                                                mission={mission}
+                                                stats={stats}
+                                                committees={committees}
+                                                presbyteries={presbyteries}
+                                                donations={donations}
+                                                announcement={announcement}
+                                            />
+                                        </div>
+                                    </motion.aside>
+                                </>
+                            )}
+                        </AnimatePresence>
 
                         {/* Save bar — a docked footer with a fade backdrop so content
                             scrolls cleanly beneath it (the page reserves matching bottom
