@@ -1,7 +1,6 @@
 import { Helmet } from 'react-helmet-async';
 import Navbar from '../components/Navbar.jsx';
 import Footer from '../components/Footer.jsx';
-import ChatbotWidget from '../components/ChatbotWidget.jsx';
 import Donation from '../components/Donation.jsx';
 
 export default function DonationPage() {
@@ -22,7 +21,6 @@ export default function DonationPage() {
         <Donation />
       </main>
       <Footer />
-      <ChatbotWidget />
     </>
   );
 }

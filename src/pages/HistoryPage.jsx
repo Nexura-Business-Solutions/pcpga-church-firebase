@@ -8,7 +8,6 @@ import { defaultHistory } from '../lib/seed-data.js';
 import { Skeleton } from '../components/Skeleton.jsx';
 import Navbar from '../components/Navbar.jsx';
 import Footer from '../components/Footer.jsx';
-import ChatbotWidget from '../components/ChatbotWidget.jsx';
 
 // "Rev. Juan Dela Cruz" → "JD", not "R" — every officer carries an honorific,
 // so charAt(0) rendered the same "R" monogram on all six cards.
@@ -173,7 +172,6 @@ export default function HistoryPage() {
                 </main>
             </div>
             <Footer />
-            <ChatbotWidget />
         </>
     );
 }

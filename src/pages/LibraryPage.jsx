@@ -12,7 +12,6 @@ import { getLibraryResources } from '../lib/store.js';
 import { safeExternalHref } from '../lib/url.js';
 import Navbar from '../components/Navbar.jsx';
 import Footer from '../components/Footer.jsx';
-import ChatbotWidget from '../components/ChatbotWidget.jsx';
 
 export default function LibraryPage() {
     const [resources, setResources] = useState([]);
@@ -232,7 +231,6 @@ export default function LibraryPage() {
                 </section>
             </div>
             <Footer />
-            <ChatbotWidget />
         </>
     );
 }
