@@ -7,7 +7,6 @@ import { safeExternalHref } from '../lib/url.js';
 import { Skeleton } from '../components/Skeleton.jsx';
 import Navbar from '../components/Navbar.jsx';
 import Footer from '../components/Footer.jsx';
-import ChatbotWidget from '../components/ChatbotWidget.jsx';
 
 function Section({ title, icon: Icon, children }) {
     return (
@@ -225,7 +224,6 @@ export default function SeminariesPage() {
                 </main>
             </div>
             <Footer />
-            <ChatbotWidget />
         </>
     );
 }

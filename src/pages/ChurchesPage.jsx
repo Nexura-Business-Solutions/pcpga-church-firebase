@@ -6,7 +6,6 @@ import { getSettings, churchesFromPresbyteries } from '../lib/store.js';
 import { regions } from '../lib/seed-data.js';
 import { Skeleton } from '../components/Skeleton.jsx';
 import Footer from '../components/Footer.jsx';
-import ChatbotWidget from '../components/ChatbotWidget.jsx';
 import PhilippinesMap from '../components/PhilippinesMap.jsx';
 import { PRESBYTERY_COLOR } from '../lib/presbyteryMap.js';
 
@@ -430,7 +429,6 @@ export default function ChurchesPage() {
             </div>
             <div ref={footerSentinelRef} aria-hidden="true" className="lg:hidden h-px" />
             <Footer />
-            <ChatbotWidget />
         </>
     );
 }
