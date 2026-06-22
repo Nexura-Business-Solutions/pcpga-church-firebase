@@ -2442,6 +2442,130 @@ body.lp-v3 .event-card__meta {
 }
 @media (max-width: 900px) { body.lp-v3 .events__grid { grid-template-columns: 1fr; } }
 
+/* ---- Recent Events feed (Facebook-style albums) ---- */
+body.lp-v3 .recent {
+  padding: clamp(3rem, 5vw, 4.5rem) 0;
+  background: var(--paper-2);
+  border-bottom: 1px solid var(--line);
+}
+body.lp-v3 .recent__inner { max-width: var(--max); margin: 0 auto; padding: 0 clamp(1.5rem, 4vw, 3rem); }
+body.lp-v3 .recent__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 2rem;
+  padding-bottom: 1.5rem;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid var(--line);
+}
+body.lp-v3 .recent__title {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-style: italic;
+  font-size: clamp(1.3rem, 1.8vw, 1.7rem);
+  color: var(--ink);
+}
+body.lp-v3 .recent__title em { color: var(--brass); }
+body.lp-v3 .recent__kicker {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+}
+body.lp-v3 .recent__empty {
+  padding: 3rem 2rem;
+  background: var(--cream-card);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--brass);
+  text-align: center;
+}
+body.lp-v3 .recent__empty p {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 1.05rem;
+  color: var(--ink-mute);
+  margin: 0;
+  line-height: 1.6;
+}
+/* The feed reads as a single readable column, like a social timeline. */
+body.lp-v3 .recent__feed {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(2rem, 4vw, 3rem);
+  max-width: 680px;
+  margin: 0 auto;
+}
+body.lp-v3 .recent__post {
+  background: var(--cream-card);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--brass);
+  padding: clamp(1.1rem, 2.5vw, 1.6rem);
+}
+body.lp-v3 .recent__caption {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: var(--ink-soft);
+  margin: 0 0 1.1rem;
+  white-space: pre-wrap;
+}
+body.lp-v3 .recent__grid {
+  display: grid;
+  gap: 3px;
+  border: 1px solid var(--line);
+  overflow: hidden;
+}
+body.lp-v3 .recent__grid--1 { grid-template-columns: 1fr; }
+body.lp-v3 .recent__grid--2 { grid-template-columns: 1fr 1fr; }
+body.lp-v3 .recent__grid--3 { grid-template-columns: 2fr 1fr; grid-template-rows: 1fr 1fr; }
+body.lp-v3 .recent__grid--3 .recent__tile:first-child { grid-row: span 2; }
+body.lp-v3 .recent__grid--4 { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; }
+body.lp-v3 .recent__tile {
+  position: relative;
+  display: block;
+  padding: 0;
+  border: 0;
+  cursor: zoom-in;
+  background: var(--paper-3);
+  aspect-ratio: 1;
+  overflow: hidden;
+}
+/* A single photo gets a wider, photo-like frame rather than a forced square. */
+body.lp-v3 .recent__grid--1 .recent__tile { aspect-ratio: 16 / 10; }
+body.lp-v3 .recent__tile img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.4s ease;
+}
+body.lp-v3 .recent__tile:hover img { transform: scale(1.04); }
+body.lp-v3 .recent__more {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(15,8,4,0.55);
+  color: #fff;
+  font-family: var(--font-serif);
+  font-size: clamp(1.5rem, 4vw, 2.2rem);
+  letter-spacing: 0.04em;
+}
+/* Lightbox reuses .evcar__lightbox; these are the album prev/next arrows. */
+body.lp-v3 .recent__lightbox-nav {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  width: 52px; height: 52px; border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.45); background: rgba(0,0,0,0.32);
+  color: #fff; font-size: 2rem; line-height: 1; cursor: pointer;
+  z-index: 1;
+}
+body.lp-v3 .recent__lightbox-nav--prev { left: clamp(0.6rem, 3vw, 2rem); }
+body.lp-v3 .recent__lightbox-nav--next { right: clamp(0.6rem, 3vw, 2rem); }
+@media (max-width: 560px) {
+  body.lp-v3 .recent__lightbox-nav { width: 44px; height: 44px; font-size: 1.5rem; }
+  body.lp-v3 .recent__lightbox-nav--prev { left: 0.4rem; }
+  body.lp-v3 .recent__lightbox-nav--next { right: 0.4rem; }
+}
+
 /* ── SUNDAYS AT PCP (full-bleed) ─────────────────────────────── */
 body.lp-v3 .sundays {
   position: relative;
