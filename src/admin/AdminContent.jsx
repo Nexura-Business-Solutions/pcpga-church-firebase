@@ -57,7 +57,8 @@ const TABS = [
     { id: 'donations', label: 'Giving', icon: CircleDollarSign },
     { id: 'announcement', label: 'Announcement Popup', icon: Bell },
     { id: 'events', label: 'Upcoming Events', icon: CalendarDays },
-    { id: 'videos', label: 'Video Greetings', icon: Film }
+    { id: 'videos', label: 'Video Greetings', icon: Film },
+    { id: 'recent', label: 'Recent Events', icon: ImagePlus }
 ];
 
 // Shared field styles. Padding is responsive (smaller on phones) so long values
@@ -155,6 +156,8 @@ export default function AdminContent() {
     const [announcement, setAnnouncement] = useState({});
     const [events, setEvents] = useState([]);
     const [videoGreetings, setVideoGreetings] = useState([]);
+    const [vgEnabled, setVgEnabled] = useState(true);
+    const [recentEvents, setRecentEvents] = useState([]);
     const [welcomeOfficers, setWelcomeOfficers] = useState([]);
     const [showPopupPreview, setShowPopupPreview] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
@@ -191,6 +194,10 @@ export default function AdminContent() {
             setEvents(Array.isArray(ue) ? ue : []);
             const vg = await getSettings('video-greetings');
             setVideoGreetings(Array.isArray(vg) ? vg : []);
+            const vge = await getSettings('video-greetings-enabled');
+            setVgEnabled(vge?.enabled !== false); // default ON when the flag doc is missing
+            const re = await getSettings('recent-events');
+            setRecentEvents(Array.isArray(re) ? re : []);
             const wo = await getSettings('welcome-officers');
             setWelcomeOfficers(Array.isArray(wo) ? wo : []);
             setLoading(false);
@@ -218,6 +225,8 @@ export default function AdminContent() {
                 saveSettings('announcement', { ...announcement, updatedAt: Date.now() }),
                 saveSettings('upcoming-events', events),
                 saveSettings('video-greetings', videoGreetings),
+                saveSettings('video-greetings-enabled', { enabled: vgEnabled }),
+                saveSettings('recent-events', recentEvents),
                 saveSettings('welcome-officers', welcomeOfficers)
             ]);
             if (results.every(r => r)) {
@@ -468,6 +477,90 @@ export default function AdminContent() {
     };
     // Detect a direct (uploaded) video file vs a YouTube/link, for the editor preview.
     const isVideoFileUrl = (url) => /\.(mp4|webm|mov|m4v)(\?|$)/i.test(String(url || ''));
+
+    // Recent Events helpers — a Facebook-style album feed. Each post carries a
+    // caption + up to MAX_RECENT_PHOTOS photos. New posts prepend (newest first);
+    // the public feed renders posts in this stored order.
+    const MAX_RECENT_PHOTOS = 10;
+    const addPost = () => {
+        const id = `re-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+        setRecentEvents([{ id, caption: '', photos: [], createdAt: Date.now() }, ...recentEvents]);
+    };
+    const updatePost = (i, patch) => {
+        setRecentEvents((prev) => prev.map((p, idx) => (idx === i ? { ...p, ...patch } : p)));
+    };
+    const removePost = (i) => {
+        setRecentEvents((prev) => prev.filter((_, idx) => idx !== i));
+    };
+    const movePost = (i, dir) => {
+        const j = i + dir;
+        if (j < 0 || j >= recentEvents.length) return;
+        setRecentEvents((prev) => {
+            const next = [...prev];
+            [next[i], next[j]] = [next[j], next[i]];
+            return next;
+        });
+    };
+    const removePhoto = (postIdx, photoIdx) => {
+        setRecentEvents((prev) => prev.map((p, idx) => (
+            idx === postIdx ? { ...p, photos: p.photos.filter((_, k) => k !== photoIdx) } : p
+        )));
+    };
+    const movePhoto = (postIdx, photoIdx, dir) => {
+        const j = photoIdx + dir;
+        setRecentEvents((prev) => prev.map((p, idx) => {
+            if (idx !== postIdx) return p;
+            if (j < 0 || j >= p.photos.length) return p;
+            const photos = [...p.photos];
+            [photos[photoIdx], photos[j]] = [photos[j], photos[photoIdx]];
+            return { ...p, photos };
+        }));
+    };
+    // Multi-file album upload — appends to a post's photos, capped at 10. Separate
+    // from handleImageUpload because that one replaces a single field by index;
+    // here we accept several files at once and push onto an array.
+    const handlePhotosUpload = async (postIdx, fileList) => {
+        const files = Array.from(fileList || []);
+        if (!files.length) return;
+        const current = recentEvents[postIdx]?.photos?.length || 0;
+        const room = MAX_RECENT_PHOTOS - current;
+        if (room <= 0) {
+            toast.error(`Up to ${MAX_RECENT_PHOTOS} photos per post.`);
+            return;
+        }
+        const toUpload = files.slice(0, room);
+        if (files.length > room) {
+            toast(`Only ${room} more photo(s) added — max ${MAX_RECENT_PHOTOS} per post.`);
+        }
+        setIsUploading(true);
+        try {
+            for (const file of toUpload) {
+                if (!file.type.startsWith('image/')) {
+                    toast.error('Please choose image files (JPG, PNG, WEBP, GIF).');
+                    continue;
+                }
+                if (file.size > 10 * 1024 * 1024) {
+                    toast.error(`${file.name}: image must be 10 MB or smaller.`);
+                    continue;
+                }
+                const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+                const url = await uploadFile(`content/recent-events/${Date.now()}-${safeName}`, file);
+                setRecentEvents((prev) => prev.map((p, idx) => (
+                    idx === postIdx ? { ...p, photos: [...p.photos, url].slice(0, MAX_RECENT_PHOTOS) } : p
+                )));
+            }
+            toast.success('Photos uploaded ✦');
+        } catch (err) {
+            toast.error(err?.code ? `${err.message} (${err.code})` : (err?.message || 'Upload failed'));
+        } finally {
+            setIsUploading(false);
+        }
+    };
+    const handlePhotosDrop = (e, postIdx) => {
+        e.preventDefault();
+        const dropped = e.dataTransfer?.files;
+        if (dropped?.length) handlePhotosUpload(postIdx, dropped);
+    };
 
     // Welcome Officers helpers — the "A Word of Welcome" carousel in the Message
     // section. Only officers that carry a message render on the site.
@@ -1755,17 +1848,34 @@ export default function AdminContent() {
                                 {/* VIDEO GREETINGS TAB */}
                                 {activeTab === 'videos' && (
                                     <div className="space-y-8">
-                                        {/* Header */}
-                                        <div className="flex items-start gap-4 p-6 bg-[hsl(var(--admin-bg-alt))] rounded-2xl border border-[hsl(var(--admin-border))]">
-                                            <div className="w-12 h-12 rounded-2xl bg-coral/10 flex items-center justify-center flex-shrink-0">
-                                                <Film className="w-5 h-5 text-coral" />
+                                        {/* Header & visibility toggle */}
+                                        <div className="flex items-start justify-between p-6 bg-[hsl(var(--admin-bg-alt))] rounded-2xl border border-[hsl(var(--admin-border))]">
+                                            <div className="flex items-start gap-4">
+                                                <div className="w-12 h-12 rounded-2xl bg-coral/10 flex items-center justify-center flex-shrink-0">
+                                                    <Film className="w-5 h-5 text-coral" />
+                                                </div>
+                                                <div>
+                                                    <h3 className="text-[hsl(var(--admin-text))] font-bold text-base mb-1">Video Greetings Carousel</h3>
+                                                    <p className="text-[hsl(var(--admin-text-dim))] text-xs leading-relaxed max-w-md">
+                                                        Rotating greeting videos shown <strong>right after the hero</strong> on the homepage. <strong>Upload a short video</strong> (drag it in, or from your phone — ≤50&nbsp;MB) <strong>or paste a YouTube/Facebook link</strong>. Up to {MAX_VIDEO_GREETINGS} videos.
+                                                    </p>
+                                                    <p className="text-[hsl(var(--admin-text-dim))] text-[11px] leading-relaxed max-w-md mt-2">
+                                                        When set to <strong>Hidden</strong>, this whole section disappears from the homepage but your saved videos are kept — &ldquo;Upcoming &amp; in session&rdquo; takes its place. Flip it back to <strong>Visible</strong> anytime.
+                                                    </p>
+                                                </div>
                                             </div>
-                                            <div>
-                                                <h3 className="text-[hsl(var(--admin-text))] font-bold text-base mb-1">Video Greetings Carousel</h3>
-                                                <p className="text-[hsl(var(--admin-text-dim))] text-xs leading-relaxed max-w-md">
-                                                    Rotating greeting videos shown <strong>right after the hero</strong> on the homepage. <strong>Upload a short video</strong> (drag it in, or from your phone — ≤50&nbsp;MB) <strong>or paste a YouTube/Facebook link</strong>. Up to {MAX_VIDEO_GREETINGS} videos.
-                                                </p>
-                                            </div>
+                                            <label className="relative inline-flex items-center cursor-pointer flex-shrink-0 ml-4">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={!!vgEnabled}
+                                                    onChange={(e) => setVgEnabled(e.target.checked)}
+                                                    className="sr-only peer"
+                                                />
+                                                <div className="w-14 h-7 bg-[hsl(var(--admin-border))] rounded-full peer peer-checked:bg-accent transition-colors duration-300 after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-6 after:w-6 after:shadow-md after:transition-all after:duration-300 peer-checked:after:translate-x-7" />
+                                                <span className="ml-3 text-[10px] font-bold uppercase tracking-widest text-[hsl(var(--admin-text-dim))]">
+                                                    {vgEnabled ? 'Visible' : 'Hidden'}
+                                                </span>
+                                            </label>
                                         </div>
 
                                         {videoGreetings.length === 0 ? (
@@ -1865,6 +1975,93 @@ export default function AdminContent() {
                                                         <Plus className="w-4 h-4" /> Add Video ({videoGreetings.length}/{MAX_VIDEO_GREETINGS})
                                                     </button>
                                                 )}
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+
+                                {/* RECENT EVENTS TAB (Facebook-style album feed) */}
+                                {activeTab === 'recent' && (
+                                    <div className="space-y-8">
+                                        {/* Header */}
+                                        <div className="flex items-start gap-4 p-6 bg-[hsl(var(--admin-bg-alt))] rounded-2xl border border-[hsl(var(--admin-border))]">
+                                            <div className="w-12 h-12 rounded-2xl bg-coral/10 flex items-center justify-center flex-shrink-0">
+                                                <ImagePlus className="w-5 h-5 text-coral" />
+                                            </div>
+                                            <div>
+                                                <h3 className="text-[hsl(var(--admin-text))] font-bold text-base mb-1">Recent Events Feed</h3>
+                                                <p className="text-[hsl(var(--admin-text-dim))] text-xs leading-relaxed max-w-md">
+                                                    A <strong>Facebook-style feed</strong> of photos from recent gatherings, shown lower on the homepage. Each post has a <strong>caption</strong> and up to <strong>{MAX_RECENT_PHOTOS} photos</strong>. New posts appear first. Drag photos in (or from your phone), then click <strong>Update</strong> below to publish.
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        {recentEvents.length === 0 ? (
+                                            <AdminEmptyState
+                                                title="No Recent Events"
+                                                description="Create a post and upload photos to start the feed."
+                                                icon={<ImagePlus className="w-12 h-12 text-coral/20" />}
+                                                actionText="Add Post"
+                                                onAction={addPost}
+                                            />
+                                        ) : (
+                                            <div className="space-y-6">
+                                                {recentEvents.map((post, i) => (
+                                                    <div key={post.id || i} className="p-5 sm:p-6 bg-[hsl(var(--admin-bg-alt))] rounded-3xl border border-[hsl(var(--admin-border))] space-y-5 relative">
+                                                        <div className="flex items-center justify-between">
+                                                            <span className="text-[10px] font-bold uppercase tracking-widest text-coral">Post {i + 1}</span>
+                                                            <div className="flex items-center gap-2">
+                                                                <button onClick={() => movePost(i, -1)} disabled={i === 0} className="p-2 rounded-xl text-[hsl(var(--admin-text-dim))] hover:bg-coral/5 hover:text-coral disabled:opacity-20 disabled:cursor-not-allowed transition-colors" aria-label="Move post up"><ChevronUp className="w-4 h-4" /></button>
+                                                                <button onClick={() => movePost(i, 1)} disabled={i === recentEvents.length - 1} className="p-2 rounded-xl text-[hsl(var(--admin-text-dim))] hover:bg-coral/5 hover:text-coral disabled:opacity-20 disabled:cursor-not-allowed transition-colors" aria-label="Move post down"><ChevronDown className="w-4 h-4" /></button>
+                                                                <button onClick={() => removePost(i)} className="p-2 rounded-xl text-red-500 hover:bg-red-50 transition-colors" aria-label="Delete post"><Trash2 className="w-4 h-4" /></button>
+                                                            </div>
+                                                        </div>
+
+                                                        <div>
+                                                            <label className="block text-coral text-[9px] tracking-[0.25em] uppercase mb-2 font-bold">Caption</label>
+                                                            <textarea
+                                                                rows={2}
+                                                                value={post.caption || ''}
+                                                                onChange={(e) => updatePost(i, { caption: e.target.value })}
+                                                                placeholder="Say something about these photos…"
+                                                                className="w-full bg-[hsl(var(--admin-bg))] border border-[hsl(var(--admin-text))]/20 rounded-2xl p-3.5 text-sm font-medium focus:ring-2 focus:ring-coral/20 outline-none transition-all resize-y leading-relaxed"
+                                                            />
+                                                        </div>
+
+                                                        <div>
+                                                            <label className="flex items-center justify-between text-coral text-[9px] tracking-[0.25em] uppercase mb-2 font-bold">
+                                                                <span>Photos</span>
+                                                                <span className="text-[hsl(var(--admin-text-dim))]">{(post.photos || []).length}/{MAX_RECENT_PHOTOS}</span>
+                                                            </label>
+                                                            <div className="flex flex-wrap gap-3" onDragOver={allowDrop} onDrop={(e) => handlePhotosDrop(e, i)}>
+                                                                {(post.photos || []).map((url, k) => (
+                                                                    <div key={url || k} className="relative w-24 h-24 rounded-2xl overflow-hidden border border-[hsl(var(--admin-border))] bg-[hsl(var(--admin-bg))] group/photo">
+                                                                        <img src={url} alt="" className="w-full h-full object-cover" />
+                                                                        <button onClick={() => removePhoto(i, k)} className="absolute top-1 right-1 w-6 h-6 rounded-full bg-black/60 text-white flex items-center justify-center opacity-0 group-hover/photo:opacity-100 transition-opacity hover:bg-red-500" aria-label="Remove photo"><X className="w-3.5 h-3.5" /></button>
+                                                                        <div className="absolute bottom-1 left-1 right-1 flex justify-between opacity-0 group-hover/photo:opacity-100 transition-opacity">
+                                                                            <button onClick={() => movePhoto(i, k, -1)} disabled={k === 0} className="w-6 h-6 rounded-lg bg-black/60 text-white flex items-center justify-center disabled:opacity-20 hover:bg-coral" aria-label="Move photo left">‹</button>
+                                                                            <button onClick={() => movePhoto(i, k, 1)} disabled={k === post.photos.length - 1} className="w-6 h-6 rounded-lg bg-black/60 text-white flex items-center justify-center disabled:opacity-20 hover:bg-coral" aria-label="Move photo right">›</button>
+                                                                        </div>
+                                                                    </div>
+                                                                ))}
+                                                                {(post.photos || []).length < MAX_RECENT_PHOTOS && (
+                                                                    <label className="w-24 h-24 rounded-2xl border-2 border-dashed border-coral/20 bg-[hsl(var(--admin-bg))] flex flex-col items-center justify-center gap-1.5 text-coral/40 cursor-pointer hover:bg-coral/5 hover:text-coral transition-colors">
+                                                                        <ImagePlus className="w-5 h-5" />
+                                                                        <span className="text-[8px] font-bold uppercase tracking-widest text-center leading-tight">Add<br />photos</span>
+                                                                        <input type="file" accept=".jpg,.jpeg,.png,.webp,.gif" multiple className="hidden" onChange={(e) => { handlePhotosUpload(i, e.target.files); e.target.value = ''; }} />
+                                                                    </label>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                ))}
+
+                                                <button
+                                                    onClick={addPost}
+                                                    className="w-full py-6 rounded-2xl border-2 border-dashed border-[hsl(var(--admin-border))] text-[10px] font-bold uppercase tracking-widest text-coral hover:bg-coral/5 transition-all flex items-center justify-center gap-2"
+                                                >
+                                                    <Plus className="w-4 h-4" /> Add Post
+                                                </button>
                                             </div>
                                         )}
                                     </div>

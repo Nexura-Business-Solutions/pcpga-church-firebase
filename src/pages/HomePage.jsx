@@ -5,6 +5,7 @@ import PhilippinesMap from '../components/PhilippinesMap.jsx';
 import { PRESBYTERY_COLOR } from '../lib/presbyteryMap.js';
 import AnnouncementModal from '../components/AnnouncementModal.jsx';
 import EventsCarousel from '../components/EventsCarousel.jsx';
+import RecentEvents from '../components/RecentEvents.jsx';
 import VideoCarousel from '../components/VideoCarousel.jsx';
 import WelcomeCarousel from '../components/WelcomeCarousel.jsx';
 import MobileScrollAids from '../components/MobileScrollAids.jsx';
@@ -224,8 +225,8 @@ export default function HomePage() {
   useEffect(() => {
     let active = true;
     (async () => {
-      const keys = ['hero', 'site-identity', 'mission-vision', 'core-principles', 'invitation-stats', 'announcement', 'standing-committees', 'presbyteries', 'upcoming-events', 'welcome-officers', 'video-greetings'];
-      const [hero, identity, mv, msg, stats, ann, committees, pres, events, welcomeOfficers, videoGreetings, sermons] = await Promise.all([
+      const keys = ['hero', 'site-identity', 'mission-vision', 'core-principles', 'invitation-stats', 'announcement', 'standing-committees', 'presbyteries', 'upcoming-events', 'welcome-officers', 'video-greetings', 'video-greetings-enabled', 'recent-events'];
+      const [hero, identity, mv, msg, stats, ann, committees, pres, events, welcomeOfficers, videoGreetings, vgEnabled, recentEvents, sermons] = await Promise.all([
         ...keys.map((k) => getSettings(k)), getSermons(),
       ]);
       if (active) setCms({
@@ -235,6 +236,8 @@ export default function HomePage() {
         events: Array.isArray(events) ? events : [],
         welcomeOfficers: Array.isArray(welcomeOfficers) ? welcomeOfficers : [],
         videoGreetings: Array.isArray(videoGreetings) ? videoGreetings : [],
+        vgEnabled: vgEnabled || {},
+        recentEvents: Array.isArray(recentEvents) ? recentEvents : [],
         sermons: Array.isArray(sermons) ? sermons : [],
       });
     })();
@@ -251,6 +254,14 @@ export default function HomePage() {
   // shown right after the hero. Drop rows without a source.
   const videoGreetings = (Array.isArray(cms.videoGreetings) ? cms.videoGreetings : [])
     .filter((v) => v && typeof v.videoUrl === 'string' && v.videoUrl.trim() !== '');
+  // The video-greetings section is shown only when the owner has it enabled
+  // (defaults ON when the flag doc is missing) AND at least one video exists.
+  // When hidden, the Upcoming events section slides up into this after-hero slot.
+  const showVideoGreetings = (cms.vgEnabled?.enabled !== false) && videoGreetings.length > 0;
+  // Recent Events — Facebook-style album posts (managed in admin), newest first
+  // by the admin's stored order. Drop empty photo entries defensively.
+  const recentPosts = (Array.isArray(cms.recentEvents) ? cms.recentEvents : [])
+    .map((p) => ({ ...p, photos: Array.isArray(p?.photos) ? p.photos.filter(Boolean) : [] }));
   // Normalize committees (editor stores `details`; landing modal reads `duties`).
   const committees = (cms.committees?.length ? cms.committees : COMMITTEES).map((c) => ({
     name: c.name,
@@ -521,6 +532,30 @@ export default function HomePage() {
   function openPresbytery(i) { setModal({ kind: 'presbytery', i }); }
   function closeModal() { setModal(null); }
 
+  // "Upcoming & in session" always sits just above the stats band. When video
+  // greetings are visible it renders directly beneath them; when they're hidden it
+  // takes the after-hero slot. Declared once and rendered once (no duplicate id).
+  const upcomingSection = (
+    <section className="events" id="events" aria-label="Upcoming events">
+      <div className="events__inner">
+        <div className="events__head">
+          <h3 className="events__title">Upcoming &amp; <em>in session.</em></h3>
+          <span className="events__feed">
+            <span className="live-dot" aria-hidden="true" />
+            <span>Denominational Feed</span>
+          </span>
+        </div>
+        {upcomingEvents.length > 0 ? (
+          <EventsCarousel events={upcomingEvents} />
+        ) : (
+          <div className="events__empty reveal">
+            <p>Upcoming events &amp; dispatches will be posted here as the General Assembly and the presbyteries convene.</p>
+          </div>
+        )}
+      </div>
+    </section>
+  );
+
   return (
     <>
       <Helmet>
@@ -651,8 +686,9 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* VIDEO GREETINGS — rotating greeting videos, right after the hero */}
-      {videoGreetings.length > 0 && (
+      {/* VIDEO GREETINGS — rotating greeting videos, right after the hero.
+          Hidden via the admin toggle (showVideoGreetings) without deleting them. */}
+      {showVideoGreetings && (
         <section className="vidgreet" id="video-greetings" aria-label="Video greetings">
           <div className="vidgreet__inner">
             <div className="vidgreet__head">
@@ -663,6 +699,10 @@ export default function HomePage() {
           </div>
         </section>
       )}
+
+      {/* EVENTS — directly under the video greetings, or in the after-hero slot
+          when those are hidden. */}
+      {upcomingSection}
 
       {/* STATS */}
       <section className="stats" aria-label="At a glance">
@@ -692,25 +732,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* EVENTS */}
-      <section className="events" id="events" aria-label="Upcoming events">
-        <div className="events__inner">
-          <div className="events__head">
-            <h3 className="events__title">Upcoming &amp; <em>in session.</em></h3>
-            <span className="events__feed">
-              <span className="live-dot" aria-hidden="true" />
-              <span>Denominational Feed</span>
-            </span>
-          </div>
-          {upcomingEvents.length > 0 ? (
-            <EventsCarousel events={upcomingEvents} />
-          ) : (
-            <div className="events__empty reveal">
-              <p>Upcoming events &amp; dispatches will be posted here as the General Assembly and the presbyteries convene.</p>
-            </div>
-          )}
-        </div>
-      </section>
+      {/* RECENT EVENTS — Facebook-style album feed of past gatherings */}
+      <RecentEvents posts={recentPosts} />
 
       <Divider />
 

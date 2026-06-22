@@ -31,3 +31,37 @@ describe("getSettings('seminaries')", () => {
     expect(await getSettings('seminaries')).toEqual([{ id: 'ptscas' }]);
   });
 });
+
+describe("getSettings('recent-events')", () => {
+  beforeEach(() => { getSettingMock.mockReset(); });
+
+  it('returns [] when the doc is missing', async () => {
+    getSettingMock.mockResolvedValue(null);
+    expect(await getSettings('recent-events')).toEqual([]);
+  });
+
+  it('returns [] when the doc is an empty object', async () => {
+    getSettingMock.mockResolvedValue({});
+    expect(await getSettings('recent-events')).toEqual([]);
+  });
+
+  it('returns the posts array when present', async () => {
+    const posts = [{ id: 're-1', caption: 'Hello', photos: ['u1'], createdAt: 1 }];
+    getSettingMock.mockResolvedValue(posts);
+    expect(await getSettings('recent-events')).toEqual(posts);
+  });
+});
+
+describe("getSettings('video-greetings-enabled')", () => {
+  beforeEach(() => { getSettingMock.mockReset(); });
+
+  it('passes the raw flag object through (not an array key)', async () => {
+    getSettingMock.mockResolvedValue({ enabled: false });
+    expect(await getSettings('video-greetings-enabled')).toEqual({ enabled: false });
+  });
+
+  it('returns null when the flag doc is missing', async () => {
+    getSettingMock.mockResolvedValue(null);
+    expect(await getSettings('video-greetings-enabled')).toBeNull();
+  });
+});
