@@ -7,10 +7,13 @@ service firebase.storage {
     // fallback, BUT the Storage->Firestore cross-service call proved unreliable
     // on this project (it returned false for a valid admin and 403'd every
     // browser upload), so the claim is the real gate.
-    // Granting the claim: set { admin: true } on the user (Admin SDK
-    // setCustomUserClaims) — the user then re-logs in to refresh their token.
-    // A new admin added via the Admins page must sign in once, then get the
-    // claim. (TODO: a Firestore trigger on admins/{email} could automate this.)
+    // Granting the claim is automated by Cloud Functions (functions/adminClaims.js):
+    // onAdminWritten sets it when an admins/{email} doc is created/updated (and
+    // strips it on delete), and onAuthUserCreated sets it when a pre-listed admin
+    // signs in for the first time. The client refreshes its ID token before each
+    // upload (uploadFile), so a freshly-granted claim takes effect without a
+    // manual sign-out. Admins that predate these triggers: run
+    // functions/scripts/backfill-admin-claims.js once.
     function isAdmin() {
       return request.auth != null
         && (request.auth.token.admin == true
