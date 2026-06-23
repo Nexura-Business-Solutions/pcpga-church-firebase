@@ -38,7 +38,9 @@ import {
     Quote,
     Trash2,
     X,
-    ExternalLink
+    ExternalLink,
+    Newspaper,
+    Pin
 } from 'lucide-react';
 
 // Labels name the public site section each tab edits (the old one-word metaphor
@@ -58,8 +60,14 @@ const TABS = [
     { id: 'announcement', label: 'Announcement Popup', icon: Bell },
     { id: 'events', label: 'Upcoming Events', icon: CalendarDays },
     { id: 'videos', label: 'Video Greetings', icon: Film },
-    { id: 'recent', label: 'Recent Events', icon: ImagePlus }
+    { id: 'recent', label: 'Recent Events', icon: ImagePlus },
+    { id: 'editors', label: "Editor's Corner", icon: Newspaper }
 ];
+
+// Editor's Corner stays live for one week from the moment it's posted, then the
+// public section auto-hides it (gated on expiresAt). Single source of truth for
+// the window so the admin's "expires on" stamp matches the homepage's gate.
+const EDITORS_CORNER_DURATION_MS = 7 * 24 * 60 * 60 * 1000;
 
 // Shared field styles. Padding is responsive (smaller on phones) so long values
 // aren't clipped on narrow screens. Long-content fields use the textarea variant
@@ -158,6 +166,12 @@ export default function AdminContent() {
     const [videoGreetings, setVideoGreetings] = useState([]);
     const [vgEnabled, setVgEnabled] = useState(true);
     const [recentEvents, setRecentEvents] = useState([]);
+    const [editorsCorner, setEditorsCorner] = useState({});
+    const [postingCorner, setPostingCorner] = useState(false);
+    // Ticking clock for the Editor's Corner countdown/expiry status (re-checked
+    // every minute) — kept in state so the render stays pure (no Date.now() call
+    // during render) and the "days left" / "expired" badge updates on its own.
+    const [nowTs, setNowTs] = useState(() => Date.now());
     const [welcomeOfficers, setWelcomeOfficers] = useState([]);
     const [showPopupPreview, setShowPopupPreview] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
@@ -198,11 +212,20 @@ export default function AdminContent() {
             setVgEnabled(vge?.enabled !== false); // default ON when the flag doc is missing
             const re = await getSettings('recent-events');
             setRecentEvents(Array.isArray(re) ? re : []);
+            const ec = await getSettings('editors-corner');
+            setEditorsCorner(ec && typeof ec === 'object' && !Array.isArray(ec) ? ec : {});
             const wo = await getSettings('welcome-officers');
             setWelcomeOfficers(Array.isArray(wo) ? wo : []);
             setLoading(false);
         }
         load();
+    }, []);
+
+    // Tick the Editor's Corner clock once a minute so its live/expired status
+    // stays current without a reload.
+    useEffect(() => {
+        const t = setInterval(() => setNowTs(Date.now()), 60 * 1000);
+        return () => clearInterval(t);
     }, []);
 
     const handleSave = async () => {
@@ -315,7 +338,7 @@ export default function AdminContent() {
         // Validate by kind. Images (announcement, event poster, video-greeting
         // poster, welcome-officer photo) are capped small; greeting videos accept
         // video files up to 50 MB — for longer clips the admin pastes a link.
-        if (target === 'announcement' || isEvent || isVgPoster || isWoPhoto) {
+        if (target === 'announcement' || isEvent || isVgPoster || isWoPhoto || target === 'editors-corner') {
             if (!file.type.startsWith('image/')) {
                 toast.error('Please choose an image file (JPG, PNG, WEBP, GIF).');
                 return;
@@ -372,7 +395,9 @@ export default function AdminContent() {
             const path = `content/${folder}/${Date.now()}-${safeName}`;
             const url = await uploadFile(path, file);
             if (target === 'hero') setHero({ ...hero, heroImage: url });
-            else if (target === 'announcement') {
+            else if (target === 'editors-corner') {
+                setEditorsCorner((prev) => ({ ...prev, imageUrl: url }));
+            } else if (target === 'announcement') {
                 setAnnouncement({ ...announcement, mediaUrl: url, mediaType: 'image' });
             } else if (isEvent) {
                 const idx = parseInt(target.split('-')[1], 10);
@@ -449,6 +474,46 @@ export default function AdminContent() {
         const ok = await saveSettings('announcement', bumped);
         if (ok) toast.success('Re-published — all visitors will see the popup again ✦');
         else toast.error('Could not re-publish the popup.');
+    };
+
+    // Editor's Corner — a single featured image+caption pinned to the homepage.
+    // Unlike the other sections, it persists through its OWN actions (not the
+    // global Save), because posting stamps the 1-week timer: postedAt = now,
+    // expiresAt = now + 7 days. Re-posting restarts the week.
+    const handlePostEditorsCorner = async () => {
+        if (!editorsCorner.imageUrl) {
+            return toast.error('Add an image first, then post.');
+        }
+        setPostingCorner(true);
+        const now = Date.now();
+        const doc = {
+            imageUrl: editorsCorner.imageUrl,
+            caption: (editorsCorner.caption || '').trim(),
+            postedAt: now,
+            expiresAt: now + EDITORS_CORNER_DURATION_MS,
+        };
+        const ok = await saveSettings('editors-corner', doc);
+        setPostingCorner(false);
+        if (ok) {
+            setEditorsCorner(doc);
+            toast.success('Posted to Editor’s Corner ✦ Live for 1 week.');
+        } else {
+            toast.error('Could not post to Editor’s Corner.');
+        }
+    };
+
+    const handleClearEditorsCorner = async () => {
+        if (!confirm('Clear the Editor’s Corner now? The homepage section will be empty until you post again.')) return;
+        setPostingCorner(true);
+        const cleared = { imageUrl: '', caption: '', postedAt: 0, expiresAt: 0 };
+        const ok = await saveSettings('editors-corner', cleared);
+        setPostingCorner(false);
+        if (ok) {
+            setEditorsCorner(cleared);
+            toast.success('Editor’s Corner cleared.');
+        } else {
+            toast.error('Could not clear the Editor’s Corner.');
+        }
     };
 
     // Video Greetings helpers — a capped, reorderable list shown after the hero.
@@ -2066,6 +2131,118 @@ export default function AdminContent() {
                                         )}
                                     </div>
                                 )}
+
+                                {/* EDITOR'S CORNER TAB (single featured, self-expiring post) */}
+                                {activeTab === 'editors' && (() => {
+                                    const ecNow = nowTs;
+                                    const DAY = 24 * 60 * 60 * 1000;
+                                    const hasImage = !!editorsCorner.imageUrl;
+                                    const live = hasImage && editorsCorner.expiresAt && ecNow < editorsCorner.expiresAt;
+                                    const expired = hasImage && editorsCorner.expiresAt && ecNow >= editorsCorner.expiresAt;
+                                    const daysLeft = live ? Math.ceil((editorsCorner.expiresAt - ecNow) / DAY) : 0;
+                                    const fmt = (ms) => new Date(ms).toLocaleDateString('en-PH', { day: 'numeric', month: 'long', year: 'numeric' });
+                                    return (
+                                        <div className="space-y-8">
+                                            {/* Header */}
+                                            <div className="flex items-start gap-4 p-6 bg-[hsl(var(--admin-bg-alt))] rounded-2xl border border-[hsl(var(--admin-border))]">
+                                                <div className="w-12 h-12 rounded-2xl bg-coral/10 flex items-center justify-center flex-shrink-0">
+                                                    <Newspaper className="w-5 h-5 text-coral" />
+                                                </div>
+                                                <div>
+                                                    <h3 className="text-[hsl(var(--admin-text))] font-bold text-base mb-1">Editor&rsquo;s Corner</h3>
+                                                    <p className="text-[hsl(var(--admin-text-dim))] text-xs leading-relaxed max-w-md">
+                                                        One <strong>featured image + caption</strong> pinned near the top of the homepage. Only <strong>one</strong> is ever shown. It stays live for <strong>1 week</strong> from when you post, then the section <strong>auto-clears</strong> until you post a new one. Posting again restarts the week.
+                                                    </p>
+                                                </div>
+                                            </div>
+
+                                            {/* Live status banner */}
+                                            <div className={`flex items-center gap-3 p-4 rounded-2xl border ${live ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : expired ? 'bg-amber-50 border-amber-200 text-amber-700' : 'bg-[hsl(var(--admin-bg-alt))] border-[hsl(var(--admin-border))] text-[hsl(var(--admin-text-dim))]'}`}>
+                                                <Clock className="w-4 h-4 flex-shrink-0" />
+                                                <p className="text-xs font-semibold">
+                                                    {live && <>Live now — {daysLeft} {daysLeft === 1 ? 'day' : 'days'} left · auto-clears on {fmt(editorsCorner.expiresAt)}.</>}
+                                                    {expired && <>This post expired on {fmt(editorsCorner.expiresAt)} and is no longer shown. Post again to feature something new.</>}
+                                                    {!live && !expired && <>Nothing posted yet. Add an image and a caption below, then press Post.</>}
+                                                </p>
+                                            </div>
+
+                                            {/* Image */}
+                                            <div className="relative group" onDragOver={allowDrop} onDrop={(e) => handleDrop(e, 'editors-corner')}>
+                                                <div className={`w-full aspect-[16/9] rounded-[2.5rem] border-2 border-dashed overflow-hidden transition-all duration-500 flex items-center justify-center ${editorsCorner.imageUrl ? 'border-coral/40 bg-coral/5' : 'border-[hsl(var(--admin-border))] hover:border-coral/40'}`}>
+                                                    {isUploading ? (
+                                                        <div className="flex flex-col items-center gap-4">
+                                                            <div className="w-8 h-8 rounded-full border-2 border-coral border-t-transparent animate-spin" />
+                                                            <p className="text-coral text-[10px] font-bold uppercase tracking-widest">Uploading Photo...</p>
+                                                        </div>
+                                                    ) : editorsCorner.imageUrl ? (
+                                                        <img src={editorsCorner.imageUrl} alt="Editor's Corner preview" className="w-full h-full object-contain bg-black" />
+                                                    ) : (
+                                                        <div className="text-center p-8">
+                                                            <ImagePlus className="w-10 h-10 text-coral/30 mx-auto mb-3" />
+                                                            <p className="text-[hsl(var(--admin-text-dim))] text-[10px] font-bold uppercase tracking-widest opacity-40 mb-2">No image yet</p>
+                                                            <p className="text-[hsl(var(--admin-text-dim))]/40 text-[9px] uppercase tracking-widest">Drag a photo here or use the button below</p>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/40 backdrop-blur-sm rounded-[2.5rem]">
+                                                    <div className="flex flex-col items-center gap-4">
+                                                        <label className="cursor-pointer px-10 py-4 bg-white text-coral text-[11px] font-bold uppercase tracking-widest rounded-2xl hover:scale-105 transition-all">
+                                                            {editorsCorner.imageUrl ? 'Replace Image' : 'Upload Image'}
+                                                            <input type="file" accept=".jpg,.jpeg,.png,.webp,.gif" className="hidden" onChange={(e) => handleImageUpload(e.target.files[0], 'editors-corner')} />
+                                                        </label>
+                                                        {editorsCorner.imageUrl && (
+                                                            <button
+                                                                onClick={(e) => { e.stopPropagation(); setEditorsCorner((prev) => ({ ...prev, imageUrl: '' })); }}
+                                                                className="text-white text-[9px] font-bold uppercase tracking-widest hover:text-red-400 transition-colors"
+                                                            >
+                                                                Remove Image
+                                                            </button>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* Caption */}
+                                            <div>
+                                                <label className="block text-coral text-[10px] tracking-[0.25em] uppercase mb-3 font-bold">Caption</label>
+                                                <textarea
+                                                    rows={3}
+                                                    value={editorsCorner.caption || ''}
+                                                    onChange={(e) => setEditorsCorner((prev) => ({ ...prev, caption: e.target.value }))}
+                                                    placeholder="A short note to go with the image…"
+                                                    className={FIELD_TEXTAREA_CLS}
+                                                />
+                                            </div>
+
+                                            {/* Actions — self-contained (do NOT use the global Save bar) */}
+                                            <div className="flex flex-col sm:flex-row gap-3 pt-2">
+                                                <button
+                                                    onClick={handlePostEditorsCorner}
+                                                    disabled={postingCorner || isUploading || !editorsCorner.imageUrl}
+                                                    className="flex-1 h-14 px-8 rounded-2xl bg-coral text-white text-[11px] font-bold uppercase tracking-[0.2em] shadow-lg hover:shadow-coral/30 transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2.5"
+                                                >
+                                                    {postingCorner ? (
+                                                        <><div className="w-4 h-4 rounded-full border-2 border-white border-t-transparent animate-spin" /> Working…</>
+                                                    ) : (
+                                                        <><Pin className="w-4 h-4" /> {live ? 'Re-post (restart the week)' : 'Post to Editor’s Corner'}</>
+                                                    )}
+                                                </button>
+                                                {hasImage && (
+                                                    <button
+                                                        onClick={handleClearEditorsCorner}
+                                                        disabled={postingCorner}
+                                                        className="h-14 px-8 rounded-2xl border border-[hsl(var(--admin-border))] text-[11px] font-bold uppercase tracking-[0.2em] text-red-500 hover:bg-red-50 transition-all active:scale-95 disabled:opacity-40 flex items-center justify-center gap-2.5"
+                                                    >
+                                                        <Trash2 className="w-4 h-4" /> Clear now
+                                                    </button>
+                                                )}
+                                            </div>
+                                            <p className="text-[hsl(var(--admin-text-dim))] text-[11px] leading-relaxed -mt-2">
+                                                Posting here saves on its own — you don&rsquo;t need the <strong>Save changes</strong> button at the bottom for this section.
+                                            </p>
+                                        </div>
+                                    );
+                                })()}
 
                                 {/* WELCOME OFFICERS TAB ("A Word of Welcome") */}
                                 {activeTab === 'welcome' && (

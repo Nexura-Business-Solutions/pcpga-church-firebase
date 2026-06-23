@@ -6,6 +6,7 @@ import { PRESBYTERY_COLOR } from '../lib/presbyteryMap.js';
 import AnnouncementModal from '../components/AnnouncementModal.jsx';
 import EventsCarousel from '../components/EventsCarousel.jsx';
 import RecentEvents from '../components/RecentEvents.jsx';
+import EditorsCorner from '../components/EditorsCorner.jsx';
 import VideoCarousel from '../components/VideoCarousel.jsx';
 import WelcomeCarousel from '../components/WelcomeCarousel.jsx';
 import MobileScrollAids from '../components/MobileScrollAids.jsx';
@@ -225,8 +226,8 @@ export default function HomePage() {
   useEffect(() => {
     let active = true;
     (async () => {
-      const keys = ['hero', 'site-identity', 'mission-vision', 'core-principles', 'invitation-stats', 'announcement', 'standing-committees', 'presbyteries', 'upcoming-events', 'welcome-officers', 'video-greetings', 'video-greetings-enabled', 'recent-events'];
-      const [hero, identity, mv, msg, stats, ann, committees, pres, events, welcomeOfficers, videoGreetings, vgEnabled, recentEvents, sermons] = await Promise.all([
+      const keys = ['hero', 'site-identity', 'mission-vision', 'core-principles', 'invitation-stats', 'announcement', 'standing-committees', 'presbyteries', 'upcoming-events', 'welcome-officers', 'video-greetings', 'video-greetings-enabled', 'recent-events', 'editors-corner'];
+      const [hero, identity, mv, msg, stats, ann, committees, pres, events, welcomeOfficers, videoGreetings, vgEnabled, recentEvents, editorsCorner, sermons] = await Promise.all([
         ...keys.map((k) => getSettings(k)), getSermons(),
       ]);
       if (active) setCms({
@@ -238,6 +239,7 @@ export default function HomePage() {
         videoGreetings: Array.isArray(videoGreetings) ? videoGreetings : [],
         vgEnabled: vgEnabled || {},
         recentEvents: Array.isArray(recentEvents) ? recentEvents : [],
+        editorsCorner: editorsCorner || {},
         sermons: Array.isArray(sermons) ? sermons : [],
       });
     })();
@@ -703,6 +705,10 @@ export default function HomePage() {
       {/* EVENTS — directly under the video greetings, or in the after-hero slot
           when those are hidden. */}
       {upcomingSection}
+
+      {/* EDITOR'S CORNER — a single featured image+caption the admin pins for a
+          week; self-expires (renders nothing once past expiresAt). */}
+      <EditorsCorner post={cms.editorsCorner} />
 
       {/* STATS */}
       <section className="stats" aria-label="At a glance">
