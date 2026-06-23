@@ -2523,18 +2523,19 @@ body.lp-v3 .edcorner__zoom {
 }
 body.lp-v3 .edcorner__frame:hover .edcorner__zoom { opacity: 1; }
 body.lp-v3 .edcorner__body { padding: clamp(1.25rem, 3vw, 1.9rem) clamp(1.25rem, 3.5vw, 2.4rem); }
-/* Title — a serif display headline (the prominent line). */
+/* Title — uses the site's standard display-heading format (mirrors .display:
+   serif, light weight, tight tracking, italic brass for any <em>). */
 body.lp-v3 .edcorner__post-title {
   font-family: var(--font-serif);
-  font-weight: 600;
+  font-weight: 300;
   font-style: normal;
-  font-size: clamp(1.5rem, 3vw, 2.15rem);
-  line-height: 1.15;
-  letter-spacing: -0.01em;
+  font-size: clamp(1.6rem, 2.6vw, 2.4rem);
+  letter-spacing: -0.025em;
+  line-height: 1.05;
   color: var(--ink);
   margin: 0 0 0.7rem;
 }
-body.lp-v3 .edcorner__post-title em { font-style: italic; color: var(--brass); }
+body.lp-v3 .edcorner__post-title em { font-style: italic; font-weight: 400; color: var(--brass); }
 /* Caption — deliberately a DIFFERENT theme from the title: smaller, upright
    sans body text in a muted ink, so the two never read as the same font. */
 body.lp-v3 .edcorner__caption {
