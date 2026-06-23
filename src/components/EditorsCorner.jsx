@@ -1,18 +1,32 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-// A single, featured "Editor's Corner" post — one image + caption that the admin
-// pins to the homepage for a week. Unlike Recent Events (a growing album feed),
-// only ONE post is ever live here, and it self-expires: the admin stamps
-// `expiresAt` at post time, and once that passes the section renders nothing
-// until a new post replaces it. The expiry is enforced client-side (no scheduled
-// function needed) — the same gate the admin panel shows as "Expired".
+// Resolve the single live post from the Editor's Corner doc. The doc is a
+// library — { posts: [{id,title,caption,imageUrl}], liveId, postedAt, expiresAt }
+// — with at most one featured (liveId). Falls back to the older single-doc
+// shape ({imageUrl,caption,...}) so data written before the library change still
+// renders. Returns null when nothing is featured.
+function resolveLivePost(doc) {
+  if (!doc || typeof doc !== 'object') return null;
+  if (Array.isArray(doc.posts)) {
+    if (!doc.liveId) return null;
+    const p = doc.posts.find((x) => x && x.id === doc.liveId);
+    if (!p) return null;
+    return { title: p.title || '', caption: p.caption || '', imageUrl: p.imageUrl || '', postedAt: doc.postedAt, expiresAt: doc.expiresAt };
+  }
+  return { title: doc.title || '', caption: doc.caption || '', imageUrl: doc.imageUrl || '', postedAt: doc.postedAt, expiresAt: doc.expiresAt };
+}
+
+// A single, featured "Editor's Corner" post — one image + title + caption the
+// admin pins to the homepage for a week. It self-expires: the admin stamps
+// `expiresAt` when featuring, and once that passes the section renders nothing
+// until a new post is featured. Expiry is enforced client-side (no scheduled
+// function) — the same gate the admin panel shows as "Expired".
 export default function EditorsCorner({ post }) {
   const [enlarged, setEnlarged] = useState(false);
 
   // Re-check expiry on an interval so a page left open across the 1-week mark
-  // clears itself instead of lingering until the next reload. `now` drives the
-  // gate below; 60s granularity is plenty for a week-long window.
+  // clears itself instead of lingering until the next reload.
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
     const t = setInterval(() => setNow(Date.now()), 60 * 1000);
@@ -31,15 +45,17 @@ export default function EditorsCorner({ post }) {
     };
   }, [enlarged]);
 
-  const imageUrl = typeof post?.imageUrl === 'string' ? post.imageUrl.trim() : '';
-  const expiresAt = Number(post?.expiresAt) || 0;
+  const live = resolveLivePost(post);
+  const imageUrl = typeof live?.imageUrl === 'string' ? live.imageUrl.trim() : '';
+  const expiresAt = Number(live?.expiresAt) || 0;
 
-  // Nothing pinned, no image, or the week is up → the corner is empty (renders
-  // nothing). It comes back the moment the admin posts something new.
+  // Nothing featured, no image, or the week is up → the corner is empty (renders
+  // nothing). It comes back the moment the admin features a post.
   if (!imageUrl || !expiresAt || now >= expiresAt) return null;
 
-  const caption = (post.caption || '').trim();
-  const postedAt = Number(post.postedAt) || 0;
+  const title = (live.title || '').trim();
+  const caption = (live.caption || '').trim();
+  const postedAt = Number(live.postedAt) || 0;
   const postedLabel = postedAt
     ? new Date(postedAt).toLocaleDateString('en-PH', { day: 'numeric', month: 'long', year: 'numeric' })
     : '';
@@ -62,11 +78,12 @@ export default function EditorsCorner({ post }) {
             onClick={() => setEnlarged(true)}
             aria-label="Enlarge image"
           >
-            <img src={imageUrl} alt={caption || "Editor's Corner"} loading="lazy" decoding="async" />
+            <img src={imageUrl} alt={title || caption || "Editor's Corner"} loading="lazy" decoding="async" />
             <span className="edcorner__zoom" aria-hidden="true">⤢</span>
           </button>
-          {(caption || postedLabel) && (
+          {(title || caption || postedLabel) && (
             <figcaption className="edcorner__body">
+              {title && <h4 className="edcorner__post-title">{title}</h4>}
               {caption && <p className="edcorner__caption">{caption}</p>}
               {postedLabel && (
                 <p className="edcorner__meta">
@@ -91,7 +108,7 @@ export default function EditorsCorner({ post }) {
             onClick={() => setEnlarged(false)}
           >
             <button type="button" className="evcar__lightbox-close" aria-label="Close">×</button>
-            <img src={imageUrl} alt={caption || "Editor's Corner"} onClick={(e) => e.stopPropagation()} />
+            <img src={imageUrl} alt={title || caption || "Editor's Corner"} onClick={(e) => e.stopPropagation()} />
           </motion.div>
         )}
       </AnimatePresence>

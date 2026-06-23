@@ -251,7 +251,11 @@ export default function HomePage() {
   // paints a broken slide; the section's length>0 gate then falls back to the
   // empty-state copy when nothing has a poster yet.
   const upcomingEvents = (Array.isArray(cms.events) ? cms.events : [])
-    .filter((ev) => ev && typeof ev.imageUrl === 'string' && ev.imageUrl.trim() !== '');
+    .filter((ev) => ev && typeof ev.imageUrl === 'string' && ev.imageUrl.trim() !== '')
+    // An event the admin toggled off stays in the data but is hidden from the
+    // site (so it can be switched back on later). `enabled` is undefined for
+    // older events → treat missing as ON.
+    .filter((ev) => ev.enabled !== false);
   // Video greetings — rotating greeting videos (uploaded MP4 or YouTube link),
   // shown right after the hero. Drop rows without a source.
   const videoGreetings = (Array.isArray(cms.videoGreetings) ? cms.videoGreetings : [])
