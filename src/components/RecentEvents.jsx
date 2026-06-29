@@ -1,38 +1,72 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-// Recent events feed. Each post is now a Facebook post embedded inline via
-// Facebook's official Embedded Posts plugin — the admin pastes a public FB
-// post link and the actual post (photos + text) renders right here on the
-// site, so visitors never have to leave for Facebook. Older posts that still
+// Recent events feed. Each post is now a Facebook post embedded inline — the
+// admin pastes a public FB post link and the actual post (photos + text)
+// renders right here on the site, so the images show without any clicking and
+// the embed itself links through to the real post. Older posts that still
 // carry uploaded `photos` keep rendering as the original album grid below, so
 // nothing already published is lost.
 
-// --- Facebook SDK (loaded once, lazily) ---------------------------------
-// The SDK turns every <div class="fb-post"> into a real, auto-sized embed.
-// No app token is required for PUBLIC posts. fb-root must exist before parse.
-const FB_SDK_SRC = 'https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v19.0';
-let fbSdkPromise = null;
-function loadFbSdk() {
-    if (typeof window === 'undefined') return Promise.resolve();
-    if (window.FB) return Promise.resolve();
-    if (fbSdkPromise) return fbSdkPromise;
-    fbSdkPromise = new Promise((resolve) => {
-        if (!document.getElementById('fb-root')) {
-            const root = document.createElement('div');
-            root.id = 'fb-root';
-            document.body.prepend(root);
-        }
-        const s = document.createElement('script');
-        s.src = FB_SDK_SRC;
-        s.async = true;
-        s.defer = true;
-        s.crossOrigin = 'anonymous';
-        s.onload = () => resolve();
-        s.onerror = () => resolve(); // fail soft — the link fallback still shows
-        document.body.appendChild(s);
-    });
-    return fbSdkPromise;
+// We embed via Facebook's iframe plugin (plugins/post.php) rather than the JS
+// SDK: the iframe is rendered server-side by Facebook, so it works even when an
+// ad-blocker or privacy setting blocks the SDK script (which would otherwise
+// leave only a "View on Facebook" fallback link). No app token is needed for
+// PUBLIC posts.
+function buildFbSrc(url, width) {
+    const enc = encodeURIComponent(url);
+    const isVideo = /\/(videos?|reel)\//i.test(url) || /\/watch\/?\?/i.test(url) || /fb\.watch/i.test(url);
+    const base = isVideo
+        ? 'https://www.facebook.com/plugins/video.php'
+        : 'https://www.facebook.com/plugins/post.php';
+    const w = Math.round(width);
+    // Generous height so single-photo posts show in full without clipping; FaceBook
+    // letterboxes shorter posts. Videos keep a 16:9-ish frame.
+    const h = isVideo ? Math.round(w * 0.62) + 130 : w + 360;
+    return `${base}?href=${enc}&show_text=true&width=${w}&height=${h}`;
+}
+
+// One embedded Facebook post. Measures its container so the embed is responsive
+// (FB bakes the width into the iframe URL, so we must re-request on resize).
+function FacebookEmbed({ url }) {
+    const wrapRef = useRef(null);
+    const [width, setWidth] = useState(500);
+    useEffect(() => {
+        const el = wrapRef.current;
+        if (!el) return undefined;
+        const measure = () => setWidth(Math.max(280, Math.min(500, el.clientWidth)));
+        measure();
+        const ro = new ResizeObserver(measure);
+        ro.observe(el);
+        return () => ro.disconnect();
+    }, []);
+    const isVideo = /\/(videos?|reel)\//i.test(url) || /\/watch\/?\?/i.test(url) || /fb\.watch/i.test(url);
+    const height = isVideo ? Math.round(width * 0.62) + 130 : width + 360;
+    return (
+        <div className="recent__embed" ref={wrapRef}>
+            <iframe
+                title="Facebook post"
+                src={buildFbSrc(url, width)}
+                width={width}
+                height={height}
+                className="recent__embed-frame"
+                style={{ border: 'none', overflow: 'hidden' }}
+                scrolling="no"
+                frameBorder="0"
+                allowFullScreen
+                allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+                loading="lazy"
+            />
+            <a
+                className="recent__embed-link"
+                href={url}
+                target="_blank"
+                rel="noopener noreferrer"
+            >
+                Open on Facebook ↗
+            </a>
+        </div>
+    );
 }
 
 const MAX_TILES = 4; // legacy photo-album posts only
@@ -82,21 +116,6 @@ export default function RecentEvents({ posts = [] }) {
         }))
         .filter((p) => p.fbUrl !== '' || p.photos.length > 0);
 
-    // Key changes whenever the set of embedded links changes — re-parse XFBML
-    // so newly-added/removed embeds render without a full reload.
-    const embedKey = valid.filter((p) => p.fbUrl).map((p) => p.fbUrl).join('|');
-    const feedRef = useRef(null);
-    useEffect(() => {
-        if (!embedKey) return undefined;
-        let cancelled = false;
-        loadFbSdk().then(() => {
-            if (cancelled) return;
-            // Parse only our subtree so we don't disturb the rest of the page.
-            window.FB?.XFBML?.parse(feedRef.current || undefined);
-        });
-        return () => { cancelled = true; };
-    }, [embedKey]);
-
     // lightbox: { photos: string[], index: number } | null (legacy albums)
     const [lightbox, setLightbox] = useState(null);
     const step = (dir) => setLightbox((lb) => stepLightbox(lb, dir));
@@ -131,26 +150,12 @@ export default function RecentEvents({ posts = [] }) {
                         <p>Updates from recent gatherings will be posted here as the presbyteries and congregations meet.</p>
                     </div>
                 ) : (
-                    <div className="recent__feed" ref={feedRef}>
+                    <div className="recent__feed">
                         {valid.map((post) => (
                             <article className="recent__post reveal" key={post.id}>
                                 {post.caption && <p className="recent__caption">{post.caption}</p>}
                                 {post.fbUrl ? (
-                                    <div className="recent__embed">
-                                        <div
-                                            className="fb-post"
-                                            data-href={post.fbUrl}
-                                            data-width="500"
-                                            data-lazy="true"
-                                        >
-                                            {/* Fallback shown until/if the SDK renders the embed. */}
-                                            <blockquote cite={post.fbUrl} className="recent__embed-fallback">
-                                                <a href={post.fbUrl} target="_blank" rel="noopener noreferrer">
-                                                    View this post on Facebook
-                                                </a>
-                                            </blockquote>
-                                        </div>
-                                    </div>
+                                    <FacebookEmbed url={post.fbUrl} />
                                 ) : (
                                     <PhotoGrid
                                         photos={post.photos}

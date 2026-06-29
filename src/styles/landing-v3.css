@@ -2632,25 +2632,28 @@ body.lp-v3 .recent__caption {
   margin: 0 0 1.1rem;
   white-space: pre-wrap;
 }
-/* Embedded Facebook post — the FB SDK injects a fixed-width iframe; center it
-   and let it shrink to the card on narrow screens. */
+/* Embedded Facebook post — a server-rendered FB iframe. Center it and let the
+   measured width keep it inside the card on narrow screens. */
 body.lp-v3 .recent__embed {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
 }
-body.lp-v3 .recent__embed .fb-post {
+body.lp-v3 .recent__embed-frame {
   max-width: 100%;
+  background: #fff;
+  border-radius: 8px;
 }
-body.lp-v3 .recent__embed-fallback {
-  margin: 0;
-  padding: 1rem 0;
-  text-align: center;
+body.lp-v3 .recent__embed-link {
+  margin-top: 0.75rem;
   font-family: var(--font-sans);
-  font-size: 0.95rem;
-}
-body.lp-v3 .recent__embed-fallback a {
-  color: var(--brass);
+  font-size: 0.8rem;
   font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--brass);
+  text-decoration: none;
+}
+body.lp-v3 .recent__embed-link:hover {
   text-decoration: underline;
 }
 body.lp-v3 .recent__grid {
