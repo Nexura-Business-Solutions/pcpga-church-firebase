@@ -2486,6 +2486,11 @@ body.lp-v3 .edcorner__card {
   border-top: 3px solid var(--brass);
   box-shadow: 0 18px 50px -28px rgba(44, 24, 16, 0.55);
 }
+/* Editor's Corner now embeds a Facebook post; give it breathing room inside
+   the card (the legacy image frame below stays for older image posts). */
+body.lp-v3 .edcorner__embed {
+  padding: clamp(1.25rem, 3.5vw, 2.2rem) clamp(1rem, 3vw, 2rem) 0.5rem;
+}
 body.lp-v3 .edcorner__frame {
   position: relative;
   display: block;
@@ -2632,19 +2637,20 @@ body.lp-v3 .recent__caption {
   margin: 0 0 1.1rem;
   white-space: pre-wrap;
 }
-/* Embedded Facebook post — a server-rendered FB iframe. Center it and let the
-   measured width keep it inside the card on narrow screens. */
-body.lp-v3 .recent__embed {
+/* Embedded Facebook post — a server-rendered FB iframe (shared by Recent Events
+   and Editor's Corner). Center it and let the measured width keep it inside the
+   card on narrow screens. */
+body.lp-v3 .fbembed {
   display: flex;
   flex-direction: column;
   align-items: center;
 }
-body.lp-v3 .recent__embed-frame {
+body.lp-v3 .fbembed__frame {
   max-width: 100%;
   background: #fff;
   border-radius: 8px;
 }
-body.lp-v3 .recent__embed-link {
+body.lp-v3 .fbembed__link {
   margin-top: 0.75rem;
   font-family: var(--font-sans);
   font-size: 0.8rem;
@@ -2653,7 +2659,7 @@ body.lp-v3 .recent__embed-link {
   color: var(--brass);
   text-decoration: none;
 }
-body.lp-v3 .recent__embed-link:hover {
+body.lp-v3 .fbembed__link:hover {
   text-decoration: underline;
 }
 body.lp-v3 .recent__grid {

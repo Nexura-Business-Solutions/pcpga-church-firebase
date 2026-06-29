@@ -1,27 +1,29 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import FacebookEmbed from './FacebookEmbed.jsx';
 
 // Resolve the single live post from the Editor's Corner doc. The doc is a
-// library — { posts: [{id,title,caption,imageUrl}], liveId, postedAt, expiresAt }
-// — with at most one featured (liveId). Falls back to the older single-doc
-// shape ({imageUrl,caption,...}) so data written before the library change still
-// renders. Returns null when nothing is featured.
+// library — { posts: [{id,title,caption,fbUrl,imageUrl}], liveId, postedAt,
+// expiresAt } — with at most one featured (liveId). Falls back to the older
+// single-doc shape so data written before the library change still renders.
+// Returns null when nothing is featured.
 function resolveLivePost(doc) {
   if (!doc || typeof doc !== 'object') return null;
   if (Array.isArray(doc.posts)) {
     if (!doc.liveId) return null;
     const p = doc.posts.find((x) => x && x.id === doc.liveId);
     if (!p) return null;
-    return { title: p.title || '', caption: p.caption || '', imageUrl: p.imageUrl || '', postedAt: doc.postedAt, expiresAt: doc.expiresAt };
+    return { title: p.title || '', caption: p.caption || '', fbUrl: p.fbUrl || '', imageUrl: p.imageUrl || '', postedAt: doc.postedAt, expiresAt: doc.expiresAt };
   }
-  return { title: doc.title || '', caption: doc.caption || '', imageUrl: doc.imageUrl || '', postedAt: doc.postedAt, expiresAt: doc.expiresAt };
+  return { title: doc.title || '', caption: doc.caption || '', fbUrl: doc.fbUrl || '', imageUrl: doc.imageUrl || '', postedAt: doc.postedAt, expiresAt: doc.expiresAt };
 }
 
-// A single, featured "Editor's Corner" post — one image + title + caption the
-// admin pins to the homepage for a week. It self-expires: the admin stamps
-// `expiresAt` when featuring, and once that passes the section renders nothing
-// until a new post is featured. Expiry is enforced client-side (no scheduled
-// function) — the same gate the admin panel shows as "Expired".
+// A single, featured "Editor's Corner" post — a Facebook post (embedded inline)
+// plus a title + caption the admin pins to the homepage for a week. It
+// self-expires: the admin stamps `expiresAt` when featuring, and once that
+// passes the section renders nothing until a new post is featured. Expiry is
+// enforced client-side (no scheduled function) — the same gate the admin panel
+// shows as "Expired". Older image-based posts still render their uploaded image.
 export default function EditorsCorner({ post }) {
   const [enlarged, setEnlarged] = useState(false);
 
@@ -33,7 +35,7 @@ export default function EditorsCorner({ post }) {
     return () => clearInterval(t);
   }, []);
 
-  // Esc closes the enlarged view.
+  // Esc closes the enlarged view (legacy image posts only).
   useEffect(() => {
     if (!enlarged) return undefined;
     const onKey = (e) => { if (e.key === 'Escape') setEnlarged(false); };
@@ -46,12 +48,13 @@ export default function EditorsCorner({ post }) {
   }, [enlarged]);
 
   const live = resolveLivePost(post);
+  const fbUrl = typeof live?.fbUrl === 'string' ? live.fbUrl.trim() : '';
   const imageUrl = typeof live?.imageUrl === 'string' ? live.imageUrl.trim() : '';
   const expiresAt = Number(live?.expiresAt) || 0;
 
-  // Nothing featured, no image, or the week is up → the corner is empty (renders
-  // nothing). It comes back the moment the admin features a post.
-  if (!imageUrl || !expiresAt || now >= expiresAt) return null;
+  // Nothing featured, no content, or the week is up → the corner is empty
+  // (renders nothing). It comes back the moment the admin features a post.
+  if ((!fbUrl && !imageUrl) || !expiresAt || now >= expiresAt) return null;
 
   const title = (live.title || '').trim();
   const caption = (live.caption || '').trim();
@@ -72,15 +75,21 @@ export default function EditorsCorner({ post }) {
         </div>
 
         <figure className="edcorner__card reveal">
-          <button
-            type="button"
-            className="edcorner__frame"
-            onClick={() => setEnlarged(true)}
-            aria-label="Enlarge image"
-          >
-            <img src={imageUrl} alt={title || caption || "Editor's Corner"} loading="lazy" decoding="async" />
-            <span className="edcorner__zoom" aria-hidden="true">⤢</span>
-          </button>
+          {fbUrl ? (
+            <div className="edcorner__embed">
+              <FacebookEmbed url={fbUrl} />
+            </div>
+          ) : (
+            <button
+              type="button"
+              className="edcorner__frame"
+              onClick={() => setEnlarged(true)}
+              aria-label="Enlarge image"
+            >
+              <img src={imageUrl} alt={title || caption || "Editor's Corner"} loading="lazy" decoding="async" />
+              <span className="edcorner__zoom" aria-hidden="true">⤢</span>
+            </button>
+          )}
           {(title || caption || postedLabel) && (
             <figcaption className="edcorner__body">
               {title && <h4 className="edcorner__post-title">{title}</h4>}
@@ -97,7 +106,7 @@ export default function EditorsCorner({ post }) {
       </div>
 
       <AnimatePresence>
-        {enlarged && (
+        {enlarged && imageUrl && (
           <motion.div
             className="evcar__lightbox"
             role="dialog"

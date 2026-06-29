@@ -70,12 +70,13 @@ const TABS = [
 // the window so the admin's "expires on" stamp matches the homepage's gate.
 const EDITORS_CORNER_DURATION_MS = 7 * 24 * 60 * 60 * 1000;
 
-// Editor's Corner is a LIBRARY of posts ({id,title,caption,imageUrl,createdAt})
-// with at most one featured at a time (liveId + the shared postedAt/expiresAt
-// window). Unposting/expiry/deletion never loses a post — it stays in the
-// library to be re-featured. normalizeCorner also upgrades the old single-doc
-// shape ({imageUrl,caption,...}) into a one-post library so existing data and
-// any already-posted item survive this change.
+// Editor's Corner is a LIBRARY of posts ({id,title,caption,fbUrl,imageUrl,
+// createdAt}) with at most one featured at a time (liveId + the shared
+// postedAt/expiresAt window). A post is now a Facebook post link (fbUrl) that
+// embeds on the homepage; older image-based posts keep their imageUrl and still
+// render. Unposting/expiry/deletion never loses a post — it stays in the library
+// to be re-featured. normalizeCorner also upgrades the old single-doc shape into
+// a one-post library so existing data and any already-posted item survive.
 function normalizeCorner(ec) {
     const empty = { posts: [], liveId: '', postedAt: 0, expiresAt: 0 };
     if (!ec || typeof ec !== 'object' || Array.isArray(ec)) return empty;
@@ -85,6 +86,7 @@ function normalizeCorner(ec) {
                 id: p.id || `ec-${p.createdAt || 0}-${Math.random().toString(36).slice(2, 7)}`,
                 title: p.title || '',
                 caption: p.caption || '',
+                fbUrl: p.fbUrl || '',
                 imageUrl: p.imageUrl || '',
                 createdAt: Number(p.createdAt) || 0,
             })),
@@ -93,11 +95,11 @@ function normalizeCorner(ec) {
             expiresAt: Number(ec.expiresAt) || 0,
         };
     }
-    // Legacy single-doc → one post, kept live if it carried an image.
-    if (ec.imageUrl) {
+    // Legacy single-doc → one post, kept live if it carried content.
+    if (ec.fbUrl || ec.imageUrl) {
         const id = `ec-legacy-${ec.postedAt || 0}`;
         return {
-            posts: [{ id, title: ec.title || '', caption: ec.caption || '', imageUrl: ec.imageUrl, createdAt: Number(ec.postedAt) || 0 }],
+            posts: [{ id, title: ec.title || '', caption: ec.caption || '', fbUrl: ec.fbUrl || '', imageUrl: ec.imageUrl || '', createdAt: Number(ec.postedAt) || 0 }],
             liveId: id,
             postedAt: Number(ec.postedAt) || 0,
             expiresAt: Number(ec.expiresAt) || 0,
@@ -534,7 +536,7 @@ export default function AdminContent() {
         const id = `ec-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
         persistCorner({
             ...editorsCorner,
-            posts: [{ id, title: '', caption: '', imageUrl: '', createdAt: Date.now() }, ...(editorsCorner.posts || [])],
+            posts: [{ id, title: '', caption: '', fbUrl: '', imageUrl: '', createdAt: Date.now() }, ...(editorsCorner.posts || [])],
         });
     };
     // Text edits update local state only (controlled inputs); they're flushed to
@@ -552,7 +554,7 @@ export default function AdminContent() {
     };
     const featureCornerPost = (id) => {
         const post = (editorsCorner.posts || []).find((p) => p.id === id);
-        if (!post || !post.imageUrl) return toast.error('Add an image to this post first, then feature it.');
+        if (!post || !(post.fbUrl || post.imageUrl)) return toast.error('Add a Facebook link to this post first, then feature it.');
         const now = Date.now();
         persistCorner({ ...editorsCorner, liveId: id, postedAt: now, expiresAt: now + EDITORS_CORNER_DURATION_MS });
         toast.success('Featured on the homepage ✦ Live for 1 week.');
@@ -2168,7 +2170,7 @@ export default function AdminContent() {
                                                 <div>
                                                     <h3 className="text-[hsl(var(--admin-text))] font-bold text-base mb-1">Editor&rsquo;s Corner</h3>
                                                     <p className="text-[hsl(var(--admin-text-dim))] text-xs leading-relaxed max-w-lg">
-                                                        A <strong>library</strong> of posts (image + title + caption). Only the one you <strong>Feature</strong> shows on the homepage, for <strong>1 week</strong> — then it auto-clears. Unposting, expiry, or deleting one never loses the others: they wait here so you can <strong>feature an old one again</strong> anytime. Text edits save automatically when you click away.
+                                                        A <strong>library</strong> of posts (Facebook link + title + caption). Paste a <strong>public Facebook post link</strong> and it embeds on the homepage. Only the one you <strong>Feature</strong> shows, for <strong>1 week</strong> — then it auto-clears. Unposting, expiry, or deleting one never loses the others: they wait here so you can <strong>feature an old one again</strong> anytime. Text edits save automatically when you click away.
                                                     </p>
                                                 </div>
                                             </div>
@@ -2192,7 +2194,7 @@ export default function AdminContent() {
                                             {posts.length === 0 ? (
                                                 <AdminEmptyState
                                                     title="No posts yet"
-                                                    description="Create your first Editor's Corner post — add an image, a title, and a caption, then feature it on the homepage."
+                                                    description="Create your first Editor's Corner post — paste a Facebook post link, add a title and caption, then feature it on the homepage."
                                                     icon={<Newspaper className="w-12 h-12 text-coral/20" />}
                                                     actionText="Add Post"
                                                     onAction={addCornerPost}
@@ -2218,46 +2220,59 @@ export default function AdminContent() {
                                                                     <button onClick={() => deleteCornerPost(p.id)} className="p-2 rounded-xl text-red-500 hover:bg-red-50 transition-colors" aria-label="Delete post"><Trash2 className="w-4 h-4" /></button>
                                                                 </div>
 
-                                                                <div className="flex flex-col sm:flex-row gap-5">
-                                                                    {/* Image */}
-                                                                    <div className="relative w-full sm:w-56 aspect-[16/10] rounded-2xl overflow-hidden border-2 border-dashed border-coral/20 shrink-0 bg-[hsl(var(--admin-bg))] group/img" onDragOver={allowDrop} onDrop={(e) => handleDrop(e, `corner-${p.id}`)}>
-                                                                        {p.imageUrl ? (
-                                                                            <img src={p.imageUrl} alt={p.title || 'Editor’s Corner'} className="w-full h-full object-cover" />
+                                                                <div className="space-y-4">
+                                                                    {/* Facebook post link */}
+                                                                    <div>
+                                                                        <label className="block text-coral text-[9px] tracking-[0.25em] uppercase mb-2 font-bold">Facebook post link</label>
+                                                                        <div className="relative">
+                                                                            <Link2 className="w-4 h-4 text-[hsl(var(--admin-text-dim))] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                                                                            <input
+                                                                                type="url"
+                                                                                inputMode="url"
+                                                                                value={p.fbUrl || ''}
+                                                                                onChange={(e) => updateCornerPost(p.id, { fbUrl: e.target.value })}
+                                                                                onBlur={flushCorner}
+                                                                                placeholder="https://www.facebook.com/.../posts/..."
+                                                                                className="w-full bg-[hsl(var(--admin-bg))] border border-[hsl(var(--admin-text))]/20 rounded-2xl py-3 pl-10 pr-3.5 text-sm font-medium focus:ring-2 focus:ring-coral/20 outline-none transition-all"
+                                                                            />
+                                                                        </div>
+                                                                        {p.fbUrl ? (
+                                                                            <a href={p.fbUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 mt-2 text-[10px] font-bold uppercase tracking-widest text-coral hover:underline">
+                                                                                <ExternalLink className="w-3 h-3" /> Open link to check
+                                                                            </a>
                                                                         ) : (
-                                                                            <div className="w-full h-full flex flex-col items-center justify-center text-coral/30 gap-2">
-                                                                                <ImagePlus className="w-6 h-6" />
-                                                                                <span className="text-[9px] font-bold uppercase tracking-widest">Image</span>
-                                                                            </div>
+                                                                            <p className="text-[hsl(var(--admin-text-dim))] text-[11px] mt-2 leading-relaxed">
+                                                                                Open the post on Facebook, tap <strong>···</strong> → <strong>Copy link</strong>, then paste it here. The post must be <strong>Public</strong> to show on the site.
+                                                                            </p>
                                                                         )}
-                                                                        <label className="absolute inset-0 bg-black/45 flex items-center justify-center opacity-0 group-hover/img:opacity-100 transition-opacity cursor-pointer">
-                                                                            <span className="text-white text-[10px] font-bold uppercase tracking-widest">{p.imageUrl ? 'Replace' : 'Upload'}</span>
-                                                                            <input type="file" accept=".jpg,.jpeg,.png,.webp,.gif" className="hidden" onChange={(e) => handleImageUpload(e.target.files[0], `corner-${p.id}`)} />
-                                                                        </label>
+                                                                        {!p.fbUrl && p.imageUrl && (
+                                                                            <p className="text-amber-600 text-[11px] mt-2 leading-relaxed">
+                                                                                This older post uses an uploaded image. Add a Facebook link above to switch it to an embedded post.
+                                                                            </p>
+                                                                        )}
                                                                     </div>
 
                                                                     {/* Title + caption */}
-                                                                    <div className="flex-1 space-y-4">
-                                                                        <div>
-                                                                            <label className="block text-coral text-[9px] tracking-[0.25em] uppercase mb-2 font-bold">Title</label>
-                                                                            <input
-                                                                                value={p.title || ''}
-                                                                                onChange={(e) => updateCornerPost(p.id, { title: e.target.value })}
-                                                                                onBlur={flushCorner}
-                                                                                placeholder="e.g. From the Editor’s desk"
-                                                                                className="w-full bg-[hsl(var(--admin-bg))] border border-[hsl(var(--admin-text))]/20 rounded-2xl p-4 text-sm font-semibold focus:ring-2 focus:ring-coral/20 outline-none transition-all"
-                                                                            />
-                                                                        </div>
-                                                                        <div>
-                                                                            <label className="block text-coral text-[9px] tracking-[0.25em] uppercase mb-2 font-bold">Caption</label>
-                                                                            <textarea
-                                                                                rows={3}
-                                                                                value={p.caption || ''}
-                                                                                onChange={(e) => updateCornerPost(p.id, { caption: e.target.value })}
-                                                                                onBlur={flushCorner}
-                                                                                placeholder="A short note to go with the image…"
-                                                                                className="w-full bg-[hsl(var(--admin-bg))] border border-[hsl(var(--admin-text))]/20 rounded-2xl p-3.5 text-sm font-medium focus:ring-2 focus:ring-coral/20 outline-none transition-all resize-y leading-relaxed"
-                                                                            />
-                                                                        </div>
+                                                                    <div>
+                                                                        <label className="block text-coral text-[9px] tracking-[0.25em] uppercase mb-2 font-bold">Title</label>
+                                                                        <input
+                                                                            value={p.title || ''}
+                                                                            onChange={(e) => updateCornerPost(p.id, { title: e.target.value })}
+                                                                            onBlur={flushCorner}
+                                                                            placeholder="e.g. From the Editor’s desk"
+                                                                            className="w-full bg-[hsl(var(--admin-bg))] border border-[hsl(var(--admin-text))]/20 rounded-2xl p-4 text-sm font-semibold focus:ring-2 focus:ring-coral/20 outline-none transition-all"
+                                                                        />
+                                                                    </div>
+                                                                    <div>
+                                                                        <label className="block text-coral text-[9px] tracking-[0.25em] uppercase mb-2 font-bold">Caption</label>
+                                                                        <textarea
+                                                                            rows={3}
+                                                                            value={p.caption || ''}
+                                                                            onChange={(e) => updateCornerPost(p.id, { caption: e.target.value })}
+                                                                            onBlur={flushCorner}
+                                                                            placeholder="A short note to go with the post…"
+                                                                            className="w-full bg-[hsl(var(--admin-bg))] border border-[hsl(var(--admin-text))]/20 rounded-2xl p-3.5 text-sm font-medium focus:ring-2 focus:ring-coral/20 outline-none transition-all resize-y leading-relaxed"
+                                                                        />
                                                                     </div>
                                                                 </div>
 
@@ -2271,7 +2286,7 @@ export default function AdminContent() {
                                                                             <button onClick={unpostCorner} className="h-12 px-6 rounded-2xl border border-[hsl(var(--admin-border))] text-[11px] font-bold uppercase tracking-[0.2em] text-[hsl(var(--admin-text-dim))] hover:bg-[hsl(var(--admin-bg))] transition-all active:scale-95">Unpost</button>
                                                                         </>
                                                                     ) : (
-                                                                        <button onClick={() => featureCornerPost(p.id)} disabled={!p.imageUrl || isUploading} className="flex-1 h-12 px-6 rounded-2xl bg-coral text-white text-[11px] font-bold uppercase tracking-[0.2em] shadow-lg hover:shadow-coral/30 transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2.5">
+                                                                        <button onClick={() => featureCornerPost(p.id)} disabled={!(p.fbUrl || p.imageUrl) || isUploading} className="flex-1 h-12 px-6 rounded-2xl bg-coral text-white text-[11px] font-bold uppercase tracking-[0.2em] shadow-lg hover:shadow-coral/30 transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2.5">
                                                                             <Pin className="w-4 h-4" /> {isExpiredLive ? 'Re-post (restart week)' : 'Feature on site'}
                                                                         </button>
                                                                     )}
