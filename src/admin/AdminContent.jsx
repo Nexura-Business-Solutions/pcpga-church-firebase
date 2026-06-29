@@ -39,6 +39,7 @@ import {
     Trash2,
     X,
     ExternalLink,
+    Link2,
     Newspaper,
     Pin
 } from 'lucide-react';
@@ -589,13 +590,13 @@ export default function AdminContent() {
     // Detect a direct (uploaded) video file vs a YouTube/link, for the editor preview.
     const isVideoFileUrl = (url) => /\.(mp4|webm|mov|m4v)(\?|$)/i.test(String(url || ''));
 
-    // Recent Events helpers — a Facebook-style album feed. Each post carries a
-    // caption + up to MAX_RECENT_PHOTOS photos. New posts prepend (newest first);
-    // the public feed renders posts in this stored order.
-    const MAX_RECENT_PHOTOS = 10;
+    // Recent Events helpers — a feed of embedded Facebook posts. Each post is
+    // just a public FB post LINK (+ optional caption); the public feed embeds it
+    // inline via Facebook's plugin, so no photo upload is needed. New posts
+    // prepend (newest first); the public feed renders posts in this stored order.
     const addPost = () => {
         const id = `re-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
-        setRecentEvents([{ id, caption: '', photos: [], createdAt: Date.now() }, ...recentEvents]);
+        setRecentEvents([{ id, fbUrl: '', caption: '', photos: [], createdAt: Date.now() }, ...recentEvents]);
     };
     const updatePost = (i, patch) => {
         setRecentEvents((prev) => prev.map((p, idx) => (idx === i ? { ...p, ...patch } : p)));
@@ -612,67 +613,6 @@ export default function AdminContent() {
             return next;
         });
     };
-    const removePhoto = (postIdx, photoIdx) => {
-        setRecentEvents((prev) => prev.map((p, idx) => (
-            idx === postIdx ? { ...p, photos: p.photos.filter((_, k) => k !== photoIdx) } : p
-        )));
-    };
-    const movePhoto = (postIdx, photoIdx, dir) => {
-        const j = photoIdx + dir;
-        setRecentEvents((prev) => prev.map((p, idx) => {
-            if (idx !== postIdx) return p;
-            if (j < 0 || j >= p.photos.length) return p;
-            const photos = [...p.photos];
-            [photos[photoIdx], photos[j]] = [photos[j], photos[photoIdx]];
-            return { ...p, photos };
-        }));
-    };
-    // Multi-file album upload — appends to a post's photos, capped at 10. Separate
-    // from handleImageUpload because that one replaces a single field by index;
-    // here we accept several files at once and push onto an array.
-    const handlePhotosUpload = async (postIdx, fileList) => {
-        const files = Array.from(fileList || []);
-        if (!files.length) return;
-        const current = recentEvents[postIdx]?.photos?.length || 0;
-        const room = MAX_RECENT_PHOTOS - current;
-        if (room <= 0) {
-            toast.error(`Up to ${MAX_RECENT_PHOTOS} photos per post.`);
-            return;
-        }
-        const toUpload = files.slice(0, room);
-        if (files.length > room) {
-            toast(`Only ${room} more photo(s) added — max ${MAX_RECENT_PHOTOS} per post.`);
-        }
-        setIsUploading(true);
-        try {
-            for (const file of toUpload) {
-                if (!file.type.startsWith('image/')) {
-                    toast.error('Please choose image files (JPG, PNG, WEBP, GIF).');
-                    continue;
-                }
-                if (file.size > 10 * 1024 * 1024) {
-                    toast.error(`${file.name}: image must be 10 MB or smaller.`);
-                    continue;
-                }
-                const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
-                const url = await uploadFile(`content/recent-events/${Date.now()}-${safeName}`, file);
-                setRecentEvents((prev) => prev.map((p, idx) => (
-                    idx === postIdx ? { ...p, photos: [...p.photos, url].slice(0, MAX_RECENT_PHOTOS) } : p
-                )));
-            }
-            toast.success('Photos uploaded ✦');
-        } catch (err) {
-            toast.error(err?.code ? `${err.message} (${err.code})` : (err?.message || 'Upload failed'));
-        } finally {
-            setIsUploading(false);
-        }
-    };
-    const handlePhotosDrop = (e, postIdx) => {
-        e.preventDefault();
-        const dropped = e.dataTransfer?.files;
-        if (dropped?.length) handlePhotosUpload(postIdx, dropped);
-    };
-
     // Welcome Officers helpers — the "A Word of Welcome" carousel in the Message
     // section. Only officers that carry a message render on the site.
     const MAX_WELCOME_OFFICERS = 8;
@@ -2124,7 +2064,7 @@ export default function AdminContent() {
                                             <div>
                                                 <h3 className="text-[hsl(var(--admin-text))] font-bold text-base mb-1">Recent Events Feed</h3>
                                                 <p className="text-[hsl(var(--admin-text-dim))] text-xs leading-relaxed max-w-md">
-                                                    A <strong>Facebook-style feed</strong> of photos from recent gatherings, shown lower on the homepage. Each post has a <strong>caption</strong> and up to <strong>{MAX_RECENT_PHOTOS} photos</strong>. New posts appear first. Drag photos in (or from your phone), then click <strong>Update</strong> below to publish.
+                                                    A feed of your <strong>Facebook posts</strong>, shown lower on the homepage. Just paste a <strong>public Facebook post link</strong> and the post itself (photos + text) shows right on the site — visitors don&rsquo;t leave for Facebook. Add an optional caption, then click <strong>Update</strong> below to publish.
                                                 </p>
                                             </div>
                                         </div>
@@ -2132,8 +2072,8 @@ export default function AdminContent() {
                                         {recentEvents.length === 0 ? (
                                             <AdminEmptyState
                                                 title="No Recent Events"
-                                                description="Create a post and upload photos to start the feed."
-                                                icon={<ImagePlus className="w-12 h-12 text-coral/20" />}
+                                                description="Add a post and paste a Facebook post link to start the feed."
+                                                icon={<Link2 className="w-12 h-12 text-coral/20" />}
                                                 actionText="Add Post"
                                                 onAction={addPost}
                                             />
@@ -2162,29 +2102,37 @@ export default function AdminContent() {
                                                         </div>
 
                                                         <div>
-                                                            <label className="flex items-center justify-between text-coral text-[9px] tracking-[0.25em] uppercase mb-2 font-bold">
-                                                                <span>Photos</span>
-                                                                <span className="text-[hsl(var(--admin-text-dim))]">{(post.photos || []).length}/{MAX_RECENT_PHOTOS}</span>
-                                                            </label>
-                                                            <div className="flex flex-wrap gap-3" onDragOver={allowDrop} onDrop={(e) => handlePhotosDrop(e, i)}>
-                                                                {(post.photos || []).map((url, k) => (
-                                                                    <div key={url || k} className="relative w-24 h-24 rounded-2xl overflow-hidden border border-[hsl(var(--admin-border))] bg-[hsl(var(--admin-bg))] group/photo">
-                                                                        <img src={url} alt="" className="w-full h-full object-cover" />
-                                                                        <button onClick={() => removePhoto(i, k)} className="absolute top-1 right-1 w-6 h-6 rounded-full bg-black/60 text-white flex items-center justify-center opacity-0 group-hover/photo:opacity-100 transition-opacity hover:bg-red-500" aria-label="Remove photo"><X className="w-3.5 h-3.5" /></button>
-                                                                        <div className="absolute bottom-1 left-1 right-1 flex justify-between opacity-0 group-hover/photo:opacity-100 transition-opacity">
-                                                                            <button onClick={() => movePhoto(i, k, -1)} disabled={k === 0} className="w-6 h-6 rounded-lg bg-black/60 text-white flex items-center justify-center disabled:opacity-20 hover:bg-coral" aria-label="Move photo left">‹</button>
-                                                                            <button onClick={() => movePhoto(i, k, 1)} disabled={k === post.photos.length - 1} className="w-6 h-6 rounded-lg bg-black/60 text-white flex items-center justify-center disabled:opacity-20 hover:bg-coral" aria-label="Move photo right">›</button>
-                                                                        </div>
-                                                                    </div>
-                                                                ))}
-                                                                {(post.photos || []).length < MAX_RECENT_PHOTOS && (
-                                                                    <label className="w-24 h-24 rounded-2xl border-2 border-dashed border-coral/20 bg-[hsl(var(--admin-bg))] flex flex-col items-center justify-center gap-1.5 text-coral/40 cursor-pointer hover:bg-coral/5 hover:text-coral transition-colors">
-                                                                        <ImagePlus className="w-5 h-5" />
-                                                                        <span className="text-[8px] font-bold uppercase tracking-widest text-center leading-tight">Add<br />photos</span>
-                                                                        <input type="file" accept=".jpg,.jpeg,.png,.webp,.gif" multiple className="hidden" onChange={(e) => { handlePhotosUpload(i, e.target.files); e.target.value = ''; }} />
-                                                                    </label>
-                                                                )}
+                                                            <label className="block text-coral text-[9px] tracking-[0.25em] uppercase mb-2 font-bold">Facebook post link</label>
+                                                            <div className="relative">
+                                                                <Link2 className="w-4 h-4 text-[hsl(var(--admin-text-dim))] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                                                                <input
+                                                                    type="url"
+                                                                    inputMode="url"
+                                                                    value={post.fbUrl || ''}
+                                                                    onChange={(e) => updatePost(i, { fbUrl: e.target.value })}
+                                                                    placeholder="https://www.facebook.com/.../posts/..."
+                                                                    className="w-full bg-[hsl(var(--admin-bg))] border border-[hsl(var(--admin-text))]/20 rounded-2xl py-3 pl-10 pr-3.5 text-sm font-medium focus:ring-2 focus:ring-coral/20 outline-none transition-all"
+                                                                />
                                                             </div>
+                                                            {post.fbUrl ? (
+                                                                <a
+                                                                    href={post.fbUrl}
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    className="inline-flex items-center gap-1.5 mt-2 text-[10px] font-bold uppercase tracking-widest text-coral hover:underline"
+                                                                >
+                                                                    <ExternalLink className="w-3 h-3" /> Open link to check
+                                                                </a>
+                                                            ) : (
+                                                                <p className="text-[hsl(var(--admin-text-dim))] text-[11px] mt-2 leading-relaxed">
+                                                                    Open the post on Facebook, tap the <strong>···</strong> menu → <strong>Copy link</strong>, then paste it here. The post must be <strong>Public</strong> to show on the site.
+                                                                </p>
+                                                            )}
+                                                            {(post.photos || []).length > 0 && (
+                                                                <p className="text-amber-600 text-[11px] mt-3 leading-relaxed">
+                                                                    This older post still has {(post.photos || []).length} uploaded photo(s). Adding a Facebook link above will show the embedded post instead.
+                                                                </p>
+                                                            )}
                                                         </div>
                                                     </div>
                                                 ))}
