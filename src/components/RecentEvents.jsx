@@ -1,73 +1,13 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import FacebookEmbed from './FacebookEmbed.jsx';
 
 // Recent events feed. Each post is now a Facebook post embedded inline — the
 // admin pastes a public FB post link and the actual post (photos + text)
-// renders right here on the site, so the images show without any clicking and
-// the embed itself links through to the real post. Older posts that still
-// carry uploaded `photos` keep rendering as the original album grid below, so
-// nothing already published is lost.
-
-// We embed via Facebook's iframe plugin (plugins/post.php) rather than the JS
-// SDK: the iframe is rendered server-side by Facebook, so it works even when an
-// ad-blocker or privacy setting blocks the SDK script (which would otherwise
-// leave only a "View on Facebook" fallback link). No app token is needed for
-// PUBLIC posts.
-function buildFbSrc(url, width) {
-    const enc = encodeURIComponent(url);
-    const isVideo = /\/(videos?|reel)\//i.test(url) || /\/watch\/?\?/i.test(url) || /fb\.watch/i.test(url);
-    const base = isVideo
-        ? 'https://www.facebook.com/plugins/video.php'
-        : 'https://www.facebook.com/plugins/post.php';
-    const w = Math.round(width);
-    // Generous height so single-photo posts show in full without clipping; FaceBook
-    // letterboxes shorter posts. Videos keep a 16:9-ish frame.
-    const h = isVideo ? Math.round(w * 0.62) + 130 : w + 360;
-    return `${base}?href=${enc}&show_text=true&width=${w}&height=${h}`;
-}
-
-// One embedded Facebook post. Measures its container so the embed is responsive
-// (FB bakes the width into the iframe URL, so we must re-request on resize).
-function FacebookEmbed({ url }) {
-    const wrapRef = useRef(null);
-    const [width, setWidth] = useState(500);
-    useEffect(() => {
-        const el = wrapRef.current;
-        if (!el) return undefined;
-        const measure = () => setWidth(Math.max(280, Math.min(500, el.clientWidth)));
-        measure();
-        const ro = new ResizeObserver(measure);
-        ro.observe(el);
-        return () => ro.disconnect();
-    }, []);
-    const isVideo = /\/(videos?|reel)\//i.test(url) || /\/watch\/?\?/i.test(url) || /fb\.watch/i.test(url);
-    const height = isVideo ? Math.round(width * 0.62) + 130 : width + 360;
-    return (
-        <div className="recent__embed" ref={wrapRef}>
-            <iframe
-                title="Facebook post"
-                src={buildFbSrc(url, width)}
-                width={width}
-                height={height}
-                className="recent__embed-frame"
-                style={{ border: 'none', overflow: 'hidden' }}
-                scrolling="no"
-                frameBorder="0"
-                allowFullScreen
-                allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
-                loading="lazy"
-            />
-            <a
-                className="recent__embed-link"
-                href={url}
-                target="_blank"
-                rel="noopener noreferrer"
-            >
-                Open on Facebook ↗
-            </a>
-        </div>
-    );
-}
+// renders right here on the site (see FacebookEmbed), so the images show
+// without any clicking and the embed itself links through to the real post.
+// Older posts that still carry uploaded `photos` keep rendering as the original
+// album grid below, so nothing already published is lost.
 
 const MAX_TILES = 4; // legacy photo-album posts only
 
