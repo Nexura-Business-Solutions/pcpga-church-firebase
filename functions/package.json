@@ -20,6 +20,6 @@
     "firebase-functions": "^7.3.2"
   },
   "devDependencies": {
-    "vitest": "^4.1.11"
+    "vitest": "^4.1.12"
   }
 }
